@@ -1,7 +1,7 @@
 ---
-title: "Google Ads Management: Process & Best Practices"
+title: "Google Ads: Campaign Management, Setup and Reporting"
 sidebarTitle: "Google Ads"
-description: "Internal guide for managing Google Ads campaigns at Hellenic Technologies. Covers account setup, campaign structure, bidding strategies, optimization routines, and client reporting."
+description: "Internal guide for Google Ads campaign management at Hellenic Technologies. Covers setup, structure, bidding, weekly optimisation, and reporting."
 ---
 
 Hellenic Technologies manages Google Ads across Search, Display, Shopping, and YouTube for 100+ clients globally. This guide walks through the standard processes for account setup, campaign management, weekly optimisation routines, and reporting — ensuring every Paid Media Specialist and Account Manager follows a consistent, high-quality delivery standard.
@@ -71,29 +71,31 @@ For weekly performance campaign reports, use the condensed weekly template in th
 
 ## Common Issues
 
-<Accordion title="Campaign not spending its budget">
-  This is usually caused by one or more of the following:
+<AccordionGroup>
+  <Accordion title="Campaign not spending its budget">
+    This is usually caused by one or more of the following:
 
-  - **Bid strategy too conservative** — if using Target CPA or Target ROAS, the targets may be too tight for the algorithm to spend. Try relaxing targets slightly or switch to Maximise Conversions temporarily.
-  - **Targeting too narrow** — review geographic targeting, audience restrictions, and keyword match types. Broadening match types or expanding locations can unlock spend.
-  - **Low Quality Score** — a poor QS means Google won't enter your ads into auctions competitively. Improve ad relevance, expected CTR, and landing page experience.
-  - **Ad disapprovals** — check the Ads & Extensions tab for any disapproved ads. Resolve policy issues promptly.
-</Accordion>
+    - **Bid strategy too conservative** — if using Target CPA or Target ROAS, the targets may be too tight for the algorithm to spend. Try relaxing targets slightly or switch to Maximise Conversions temporarily.
+    - **Targeting too narrow** — review geographic targeting, audience restrictions, and keyword match types. Broadening match types or expanding locations can unlock spend.
+    - **Low Quality Score** — a poor QS means Google won't enter your ads into auctions competitively. Improve ad relevance, expected CTR, and landing page experience.
+    - **Ad disapprovals** — check the Ads & Extensions tab for any disapproved ads. Resolve policy issues promptly.
+  </Accordion>
 
-<Accordion title="High cost per lead (CPL)">
-  High CPL typically points to one of three areas:
+  <Accordion title="High cost per lead (CPL)">
+    High CPL typically points to one of three areas:
 
-  - **Keyword targeting** — review whether keywords are too broad or attracting irrelevant traffic. Tighten match types or refine your negative keyword list.
-  - **Landing page quality** — a poor post-click experience kills conversion rate. Check landing page load speed, message match with the ad, and clarity of the CTA. Escalate to the Web Dev team if structural changes are needed.
-  - **Audience targeting** — if running Display or PMax, ensure audience signals are well-defined. Exclude audiences that are consistently non-converting.
-</Accordion>
+    - **Keyword targeting** — review whether keywords are too broad or attracting irrelevant traffic. Tighten match types or refine your negative keyword list.
+    - **Landing page quality** — a poor post-click experience kills conversion rate. Check landing page load speed, message match with the ad, and clarity of the CTA. Escalate to the Web Dev team if structural changes are needed.
+    - **Audience targeting** — if running Display or PMax, ensure audience signals are well-defined. Exclude audiences that are consistently non-converting.
+  </Accordion>
 
-<Accordion title="Conversion tracking not firing">
-  Before raising a bug, work through this checklist:
+  <Accordion title="Conversion tracking not firing">
+    Before raising a bug, work through this checklist:
 
-  1. Confirm the GTM container is published and the tag is set to the correct trigger.
-  2. Use GTM Preview mode and/or the Google Tag Assistant Chrome extension to verify the tag fires on the intended action.
-  3. Check that the conversion action in Google Ads is set to "Every conversion" or "One conversion" as appropriate.
-  4. Confirm auto-tagging is enabled on the Google Ads account.
-  5. If the issue persists, raise a task for the Web Analytics team with a screen recording showing the GTM Preview output.
-</Accordion>
+    1. Confirm the GTM container is published and the tag is set to the correct trigger.
+    2. Use GTM Preview mode and/or the Google Tag Assistant Chrome extension to verify the tag fires on the intended action.
+    3. Check that the conversion action in Google Ads is set to "Every conversion" or "One conversion" as appropriate.
+    4. Confirm auto-tagging is enabled on the Google Ads account.
+    5. If the issue persists, raise a task for the Web Analytics team with a screen recording showing the GTM Preview output.
+  </Accordion>
+</AccordionGroup>
