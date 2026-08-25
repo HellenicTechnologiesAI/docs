@@ -1,0 +1,67 @@
+---
+title: "AI Assistants: Setup, Configuration & Delivery Guide"
+sidebarTitle: "AI Assistants"
+description: "Internal guide for delivering the hellenicAI Assistants service. Covers setup steps, configuration options, knowledge base integration, model selection, and client handover."
+---
+
+AI Assistants is the flagship service of the hellenicAI platform. These are custom AI agents deployed for clients to automate tasks, answer queries, and handle internal or customer-facing workflows — ranging from a customer support bot to an internal knowledge assistant to a sales qualification agent. This guide walks you through the end-to-end process of setting up, configuring, and handing over an AI Assistant to a client.
+
+## Setting Up an AI Assistant
+
+Follow these steps in order when delivering the AI Assistants service for a new client. Each step builds on the previous one — do not skip ahead to deployment without completing configuration and testing.
+
+<Steps>
+  <Step title="Access the hellenicAI dashboard">
+    Log in at [app.hellenicai.com](https://app.hellenicai.com) and navigate to the AI Assistants section. Make sure you are working within the correct client account if you manage multiple clients.
+  </Step>
+  <Step title="Create a new Assistant">
+    Click **New Assistant** and fill in the core identity fields: name (what the assistant will be called), persona (how it presents itself), and purpose (a clear description of what it is designed to do). A well-defined purpose at this stage improves model behavior throughout the configuration.
+  </Step>
+  <Step title="Configure the knowledge base">
+    Upload the documents, FAQs, product sheets, policy documents, or other materials the assistant should draw from. You can also connect live data sources where available. The quality and completeness of the knowledge base is the single biggest factor in assistant accuracy — work with the client to gather comprehensive source materials before this step.
+  </Step>
+  <Step title="Select the AI model">
+    Choose the underlying model for the assistant. The platform supports Claude, GPT-4o, Gemini, Mistral, and 100+ other frontier models. For most standard use cases, use auto-selection and allow the platform to route to the optimal model. Manual selection is available when the client has a specific requirement (e.g., cost sensitivity, multilingual performance, or a preferred vendor).
+  </Step>
+  <Step title="Set guardrails, tone, and response style">
+    Define the boundaries of what the assistant will and will not answer. Configure tone (formal, friendly, technical, etc.), maximum response length, and any topic restrictions. Set the fallback response for out-of-scope queries, and configure escalation to a human agent if required.
+  </Step>
+  <Step title="Test with sample queries">
+    Run a structured set of test queries covering expected use cases, edge cases, and out-of-scope questions. Document results and refine the knowledge base, guardrails, or model settings as needed. Do not skip this step — testing catches issues before the client sees them.
+  </Step>
+  <Step title="Deploy and hand over to client">
+    Once testing is complete and the client has signed off, deploy the assistant. Share access credentials and the dashboard link with the client. Provide a brief walkthrough of how to monitor usage and submit requests for updates.
+  </Step>
+</Steps>
+
+## Configuration Options Reference
+
+The table below summarises the main configuration levers available when building an AI Assistant. Use this as a checklist during setup to ensure nothing is missed.
+
+| Setting | What It Controls |
+|---|---|
+| Model selection | Which AI model powers the assistant (auto or manual) |
+| Temperature / creativity | How varied or deterministic the assistant's responses are |
+| Max response length | Caps the length of individual responses |
+| Fallback behavior | What the assistant says when it cannot answer a query |
+| Human escalation | Whether and how the assistant hands off to a live agent |
+| Topic restrictions | Subjects the assistant is blocked from responding to |
+| Tone and persona | The voice and character the assistant adopts |
+
+<Tip>
+  Before handing over to the client, run at least 20–30 test queries that cover your expected use cases, adversarial inputs (attempts to jailbreak or confuse the assistant), and scenarios where the assistant should escalate or decline to answer. Clients notice issues fastest in the first 48 hours after go-live — thorough pre-launch testing is the best way to protect that relationship.
+</Tip>
+
+## Frequently Asked Questions
+
+<AccordionGroup>
+  <Accordion title="Which AI model should I choose?">
+    For the majority of client deployments, use the platform's **auto-selection** setting. The platform routes queries to the most appropriate model based on task type, cost, and performance. Manual model selection is appropriate when a client has a specific requirement — for example, a preference for a particular vendor, a need for a model with strong multilingual output, or a cost ceiling that rules out certain models. If you are unsure, consult the AI team before overriding auto-selection.
+  </Accordion>
+  <Accordion title="How do I update the knowledge base after launch?">
+    Navigate to the assistant's knowledge base settings in the dashboard and either re-upload updated documents or trigger a sync if the source is a connected data source. Changes take effect after the platform re-indexes the content, which typically completes within a few minutes. For major knowledge base overhauls, schedule an update during off-peak hours to avoid any brief degradation in response quality during re-indexing.
+  </Accordion>
+  <Accordion title="What if the assistant gives wrong or unexpected answers?">
+    Start by reviewing the knowledge base — inaccurate or missing source material is the most common cause of wrong answers. If the knowledge base looks correct, check the guardrails and topic configuration to see if a setting is causing unexpected behavior. Adjusting the temperature setting down can also reduce hallucination risk for fact-heavy assistants. Log the problematic query and the output, fix the root cause, and re-test before notifying the client of the resolution.
+  </Accordion>
+</AccordionGroup>

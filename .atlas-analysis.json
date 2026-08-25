@@ -1,24 +1,11 @@
 {
-  "$schema": "https://mintlify.com/docs.json",
-  "name": "Hellenic Technologies",
+  "projectType": "saas",
+  "projectName": "Hellenic Technologies Intranet",
+  "projectDescription": "Internal knowledge base for Hellenic Technologies agency staff covering services, workflows, tools, and operational processes.",
   "theme": "maple",
-  "logo": {
-    "light": "/logo/light.svg",
-    "dark": "/logo/dark.svg"
-  },
-  "favicon": "/favicon.svg",
-  "colors": {
-    "primary": "#ef7025",
-    "light": "#eec9bc",
-    "dark": "#4fa1ab"
-  },
-  "navbar": {
-    "primary": {
-      "type": "button",
-      "label": "Dashboard",
-      "href": "https://app.hellenicai.com"
-    }
-  },
+  "primaryColor": "#ef7025",
+  "lightColor": "#eec9bc",
+  "darkColor": "#4fa1ab",
   "navigation": {
     "tabs": [
       {
@@ -112,9 +99,24 @@
       }
     ]
   },
-  "footer": {
-    "socials": {
-      "linkedin": "https://linkedin.com/company/hellenic-technologies"
-    }
-  }
+  "keyFeatures": [
+    "hellenicAI platform with AI Assistants, OmniChannel Chatbot, and B2B Outreach",
+    "Full-service digital marketing including Google Ads, Meta Ads, SEO/AEO",
+    "Web development packages: Falcon, Lynx, Mammoth, and Agentic Websites",
+    "Web analytics with GTM, GA4, server-side tracking",
+    "hellenicBI data pipelines, warehouses, and dashboards",
+    "Creative design: branding, web design, packaging",
+    "Managed DevOps and cloud architecture",
+    "After-sales retainers and SLA/BAU support",
+    "GDPR-compliant EU-hosted infrastructure",
+    "Enterprise AI consulting and bespoke solutions"
+  ],
+  "publicApiSurface": [
+    "hellenicAI dashboard (app.hellenicai.com)",
+    "AI Assistants configuration",
+    "OmniChannel Chatbot deployment",
+    "B2B Outreach campaign management",
+    "Analytics dashboards",
+    "Client reporting portals"
+  ]
 }

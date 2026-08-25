@@ -1,0 +1,73 @@
+---
+title: "Web Analytics Services: GTM, GA4 & Tracking Guide"
+sidebarTitle: "Web Analytics"
+description: "Internal reference for Hellenic Technologies web analytics services. Covers GTM setup, GA4 implementation, server-side tracking, digital compliance, and audit processes."
+---
+
+The Web Analytics team implements and manages tracking for clients using Google Tag Manager, GA4, and server-side tracking. Services include analytics audits, browser tracking, server-side tracking, and digital compliance — ensuring every client has accurate, privacy-respecting data to inform their decisions.
+
+## Service Components
+
+<CardGroup cols={2}>
+  <Card title="Analytics Audit" icon="magnifying-glass-chart">
+    Review the client's existing tracking setup, identify gaps in data collection, and surface data quality issues before any new implementation begins.
+  </Card>
+  <Card title="Browser Tracking" icon="browser">
+    Client-side implementation using Google Tag Manager and GA4. Covers page views, events, conversions, and custom dimensions via the GTM web container.
+  </Card>
+  <Card title="Server-Side Tracking" icon="server">
+    GTM server-side container setup for first-party data collection, improved attribution accuracy, and reduced dependency on client-side JavaScript.
+  </Card>
+  <Card title="GA4 Configuration" icon="chart-line">
+    Full GA4 property setup including event tracking, custom dimensions, conversion configuration, and audience definitions.
+  </Card>
+  <Card title="Digital Compliance" icon="shield-check">
+    Consent management platform integration, cookie banner setup, and GDPR-compliant tag firing — including Google Consent Mode v2.
+  </Card>
+</CardGroup>
+
+## Standard Analytics Implementation
+
+Follow these steps for every new analytics engagement, from audit through to handover.
+
+<Steps>
+  <Step title="Audit Existing Tracking">
+    Review any existing GTM containers, GA4 (or UA) properties, and third-party tags. Document what's in place, what's firing incorrectly, and what data is missing. Use this as the baseline for the measurement plan.
+  </Step>
+  <Step title="Define Measurement Plan">
+    Work with the Account Manager and client to agree on KPIs, key events, and conversion actions. The measurement plan is the single source of truth for the entire implementation — get sign-off before building anything.
+  </Step>
+  <Step title="Set Up GTM Container">
+    Create or take ownership of the GTM web container. If server-side tracking is in scope, set up the server-side container at this stage (hosted via Stape.io). Ensure all workspace naming conventions and folder structures follow HT standards.
+  </Step>
+  <Step title="Implement GA4 Property">
+    Create the GA4 property and connect it to GTM via a GA4 Configuration tag. Implement all events defined in the measurement plan — custom events, enhanced measurement, eCommerce (if applicable), and any platform-specific events.
+  </Step>
+  <Step title="Configure Consent Mode">
+    Integrate with the client's consent management platform (CMP). Set up Google Consent Mode v2 (Basic or Advanced as required). Verify that tags respect consent signals and that no tracking fires before user consent where required by GDPR.
+  </Step>
+  <Step title="QA All Tags and Triggers">
+    Use GTM Preview Mode and GA4 DebugView to verify every tag fires correctly. Test across desktop and mobile browsers. Check that consent mode signals pass correctly and that blocked tags behave as expected.
+  </Step>
+  <Step title="Train Client or Provide Documentation">
+    Deliver a handover document covering what's tracked, where to find reports in GA4, and how to interpret key metrics. Where the client will manage the setup themselves, offer a short training session.
+  </Step>
+  <Step title="Hand Off to Managed Web Analytics">
+    If the client is on a Managed Web Analytics retainer, brief the managed services team on the setup, share documentation, and transfer ownership of ongoing monitoring and reporting.
+  </Step>
+</Steps>
+
+## Tools & Platforms
+
+| Tool | Purpose |
+|---|---|
+| Google Tag Manager (Web) | Client-side tag management and event tracking |
+| Google Tag Manager (Server-Side) | Server-side data collection and tag routing |
+| GA4 | Core analytics property — events, conversions, audiences |
+| Looker Studio | Client-facing dashboards and reporting |
+| BigQuery | GA4 raw data export for advanced analysis |
+| Stape.io | Server-side GTM container hosting |
+
+<Note>
+  Server-side tracking is a strong differentiator for privacy-first clients operating under GDPR. When pitching to enterprise clients — particularly those with EU audiences — lead with the server-side offering. Reference the **OMRON case study** as a proof point: Hellenic Technologies deployed privacy-first server-side tracking across 24 countries in the EMEA region, maintaining full data accuracy while achieving GDPR compliance at scale.
+</Note>

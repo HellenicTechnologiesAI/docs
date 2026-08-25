@@ -1,0 +1,81 @@
+---
+title: "Meta Ads Management: Process & Best Practices"
+sidebarTitle: "Meta Ads"
+description: "Internal reference for managing Meta (Facebook & Instagram) ad campaigns. Covers account structure, creative requirements, audience strategy, pixel setup, and optimization."
+---
+
+The Meta Ads practice manages campaigns on Facebook and Instagram for client acquisition, retargeting, and brand awareness. This guide covers everything from initial account access and pixel verification through to campaign structure, creative briefing, and ongoing optimisation — giving paid media specialists and account managers a consistent framework for delivery.
+
+## Account Structure
+
+All Meta campaigns follow a strict hierarchy. Understanding this structure is essential for correct campaign setup and reporting:
+
+```
+Business Manager
+  └── Ad Account
+        └── Campaigns        (objective: awareness, traffic, leads, sales, etc.)
+              └── Ad Sets    (audience, placement, budget, schedule)
+                    └── Ads  (creative: image, video, carousel, etc.)
+```
+
+Each client must have their own **Ad Account** inside their **Business Manager**. Never run client campaigns from the HT agency ad account. Confirm Business Manager ownership is with the client — HT should hold Partner access only.
+
+## New Client Setup
+
+<Steps>
+  <Step title="Get Access to Client's Business Manager">
+    Request Partner access to the client's Business Manager (not personal admin access). The client should add Hellenic Technologies as a Partner using the HT Business Manager ID. Confirm access to their Ad Account, Pixel, and any existing custom audiences before proceeding.
+  </Step>
+  <Step title="Verify Meta Pixel Installation and Firing">
+    Use the **Meta Pixel Helper** Chrome extension to confirm the pixel is installed on the client's website and firing the correct standard events (PageView, ViewContent, Lead, Purchase, etc.). If the pixel is missing or misconfigured, escalate to the Web Analytics team to implement via GTM. Do not launch campaigns without a verified, firing pixel.
+  </Step>
+  <Step title="Set Up Custom Audiences and Lookalikes">
+    Create the core audience set before building campaigns:
+    - Website Custom Audiences (all visitors, product/service page visitors, non-converters)
+    - Customer list Custom Audience (upload hashed CRM list from client)
+    - Lookalike Audiences based on converters or best customers (1%, 2–3%, 5% tiers)
+    Allow 24–48 hours for audiences to populate before using them in live campaigns.
+  </Step>
+  <Step title="Build Campaign Structure (TOF / MOF / BOF)">
+    Structure campaigns across the three funnel stages:
+    - **TOF (Top of Funnel)** — broad or interest-based audiences; objective: awareness or traffic
+    - **MOF (Middle of Funnel)** — website visitors, video viewers; objective: engagement or leads
+    - **BOF (Bottom of Funnel)** — retargeting warm audiences and recent site visitors; objective: conversions or catalogue sales
+    Document the full structure in the client account folder before building in Meta.
+  </Step>
+  <Step title="Brief Creative Team on Ad Formats Needed">
+    Submit a creative brief to the Creative Design team specifying: campaign objective, funnel stage, required formats and dimensions, messaging direction, CTA, and deadline. Use the standard creative brief template in the shared drive. Allow a minimum of **5 business days** for creative production — plan accordingly.
+  </Step>
+  <Step title="Launch With Small Budget, Then Scale">
+    Start each new campaign or ad set with a conservative daily budget (typically 20–30% of the intended steady-state budget). Run for 3–5 days to gather initial data before making significant budget or targeting changes. Meta's algorithm needs time to exit the learning phase — avoid editing ad sets during this window unless there is a critical issue.
+  </Step>
+</Steps>
+
+## Creative Formats
+
+Meta supports a range of ad formats. Match the format to the campaign objective and funnel stage:
+
+| Format | Best For |
+|---|---|
+| Single Image | Brand awareness, simple product/service messaging, retargeting |
+| Carousel | Multi-product showcase, step-by-step storytelling, feature highlights |
+| Video | TOF awareness, product demos, testimonials |
+| Collection | eCommerce product discovery (mobile-first) |
+| Reels | High-reach TOF campaigns; native, authentic feel performs best |
+
+Brief the creative team early and specify the format in the creative brief — do not accept static images for Reels placements.
+
+<Tip>
+  Refresh creatives every **2–3 weeks** to combat ad fatigue. Monitor frequency metrics in Ads Manager — when frequency on a retargeting audience exceeds 3–4 within a 7-day window, creative fatigue is likely the cause of declining performance. Brief new creative variants proactively rather than waiting for performance to drop.
+</Tip>
+
+## Common Optimisations
+
+- **Advantage+ Audiences** — enable Advantage+ audience targeting for conversion campaigns to give Meta's algorithm flexibility to find the best-performing segments within your defined parameters.
+- **Budget consolidation** — avoid spreading budget across too many ad sets. Consolidate to fewer, larger ad sets to accelerate the algorithm's learning phase and improve efficiency.
+- **Creative testing** — run A/B tests on headline, visual, and CTA variants systematically. Use Meta's built-in A/B test tool rather than duplicating ad sets manually, which can cause audience overlap.
+- **Placement review** — check placement-level performance monthly. Audience Network placements often drive low-quality traffic; exclude if cost per result is significantly above account average.
+
+<Warning>
+  Always comply with Meta's advertising policies. Violations — including restricted content categories, prohibited claims, or unapproved use of personal attributes in ad copy — can result in ad disapprovals, ad account restrictions, or permanent **account bans**. Before launching campaigns in sensitive categories (finance, health, employment, housing), review Meta's Special Ad Categories requirements and apply the correct category in Ads Manager. When in doubt, check with your Account Manager or the Head of Paid Media before publishing.
+</Warning>

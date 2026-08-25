@@ -1,0 +1,193 @@
+---
+title: "Tools and Platforms Used at Hellenic Technologies"
+sidebarTitle: "Tools Overview"
+description: "A reference guide to all tools, platforms, and software used by Hellenic Technologies teams across services, project management, and communication."
+---
+
+Hellenic Technologies runs on a carefully selected stack of tools and platforms that spans AI, digital marketing, web development, data analytics, and internal operations. Knowing which tool to use — and how to access it — saves time and avoids duplicated effort. This page gives every team member a consolidated reference for the software we use day-to-day, organised by function. If you need access to a tool not currently in your account, see the note at the bottom of this page.
+
+<Tabs>
+  <Tab title="AI Tools">
+    ## hellenicAI Platform
+
+    The hellenicAI platform is Hellenic Technologies' proprietary AI product suite, used both internally and delivered to clients. All team members working on AI projects should be familiar with the dashboard.
+
+    | Tool | URL / Access | Purpose |
+    |------|-------------|---------|
+    | hellenicAI Dashboard | [app.hellenicai.com](https://app.hellenicai.com) | Central hub for all hellenicAI products |
+    | AI Assistants | via app.hellenicai.com | Configure and deploy branded AI assistant chatbots |
+    | OmniAI (OmniChannel Chatbot) | via app.hellenicai.com | Multi-channel chatbot across web, WhatsApp, and more |
+    | B2B AI Outreach | via app.hellenicai.com | AI-driven lead generation and outreach automation |
+    | Google Ads AI | via app.hellenicai.com | AI-powered Google Ads campaign optimisation |
+    | Meta Ads AI | via app.hellenicai.com | AI-powered Meta campaign management |
+    | SEO AI | via app.hellenicai.com | AI-assisted SEO content and optimisation tools |
+    | Social Media AI | via app.hellenicai.com | AI-generated social content and scheduling |
+
+    ## Underlying AI Model Providers
+
+    hellenicAI products are powered by leading foundation model providers. Familiarity with these models helps you set appropriate client expectations and choose the right model for each use case.
+
+    | Provider | Models | Typical Use Case |
+    |----------|--------|-----------------|
+    | Anthropic | Claude (Haiku, Sonnet, Opus) | Long-context reasoning, document analysis, conversational AI |
+    | OpenAI | GPT-4o, GPT-4o mini | General-purpose chat, function calling, multimodal tasks |
+    | Google | Gemini 1.5 Pro / Flash | Multimodal inputs, Google ecosystem integrations |
+    | Mistral AI | Mistral Large, Mistral Small | Cost-efficient European-hosted inference, GDPR-friendly |
+
+    <Note>
+      Model selection for client deployments is determined by the AI Division. Do not change the underlying model of a live client assistant without approval from the AI Product Lead.
+    </Note>
+  </Tab>
+
+  <Tab title="Marketing Tools">
+    ## Paid Media Platforms
+
+    | Tool | Access | Purpose |
+    |------|--------|---------|
+    | Google Ads | ads.google.com | Search, Display, Shopping, YouTube, and Performance Max campaigns |
+    | Meta Ads Manager | business.facebook.com | Facebook and Instagram paid campaigns |
+    | TikTok Ads Manager | ads.tiktok.com | TikTok paid media campaigns |
+    | LinkedIn Campaign Manager | linkedin.com/campaignmanager | B2B paid campaigns on LinkedIn |
+    | Google Merchant Centre | merchants.google.com | Product feed management for Shopping campaigns |
+
+    ## SEO & Content Tools
+
+    | Tool | Purpose |
+    |------|---------|
+    | Google Search Console | Organic performance monitoring, indexing, and crawl errors |
+    | SEMrush / Ahrefs | Keyword research, backlink analysis, competitive intelligence |
+    | Screaming Frog | Technical SEO audits and site crawling |
+    | Surfer SEO | Content optimisation and on-page SEO scoring |
+
+    ## Analytics & Reporting (Marketing)
+
+    | Tool | Purpose |
+    |------|---------|
+    | Google Analytics 4 (GA4) | Web and app analytics, audience insights, conversion tracking |
+    | Google Tag Manager (GTM) | Tag management, event tracking, and marketing pixel deployment |
+    | Looker Studio | Campaign performance dashboards and client reporting |
+
+    <Tip>
+      Always use the agency's shared Google Ads and Meta MCC (manager) accounts when accessing client ad accounts — never create individual logins. Contact the Digital Marketing Lead if you need access to a specific client account.
+    </Tip>
+  </Tab>
+
+  <Tab title="Dev Tools">
+    ## CMS & eCommerce
+
+    | Tool | Purpose |
+    |------|---------|
+    | WordPress | Primary CMS for Falcon, Lynx, and Mammoth website projects |
+    | WooCommerce | eCommerce layer on WordPress for online store builds |
+    | ACF (Advanced Custom Fields) | Custom field architecture for flexible WordPress builds |
+    | Elementor / Gutenberg | Page building for Falcon and Lynx template projects |
+
+    ## Version Control & Collaboration
+
+    | Tool | Purpose |
+    |------|---------|
+    | Git (GitHub / GitLab) | Source code version control, branch management, and code review |
+    | GitHub Actions / CI/CD pipelines | Automated testing, deployment, and release workflows |
+
+    ## Design-to-Development
+
+    | Tool | Purpose |
+    |------|---------|
+    | Figma | UI/UX design, prototyping, and design handoff to developers |
+    | Figma Dev Mode | Inspect designs, export assets, and access CSS specs |
+    | Zeplin (legacy) | Legacy design handoff — new projects use Figma Dev Mode |
+
+    ## Environments & Infrastructure
+
+    | Tool / Practice | Purpose |
+    |-----------------|---------|
+    | Staging environments | Every project has a staging URL for QA before go-live |
+    | Local development (Docker / Local by Flywheel) | Local WordPress development for dev team |
+    | cPanel / Plesk | Hosting control panels for managed server clients |
+
+    <Warning>
+      Never push code directly to a live production environment without going through the staging review and sign-off process. All deployments must follow the release checklist documented in the Web Development SOPs.
+    </Warning>
+  </Tab>
+
+  <Tab title="Analytics Tools">
+    ## Data Collection & Tagging
+
+    | Tool | Purpose |
+    |------|---------|
+    | Google Tag Manager (GTM) | Client-side and server-side tag management |
+    | GA4 (Google Analytics 4) | Event-based web and app analytics |
+    | Server-Side GTM | Privacy-preserving, first-party data collection via server containers |
+    | Consent Management Platforms (CMPs) | Cookie consent and GDPR compliance (e.g., Cookiebot, CookieYes) |
+
+    ## Data Storage & Engineering
+
+    | Tool | Purpose |
+    |------|---------|
+    | Google BigQuery | Cloud data warehouse for large-scale analytics and BI |
+    | Google Cloud Storage | Raw data storage and pipeline staging |
+    | Fivetran / Stitch (data connectors) | Automated data pipeline connectors |
+    | dbt (data build tool) | SQL-based data transformation within the warehouse |
+
+    ## Visualisation & Reporting
+
+    | Tool | Purpose |
+    |------|---------|
+    | Looker Studio | Client-facing dashboards and marketing performance reports |
+    | Power BI | Enterprise BI dashboards for hellenicBI clients |
+    | Tableau | Advanced data visualisation for select enterprise engagements |
+
+    ## Attribution & Measurement
+
+    | Tool | Purpose |
+    |------|---------|
+    | GA4 Attribution Models | Data-driven and last-click attribution within GA4 |
+    | Custom Attribution Models (hellenicBI) | Multi-touch attribution built in BigQuery for enterprise clients |
+    | Google Ads Conversion Tracking | Import GA4 conversions and set up enhanced conversions |
+
+    <Note>
+      All analytics implementations must be audited against the agency's tracking QA checklist before client handover. The Web Analytics team owns the QA sign-off process.
+    </Note>
+  </Tab>
+
+  <Tab title="Communication & PM">
+    ## Project Management
+
+    | Tool | Purpose |
+    |------|---------|
+    | Primary PM Platform | Task management, project boards, sprint tracking, and delivery timelines (see Operations for current tool) |
+    | Project briefs & SOW templates | Stored in the shared internal drive — use these for every new project |
+    | Time tracking tool | Log billable and non-billable hours as required per your department |
+
+    ## Communication
+
+    | Tool | Purpose |
+    |------|---------|
+    | Team messaging (Slack / Teams) | Day-to-day internal communication, department channels, and direct messages |
+    | Email | Formal client communication and external correspondence |
+    | Video conferencing | Client calls, internal team meetings, and stand-ups |
+
+    ## CRM & Client Management
+
+    | Tool | Purpose |
+    |------|---------|
+    | CRM Platform | Client records, deal pipeline, contact management, and account history |
+    | Shared drives (Google Drive / SharePoint) | Document storage, file sharing, and collaborative editing |
+    | Internal wiki / knowledge base | This portal — policies, SOPs, and reference documentation |
+
+    ## Ticketing & Support
+
+    | Tool | Purpose |
+    |------|---------|
+    | Support ticketing system | After Sales / Client Success ticket management and SLA tracking |
+    | IT helpdesk | Internal IT requests, access provisioning, and equipment issues |
+
+    <Tip>
+      For client-facing communication, always use your official Hellenic Technologies email address. Keep all client conversations logged in the CRM so that any team member can pick up context if needed.
+    </Tip>
+  </Tab>
+</Tabs>
+
+<Info>
+  **Need access to a tool?** All software access requests — new licences, additional seats, or elevated permissions — must go through the **IT / Operations team**. Do not create personal accounts for agency tools or add billing details to free-tier accounts. Raise an access request ticket via the internal helpdesk and allow up to 2 business days for provisioning.
+</Info>

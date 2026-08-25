@@ -1,0 +1,96 @@
+---
+title: "OmniAI Chatbot: Deployment & Management Guide"
+sidebarTitle: "OmniChannel Chatbot"
+description: "Guide for deploying and managing the OmniAI OmniChannel Chatbot for clients. Covers channel integrations, configuration, conversation flows, and analytics."
+---
+
+OmniAI is Hellenic Technologies' OmniChannel chatbot product, available through the hellenicAI platform. It allows clients to deploy a single AI-powered chatbot across multiple customer-facing channels — website live chat, WhatsApp, Facebook Messenger, Instagram DM, and more — all managed from one central dashboard. This guide covers everything you need to deploy, configure, and manage OmniAI for a client from initial setup through to live monitoring.
+
+## Supported Channels
+
+OmniAI currently supports the following channels. Additional integrations may be available — check the dashboard for the latest channel list before scoping a client deployment.
+
+<CardGroup cols={2}>
+  <Card title="Website Live Chat" icon="globe">
+    Embed a chat widget directly on the client's website using a JavaScript snippet. Fully customisable to match brand colours and styling.
+  </Card>
+  <Card title="WhatsApp" icon="whatsapp">
+    Connect via the WhatsApp Business API. Requires Meta approval — see the warning below regarding lead time.
+  </Card>
+  <Card title="Facebook Messenger" icon="facebook">
+    Connect to the client's Facebook Page via the Messenger platform integration. Requires Page admin access.
+  </Card>
+  <Card title="Instagram DM" icon="instagram">
+    Handle Instagram Direct Messages through the same OmniAI instance. Requires the Instagram account to be connected to a Facebook Business account.
+  </Card>
+</CardGroup>
+
+## Deploying OmniAI for a Client
+
+<Steps>
+  <Step title="Log in to the hellenicAI dashboard">
+    Access [app.hellenicai.com](https://app.hellenicai.com) and navigate to the OmniChannel Chatbot section within the client's account. Confirm you are in the correct client workspace before proceeding.
+  </Step>
+  <Step title="Create a new OmniAI instance">
+    Click **New Chatbot** and give the instance a clear, descriptive name (e.g., "ClientName – Customer Support Bot"). This name is internal — the bot's display name shown to end users is configured separately.
+  </Step>
+  <Step title="Configure conversation flows and intents">
+    Define the main intents the chatbot should handle — for example, product enquiries, booking requests, support ticket creation, or FAQ responses. Map out the conversation flows for each intent, including how the bot collects information, responds, and progresses the conversation. Keep flows concise and test them from the user's perspective.
+  </Step>
+  <Step title="Connect the required channels">
+    Activate each channel the client has requested:
+    - **Website**: copy the generated `<script>` embed code (see below) and pass it to the client's web development team for installation.
+    - **WhatsApp**: initiate the WhatsApp Business API connection — note the approval requirement in the warning below.
+    - **Messenger**: authenticate with the client's Facebook Page using an account with Page admin permissions.
+    - **Instagram DM**: link through the connected Facebook Business account.
+  </Step>
+  <Step title="Upload knowledge base and set fallback responses">
+    Add the client's product, service, and policy documentation to the chatbot's knowledge base. Set a clear fallback response for queries the bot cannot resolve — this should acknowledge the limitation and offer an alternative path (e.g., escalate to human, provide a contact email).
+  </Step>
+  <Step title="Set business hours and handoff rules">
+    Configure the bot's active hours and define the human escalation rules. Specify what triggers a handoff (e.g., user request, repeated failed intents, high-value query types) and where escalated conversations are routed — to a live agent inbox, email notification, or CRM ticket.
+  </Step>
+  <Step title="Test across all active channels">
+    Before go-live, test every connected channel independently. Verify that conversation flows behave as expected, fallback responses trigger correctly, escalations route to the right destination, and the widget/integration renders correctly on each platform. Use a separate test account or device where possible.
+  </Step>
+  <Step title="Go live and monitor">
+    Activate the chatbot across all channels. Monitor the analytics dashboard closely for the first 48–72 hours. Check for unexpected escalation spikes, failed intents, or user drop-off points in the flows that may indicate configuration gaps.
+  </Step>
+</Steps>
+
+## Website Embed Code
+
+Once the website channel is activated in the dashboard, a unique embed snippet is generated for the client. Pass this to the client's web development team for installation — it should be placed before the closing `</body>` tag on every page where the chat widget should appear.
+
+```html
+<!-- OmniAI Chat Widget — place before </body> -->
+<script
+  src="https://app.hellenicai.com/omni/widget.js"
+  data-instance-id="YOUR_INSTANCE_ID"
+  async>
+</script>
+```
+
+Replace `YOUR_INSTANCE_ID` with the unique ID shown in the OmniAI dashboard for the client's instance. Do not hard-code this manually — always copy it directly from the dashboard to avoid errors.
+
+<Warning>
+  **WhatsApp Business API requires Meta approval before it can go live.** The approval process typically takes several business days and may require the client to verify their business with Meta. Start the WhatsApp integration process as early as possible — ideally at the point of project kick-off — so that approval is in place by the time other channels are ready. Do not promise a WhatsApp go-live date without first confirming where the approval process stands.
+</Warning>
+
+## Analytics & Performance Monitoring
+
+The OmniAI dashboard provides real-time analytics across all connected channels. Key metrics to review regularly:
+
+| Metric | What to Watch For |
+|---|---|
+| Conversation volume | Sudden drops may indicate an embed or integration issue |
+| Resolution rate | Low resolution rate signals knowledge base or flow gaps |
+| Escalation rate | High escalation rate may mean flows are too narrow |
+| Channel breakdown | Compare performance across website, WhatsApp, Messenger, etc. |
+| Drop-off points | Identify where users abandon conversations in the flow |
+
+Schedule a weekly or bi-weekly review with the client during the first month post-launch to review these metrics and iterate on the configuration.
+
+<Tip>
+  Always set up a staging or test environment before deploying to production — especially for website integrations where a broken embed could affect all site visitors. Use a staging URL or a hidden test page to validate the full end-to-end experience on every channel before switching the production instance live.
+</Tip>

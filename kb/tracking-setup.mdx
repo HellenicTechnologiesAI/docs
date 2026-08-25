@@ -1,0 +1,120 @@
+---
+title: "Tracking Setup Checklist: GTM & GA4 Implementation"
+sidebarTitle: "Tracking Setup"
+description: "Step-by-step checklist for setting up web tracking at Hellenic Technologies. Covers GTM container setup, GA4 events, conversion configuration, and pre-launch QA."
+---
+
+Use this checklist for every new client tracking implementation to ensure consistency, data quality, and GDPR compliance across all Hellenic Technologies analytics projects. Work through each step in order — do not skip steps even on smaller implementations.
+
+<Warning>
+  Never publish a GTM container without completing QA first. Always use GTM **Preview Mode** to verify tag behaviour before hitting Publish. A live container with broken or misconfigured tags can corrupt client data — and bad data is worse than no data.
+</Warning>
+
+## Implementation Checklist
+
+<Steps>
+  <Step title="Pre-Work">
+    Before touching any tool, complete the following:
+
+    - Obtain edit access to the client's GA4 property (or confirm you'll be creating a new one)
+    - Obtain publish access to the client's GTM container (or confirm you'll be creating a new one)
+    - Define and document the **measurement plan**: list all KPIs, events to track, conversion actions, and any custom dimensions or user properties required
+    - Get the measurement plan signed off by the Account Manager and client before proceeding
+  </Step>
+  <Step title="GTM Setup">
+    Set up and configure the Google Tag Manager container:
+
+    - Create a new GTM container or verify access to the existing one
+    - Add the GTM snippet to the site — `<head>` tag (JS snippet) and opening `<body>` tag (noscript iframe)
+    - Confirm the snippet is present and firing on all pages (use Tag Assistant or GTM Preview)
+    - Enable **Consent Mode v2** default commands in GTM before any other tags fire
+    - Set up workspace structure: use separate workspaces for development and production changes
+  </Step>
+  <Step title="GA4 Configuration">
+    Create and configure the GA4 property:
+
+    - Create the GA4 property in Google Analytics (or verify the existing one)
+    - Connect GA4 to GTM using a **GA4 Configuration tag** (set to fire on all pages)
+    - Enable **Enhanced Measurement** in the GA4 property settings:
+      - ✅ Page views
+      - ✅ Scrolls (90% depth)
+      - ✅ Outbound clicks
+      - ✅ File downloads
+      - ✅ Video engagement (if video content present)
+    - Verify the data stream is receiving hits in GA4 Realtime
+  </Step>
+  <Step title="Custom Events">
+    Implement all custom events defined in the measurement plan:
+
+    - Form submissions (all lead-gen and contact forms)
+    - CTA button clicks (primary conversion buttons)
+    - eCommerce events (if applicable): `view_item`, `add_to_cart`, `begin_checkout`, `purchase`
+    - Any other events specified in the measurement plan
+    - Use consistent event naming: snake_case, descriptive, GA4-compatible (no spaces, no special chars)
+    - Add relevant event parameters (e.g., `form_name`, `button_text`, `page_location`)
+  </Step>
+  <Step title="Conversions">
+    Mark key events as conversions in GA4:
+
+    - Navigate to **Admin → Events** in GA4 and toggle conversion tracking for the agreed conversion events
+    - Typical conversions: form submissions, purchases, bookings, calls, sign-ups
+    - Do not mark every event as a conversion — only actions that represent genuine business value
+    - Document which events are marked as conversions in the client tracking sheet
+  </Step>
+  <Step title="Consent Mode Configuration">
+    Configure GDPR-compliant consent handling:
+
+    - Integrate GTM with the client's **Consent Management Platform (CMP)** — e.g., Cookiebot, OneTrust, Complianz
+    - Set up **Google Consent Mode v2**:
+      - Use **Advanced Mode** where possible (allows modelled data for unconsenting users)
+      - Use **Basic Mode** if the client's legal team requires no tags to fire before consent
+    - Map CMP consent categories to Google Consent Mode signals (`analytics_storage`, `ad_storage`, `ad_user_data`, `ad_personalization`)
+    - Verify consent signals are passing to GA4 and any ad tags (use GA4 DebugView + Tag Assistant)
+
+    <Note>
+      Under GDPR, you must never fire analytics or advertising tags before the user has granted consent — unless those tags are classified as "strictly necessary." When in doubt, consult the Digital Compliance team before going live.
+    </Note>
+  </Step>
+  <Step title="QA">
+    Thoroughly test all tags before publishing:
+
+    - Enable **GTM Preview Mode** and walk through the site as a new user
+    - Verify every tag in the measurement plan fires on the correct trigger and only on the correct trigger
+    - Check event parameters are populating correctly (use GA4 **DebugView** in real time)
+    - Test consent flows: verify tags respect granted/denied consent states
+    - Test on **mobile** (at least one iOS and one Android browser)
+    - Test across multiple desktop browsers (Chrome, Firefox, Safari minimum)
+    - Check that no duplicate events are firing
+    - Sign off the QA checklist before publishing
+  </Step>
+  <Step title="Server-Side Tracking (If in Scope)">
+    If the project includes server-side tracking:
+
+    - Set up the **GTM server-side container** (hosted via Stape.io per HT standard)
+    - Configure the server-side GA4 client and route GA4 events through the server container
+    - Route advertising tags (Google Ads, Meta CAPI) through the server container
+    - Set up **first-party cookies** via the server container to extend cookie lifetime
+    - Configure the custom domain for the server container (must be a subdomain of the client's domain)
+    - QA all server-side tags using the server container's Preview Mode
+    - Verify events appear correctly in GA4 and ad platforms after routing through server
+  </Step>
+  <Step title="Documentation">
+    Update the client tracking documentation before handover:
+
+    - Fill in the **Client Tracking Sheet** (stored in the client's shared drive folder):
+      - All GTM tags, triggers, and variables
+      - All custom events and their parameters
+      - All conversion events
+      - Any custom dimensions or user properties
+      - Consent mode configuration
+    - Note any known limitations, workarounds, or deferred items for future sprints
+  </Step>
+  <Step title="Handover">
+    Complete the handover with the client and internal team:
+
+    - Share GA4 property access with the client — **Viewer role minimum**, Editor only if they'll manage it themselves
+    - Brief the client on what is being tracked, where to find it in GA4, and how to read the reports
+    - If the client is moving to a **Managed Web Analytics** retainer, brief the managed services team and transfer documentation
+    - Archive the GTM workspace and publish a clean final version
+  </Step>
+</Steps>

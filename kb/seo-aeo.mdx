@@ -1,0 +1,72 @@
+---
+title: "SEO & AEO Services: Strategy and Delivery Guide"
+sidebarTitle: "SEO & AEO"
+description: "Internal guide for delivering SEO and AEO (Answer Engine Optimization) services at Hellenic Technologies. Covers audits, keyword strategy, on-page, technical, and link building."
+---
+
+Hellenic Technologies delivers SEO and AEO services, including traditional search engine optimisation and optimisation for AI answer engines such as ChatGPT, Perplexity, and Google AI Overviews. This guide covers how both services are scoped, delivered, and reported — and is the primary reference for SEO Specialists, Account Managers, and any team member contributing to organic search delivery.
+
+## What Is AEO?
+
+**Answer Engine Optimisation (AEO)** is the practice of structuring content so that AI-powered search tools — including Google AI Overviews, ChatGPT, Perplexity, and Bing Copilot — surface your client's content as an authoritative, cited answer to user queries.
+
+AEO builds directly on strong SEO foundations: a technically healthy site, high-quality content, and strong topical authority are prerequisites. The additional layer involves structuring content specifically for AI consumption: clear question-and-answer formats, FAQ schema markup, clean H-tag hierarchies, and factually precise language that an AI can confidently cite. Treat AEO not as a separate service but as an advanced content layer applied on top of a solid SEO strategy.
+
+## Service Components
+
+The SEO/AEO service covers the following delivery areas:
+
+- **Technical SEO audit** — crawl analysis, Core Web Vitals assessment, indexation health, site architecture review
+- **Keyword research** — intent-mapped keyword universe aligned with client business goals
+- **Competitive gap analysis** — identifying keyword and content opportunities vs. top-ranking competitors
+- **On-page optimisation** — title tags, meta descriptions, H-tag structure, internal linking, content updates
+- **Content strategy** — topic cluster planning, content briefs, AEO-optimised FAQ and pillar content
+- **Link building** — digital PR, outreach, and editorial link acquisition (no black-hat tactics)
+- **AEO content structuring** — FAQ schema implementation, structured data, AI-optimised content formatting
+
+## New SEO Client Onboarding
+
+<Steps>
+  <Step title="Run Technical Audit">
+    Crawl the client's site using **Screaming Frog** and cross-reference with **Google Search Console** data. Assess: crawlability, indexation status, Core Web Vitals (via PageSpeed Insights and GSC), duplicate content, broken links, redirect chains, and XML sitemap health. Document findings in the Technical Audit template (shared drive: `/Templates/SEO/Technical Audit.xlsx`).
+  </Step>
+  <Step title="Keyword Research Aligned With Business Goals">
+    Conduct keyword research using **Ahrefs** or **SEMrush** (use the agency account — credentials in 1Password). Build a keyword universe segmented by intent: informational, navigational, commercial, transactional. Prioritise based on search volume, keyword difficulty, and business relevance. Present the prioritised keyword map to the client or Account Manager for sign-off before proceeding.
+  </Step>
+  <Step title="Competitive Gap Analysis">
+    Identify the top 3–5 organic competitors using Ahrefs Site Explorer. Run a keyword gap analysis to surface terms competitors rank for that the client does not. Use these gaps to inform both the on-page optimisation priority list and the content strategy.
+  </Step>
+  <Step title="Prioritised Action Plan">
+    Compile the technical findings, keyword priorities, and content gaps into a single prioritised action plan. Use the impact vs. effort matrix to rank tasks. Present this to the client (via the Account Manager) within the first 2 weeks of the engagement. The action plan becomes the delivery roadmap for month one and beyond.
+  </Step>
+  <Step title="On-Page Implementation">
+    Begin implementing on-page optimisations in priority order: title tags, meta descriptions, H-tag structure, internal links, and content updates. For changes requiring CMS access or development work (e.g., schema markup, site architecture changes, page speed fixes), raise a task with the Web Development team and include the technical brief.
+  </Step>
+  <Step title="Monthly Reporting and Iteration">
+    Deliver a monthly SEO report covering: organic traffic (via GA4), keyword ranking movements (via Ahrefs/SEMrush), technical health status, and a summary of work completed vs. planned for next month. Use the SEO Monthly Report template in the shared drive. Iterate the action plan each month based on what the data shows.
+  </Step>
+</Steps>
+
+## Tools Used
+
+All SEO/AEO work uses the following tools. Agency account credentials are stored in **1Password** under the SEO team vault:
+
+| Tool | Purpose |
+|---|---|
+| Google Search Console | Indexation, impressions, clicks, Core Web Vitals, manual actions |
+| Screaming Frog SEO Spider | Technical site crawl, on-page analysis, redirect mapping |
+| Ahrefs | Keyword research, backlink analysis, rank tracking, competitor research |
+| SEMrush | Alternative to Ahrefs; also used for position tracking and site audits |
+| PageSpeed Insights / CrWUX | Core Web Vitals measurement |
+| Schema Markup Validator | Validating structured data / schema implementation |
+
+<Note>
+  For AEO optimisation, structure key pages with the following elements:
+
+  - **FAQ schema** (`FAQPage` structured data) on pages targeting question-based queries
+  - **Clear H-tag hierarchy** — H1 → H2 → H3 in logical order; H2s should directly address common user questions
+  - **Authoritative, factual content** — cite sources, include data and statistics, write in clear declarative sentences
+  - **Concise answer blocks** — lead each section with a direct 2–3 sentence answer before elaborating; this is the format AI engines extract as cited responses
+
+  AEO is an evolving discipline. Check the Hellenic Technologies internal blog and industry sources (e.g., Search Engine Journal, Ahrefs Blog) monthly for updates to AI search behaviour.
+</Note>
