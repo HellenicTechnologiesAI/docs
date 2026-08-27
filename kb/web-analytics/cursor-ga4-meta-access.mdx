@@ -1,195 +1,79 @@
 ---
-title: "Grant Cursor access to GA4, GTM, Ads, and Meta"
+title: "Cursor marketing data access (OAuth, not service account)"
 sidebarTitle: "Cursor: platform access"
-description: "Give the Cursor service account every HT-owned GA4 account, GTM account, Google Ads MCC child, and Meta asset at once. Do not share properties, containers, or pixels one by one."
+description: "Cursor uses digital@ OAuth refresh tokens and HT-SysAdmin. Do not invite a service account to GA4, GTM, or Google Ads."
 icon: "key"
 ---
 
 <Warning>
-  Cursor does **not** inherit your personal Google or Meta login. Agents use one Google service account (`GOOGLE_SERVICE_ACCOUNT_JSON`) plus a Meta system user. GA4, Tag Manager, and Google Ads are **three separate products**. A grant on one never covers the others. Do not invent pixels or conversion IDs. Do not reuse HT assets on another customer.
+  **Do not create a Google service account. Do not invite `cursor@….iam.gserviceaccount.com` to GA4, GTM, or Google Ads.** The GA4 Add-users box turning that email red is irrelevant. Cursor already uses `digital@hellenictechnologies.com` via a long-lived OAuth refresh token. That identity already sees the full HT Google stack.
 </Warning>
 
 Live URL: [https://ht-intra.mintlify.site/kb/web-analytics/cursor-ga4-meta-access](https://ht-intra.mintlify.site/kb/web-analytics/cursor-ga4-meta-access).
 
 Related: [SST playbook](/kb/web-analytics/server-side-tracking) · [Existing Stape prompt](/kb/web-analytics/cursor-prompt-existing-stape) · [New customer prompt](/kb/web-analytics/cursor-prompt-new-customer).
 
-## What you are granting
+## Who Cursor is
 
-| Surface | Who Cursor is | One grant covers |
+| Surface | Identity | How agents authenticate |
 | --- | --- | --- |
-| **GA4** | Same `client_email` | **One add per Analytics Account.** All current and future properties under that account. |
-| **Tag Manager** | Same `client_email` | **One add per GTM Account** as Account Admin. All current and future containers under that account. |
-| **Google Ads** | Same `client_email` on the **MCC** | **One add on the manager account.** Every client account already linked under that MCC, plus new links you accept later. |
-| **Meta** | `HT-SysAdmin` or system user **HT Cursor** | All ad accounts and datasets in the HT portfolio, plus assets clients Partner-share into HT. |
+| **GA4, GTM, Sheets, Gmail, Calendar, GSC, Drive** | `digital@hellenictechnologies.com` | OAuth client \+ refresh token. REST. |
+| **Google Ads** | Same human, MCC `3568564840` | Separate OAuth client \+ refresh token. **`google-ads-api` gRPC only.** Never `googleads.googleapis.com` REST (returns HTML 404 from this environment). |
+| **DV360** | Same Google stack, Partner `1606967182` | Separate OAuth client. REST on `displayvideo.googleapis.com`. |
+| **Meta** | System user `HT-SysAdmin` | Long-lived Graph token. 57 ad accounts today. |
 
-Google Cloud IAM on the GCP project is **not** enough. You must add the email inside each product UI (or API).
+Tokens live in **Cloud Agent secrets** (and the marketing-data workspace `.env/`). Never in Git, Mintlify, or chat. If a token was pasted in chat, rotate it.
 
-Enable these APIs on the **same** GCP project that owns the service account: Analytics Admin API, Tag Manager API, Google Ads API.
+## Verified inventory (do not assume HT-only)
 
-## Find the service account email
+Checked live against `digital@` / `HT-SysAdmin`:
 
-1. Cursor **Cloud Agents → Secrets** → `GOOGLE_SERVICE_ACCOUNT_JSON`.
-2. Copy `client_email` only (`…@….iam.gserviceaccount.com`). Never paste the private key into chat, Git, or this KB.
+| Product | Visible now | Golden Gastro |
+| --- | --- | --- |
+| GA4 | 84 accounts / 192 properties | **Yes.** Account `396117908`, property `539367952`, measurement `G-LNPZX5HKQF` |
+| GTM | 210 accounts | **Yes.** Account `6357803150`, web container `GTM-N8ZFXBTK` (`253795963`) |
+| Google Ads | 124 accounts under MCC `3568564840` | Use `customer_client` via gRPC. Do not invent a CID. |
+| Meta | 57 ad accounts | **No.** Not in `me/adaccounts`. Needs a Partner share of the Golden Gastro ad account \+ dataset into HT. Do not create a pixel. Do not reuse the HT pixel. |
 
-If the secret is missing, stop and add it. Do not create a second service account unless the old JSON is lost.
+Known IDs agents may reuse (do not copy onto another customer): HT GA4 `394561578`, HT web GTM `1226191120`, HT SST GTM `6202173174`.
 
-## GA4 — Account, not Property
+## Agent rules
 
-<Warning>
-  The GA4 **Add users** box turns `cursor@hellenicai.iam.gserviceaccount.com` red and says it is not a Google Account. That is a UI bug. The email is valid. Close the dialog. Add the service account with the Admin API below. Do not create a second service account and do not switch to a `@gmail.com`.
-</Warning>
+1. Need GA4 data or Admin writes (key events, audiences)? Refresh the **digital@** token, then `accountSummaries` / `properties/{id}`. Prefer the 192-property list over guesses.
+2. Need GTM reads/writes? Same token. `GET …/tagmanager/v2/accounts` then `…/accounts/{id}/containers`.
+3. Need Google Ads? `google-ads-api` \+ MCC `3568564840` as `login-customer-id`. Never raw REST to `googleads.googleapis.com`.
+4. Need Meta? `HT-SysAdmin` token. If the customer ad account or pixel is missing from the 57, stop and report **not writable**. Partner-share that BM into HT, then assign the asset to `HT-SysAdmin`.
+5. A previous agent that said it only had HT `properties/394561578` was using the **service account**, not this OAuth. Ignore that report.
 
-Property-level share is why Cursor only sees HT `properties/394561578`. Stop doing that.
+## When a _new_ client is missing
 
-<Steps>
-  <Step title="Open Account Access Management">
-    [analytics.google.com](https://analytics.google.com/) → **Admin** → **Account** column (not Property) → **Account access management**. You need Administrator on that account.
-  </Step>
-  <Step title="Add the service account">
-    **\+** → **Add users**. Paste `client_email`. Uncheck notify. Role: **Editor** (key events, audiences). **Administrator** only if agents must invite other users.
-  </Step>
-  <Step title="Once per Analytics Account">
-    Repeat for every GA4 **account** you admin. New properties under those accounts inherit the grant.
-  </Step>
-</Steps>
+Invite the **human** `digital@hellenictechnologies.com`, not a service account.
 
-### UI is red — add it in OAuth Playground (2 minutes)
+| Product | What to add |
+| --- | --- |
+| GA4 | Account access management → add `digital@hellenictechnologies.com` as Editor or Administrator. The UI accepts this email. |
+| GTM | Account User Management → add `digital@` as Account Admin. |
+| Google Ads | Link the advertiser under MCC `3568564840`. `digital@` already sits on the MCC. |
+| Meta | Client BM → Partners → HT Business ID → share ad account \+ dataset → assign to `HT-SysAdmin`. |
 
-Use the Google account that is already **Administrator** on goldengastro.de (or the parent Analytics account).
+One add per **account / MCC / Business**. Not per property, container, or pixel.
 
-1. Open [Google OAuth 2.0 Playground](https://developers.google.com/oauthplayground/).
-2. Gear (top right) → leave defaults (or tick **Use your own OAuth credentials** if you have a Desktop client). Close the gear.
-3. Left list: paste this scope only, then **Authorize APIs**: `https://www.googleapis.com/auth/analytics.manage.users`
-4. Sign in. **Allow**. **Exchange authorization code for tokens**.
-5. **Step 3** → HTTP method **POST** → this URL (account-level, preferred). Get **Account ID** from GA4 Admin → Account settings (digits only): `https://analyticsadmin.googleapis.com/v1beta/accounts/ACCOUNT_ID/accessBindings`
-6. Request body:
+## Secrets (names only)
 
-```json
-{
-  "user": "cursor@hellenicai.iam.gserviceaccount.com",
-  "roles": ["predefinedRoles/editor"]
-}
-```
+Store in Cloud Agent secrets. Do not paste values into this KB.
 
-7. **Send the request**. A `200` with a `name` like `accounts/…/accessBindings/…` means it worked. Reload GA4 User Management — the service account appears even though the form still refuses to type it.
+- `GOOGLE_OAUTH_CLIENT_ID` / `GOOGLE_OAUTH_CLIENT_SECRET` / `GOOGLE_OAUTH_REFRESH_TOKEN` — digital@ (GA4, GTM, Sheets, …)
+- `GOOGLE_ADS_CLIENT_ID` / `GOOGLE_ADS_CLIENT_SECRET` / `GOOGLE_ADS_REFRESH_TOKEN` / `GOOGLE_ADS_DEVELOPER_TOKEN` / `GOOGLE_ADS_LOGIN_CUSTOMER_ID` (`3568564840`)
+- `DV360_CLIENT_ID` / `DV360_CLIENT_SECRET` / `DV360_REFRESH_TOKEN`
+- `META_SYSTEM_USER_TOKEN` — HT-SysAdmin
+- Stape / TikTok / others stay in their existing secret names
 
-If you only have Admin on the **property** (not the account), POST to `https://analyticsadmin.googleapis.com/v1beta/properties/PROPERTY_ID/accessBindings` instead. Property ID is Admin → Property settings (digits, e.g. HT is `394561578`). Account-level is better so you do not repeat this for every site.
-
-Same pattern for GTM if that UI also rejects the email: POST `https://tagmanager.googleapis.com/tagmanager/v2/accounts/ACCOUNT_ID/user_permissions` with scope `https://www.googleapis.com/auth/tagmanager.manage.users` and body `{"emailAddress":"cursor@hellenicai.iam.gserviceaccount.com","accountAccess":{"permission":"admin"}}`.
-
-If the UI rejects `*.iam.gserviceaccount.com` and you prefer terminal, use the Admin API. Run this **as yourself** (OAuth), scope `https://www.googleapis.com/auth/analytics.manage.users`.
-
-```bash
-export SA_EMAIL="paste-client-email-here"
-
-curl -sS -H "Authorization: Bearer $(gcloud auth print-access-token)" \
-  "https://analyticsadmin.googleapis.com/v1beta/accounts"
-
-# Then once per ACCOUNT_ID:
-curl -sS -X POST \
-  "https://analyticsadmin.googleapis.com/v1beta/accounts/${ACCOUNT_ID}/accessBindings" \
-  -H "Authorization: Bearer $(gcloud auth print-access-token)" \
-  -H "Content-Type: application/json" \
-  -d "{\"user\": \"${SA_EMAIL}\", \"roles\": [\"predefinedRoles/editor\"]}"
-```
-
-Client-owned GA4 accounts you do not admin stay invisible until that client adds the same email at **their** account level. Golden Gastro `G-LNPZX5HKQF` is in that bucket until its account includes the SA.
-
-## Tag Manager — Account User Management, not one container
-
-GTM is not GA4. Publishing HT web `GTM-TRPS26L` does **not** grant `GTM-N8ZFXBTK` or any other container.
-
-<Steps>
-  <Step title="Open Account User Management">
-    [tagmanager.google.com](https://tagmanager.google.com/) → pick the **account** in the left list → **Admin** → **Account** column → **User Management**. Not Container User Management.
-  </Step>
-  <Step title="Add Account Admin">
-    **\+** → **Add users**. Paste `client_email`. Account permission: **Admin**. That covers every container in the account, including ones created later. Do not add the SA on a single container (Read / Edit / Publish) unless this is a client-owned account they will not promote to Admin.
-  </Step>
-  <Step title="Once per GTM Account">
-    HT web (`1226191120`) and HT SST (`6202173174`) are two accounts. Customer web containers often live in more accounts. Add the same email to each account you admin.
-  </Step>
-</Steps>
-
-If the UI rejects the service-account email, use the Tag Manager API as yourself. Scope: `https://www.googleapis.com/auth/tagmanager.manage.users`.
-
-```bash
-export SA_EMAIL="paste-client-email-here"
-
-curl -sS -H "Authorization: Bearer $(gcloud auth print-access-token)" \
-  "https://tagmanager.googleapis.com/tagmanager/v2/accounts"
-
-# Then once per GTM ACCOUNT_ID:
-curl -sS -X POST \
-  "https://tagmanager.googleapis.com/tagmanager/v2/accounts/${ACCOUNT_ID}/user_permissions" \
-  -H "Authorization: Bearer $(gcloud auth print-access-token)" \
-  -H "Content-Type: application/json" \
-  -d "{\"emailAddress\": \"${SA_EMAIL}\", \"accountAccess\": {\"permission\": \"admin\"}}"
-```
-
-Client-owned GTM accounts (Golden Gastro `GTM-N8ZFXBTK` if it is not under an HT account) need the client, or you as their Admin, to add the same email on **that** account.
-
-## Google Ads — one MCC, then link every client
-
-Do not invite the service account on each advertiser account. Put every HT-managed Ads account under **one manager account (MCC)**, then add the SA once there.
-
-<Steps>
-  <Step title="Confirm the MCC">
-    [ads.google.com](https://ads.google.com/) → switch to the **manager** account (not HT advertiser `736-760-0503` unless that _is_ the MCC). **Accounts** should list every client you run. If a client is missing, **Accounts → Link existing accounts** (or send a manager-link request) and wait for accept.
-  </Step>
-  <Step title="Add the service account on the MCC">
-    Still on the MCC: **Admin → Access and security → Users → \+**. Paste `client_email`. Access: **Standard** (enough to read conversions, upload offline conversions, and inspect conversion actions). Google often blocks **Admin** on service accounts. New client accounts you link later inherit this user.
-  </Step>
-  <Step title="API secrets">
-    MCC **Tools → API Center**: copy the **developer token**. Store in Cloud Agent secrets as `GOOGLE_ADS_DEVELOPER_TOKEN` and `GOOGLE_ADS_LOGIN_CUSTOMER_ID` (MCC ID, digits only, no dashes). Reuse `GOOGLE_SERVICE_ACCOUNT_JSON`. Enable **Google Ads API** on the GCP project. API calls must send `login-customer-id: MCC_ID`.
-  </Step>
-</Steps>
-
-Accounts that are **not** linked under that MCC stay invisible, even if you can open them in the UI with your personal login. Same rule as Meta Partner shares.
-
-Included in Conversions is still UI-only. Agents can list and create conversion actions; a human may still need to flip that toggle.
-
-## Meta — portfolio Full control, then Partner for client BMs
-
-`HT-SysAdmin` seeing no Golden Gastro pixel is expected if that dataset lives in the **client** Business or was never assigned inside HT.
-
-### A. Assets HT already owns (once)
-
-<Steps>
-  <Step title="Prefer a system user">
-    [business.facebook.com](https://business.facebook.com/) → **Settings → Users → System users** → add **HT Cursor** (Admin). Keep `HT-SysAdmin` as the human fallback.
-  </Step>
-  <Step title="Full control + assign all assets">
-    Give HT Cursor / `HT-SysAdmin` **Full control** of the HT portfolio. **Assign assets**: select all **Ad accounts** and all **Datasets**. Optional: one **Business asset group** named `HT tracking`, assign the system user to the group.
-  </Step>
-  <Step title="Token">
-    Generate a token with `ads_management`, `ads_read`, `business_management`. Store as `META_SYSTEM_USER_TOKEN`. Adding assets later does not need a new token.
-  </Step>
-</Steps>
-
-Do **not** create a new pixel because the API 404s. Do **not** point a customer tag at the HT pixel.
-
-### B. Client-owned Businesses
-
-1. Client BM → **Partners** → add the **HT Business ID**.
-2. Share the ad account \+ dataset (Advertise \+ Manage dataset).
-3. Accept in HT, then **Assign assets** to HT Cursor.
-
-One Partner accept per client Business. There is no Meta dump of every BM your personal login can open.
+`GOOGLE_SERVICE_ACCOUNT_JSON` is **not** the marketing stack. Do not invite that SA onto customer GA4/GTM/Ads.
 
 ## What Cursor still must not do
 
-- Treat GTM access as GA4 or Ads access.
-- Create a Meta pixel or Ads account because an API 404s. Pause the tag and report **not writable**.
+- Create or invite `*.iam.gserviceaccount.com` users.
+- Create a Meta pixel or Ads account because an API 404s.
 - Reuse HT pixel, HT GA4 `G-GYMSRM45JV`, HT web `GTM-TRPS26L`, or HT Ads `736-760-0503` on another hostname.
+- Call `googleads.googleapis.com` over REST.
 - Store tokens in Git, Mintlify, or a customer prompt.
-
-## Check it worked
-
-Ask a Cloud Agent (read-only):
-
-1. **GA4** — list accounts/properties. More than `properties/394561578`.
-2. **GTM** — list accounts/containers. Must include customer web containers, not only `GTM-TRPS26L` / `GTM-WKJ6FDLB`.
-3. **Ads** — `ListAccessibleCustomers` with `login-customer-id` = MCC. Must list linked client accounts, not only HT `736-760-0503`.
-4. **Meta** — list ad accounts and datasets. Golden Gastro appears only after the Partner share.
-5. Then resume the customer job against **that** property, container, Ads account, and pixel.
