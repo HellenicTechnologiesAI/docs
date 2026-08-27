@@ -1,24 +1,24 @@
 ---
 title: "Server Side Tracking — Agent Playbook"
 sidebarTitle: "Server Side Tracking"
-description: "Canonical HT playbook for Stape / GTM / same-origin / consent. Scenario A fixes existing customer SST. Scenario B is greenfield. Do not follow generic checklists that fire purchase or All Pages pixels."
+description: "Canonical HT playbook for Stape / GTM / consent. Same-origin only when we have Cloudflare access. Scenario A fixes existing customer SST. Scenario B is greenfield."
 icon: "server"
 ---
 
 <Warning>
-  This page is the **source of truth** for Hellenic Technologies server-side tracking. The older staff pages [Web Analytics](/kb/web-analytics) and [Tracking Setup](/kb/tracking-setup) are high-level commercial notes. They mention Cookiebot, All Pages GA4 config, and `purchase`. **Do not follow those SST steps.** Follow this playbook. Do not invent pixel IDs, conversion IDs, Stape loader filenames, or results.
+  This page is the **source of truth** for Hellenic Technologies server-side tracking. Do not invent pixel IDs, conversion IDs, Stape loader filenames, or results. Do not fire `purchase` on B2B. Do not put Meta / TikTok / LinkedIn base pixels on All Pages. Same-origin only when we have Cloudflare access.
 </Warning>
 
 This document exists so a Cursor agent can pick up a customer job **without repeating the three-day hellenictechnologies.com debug**. Read the hard rules first. Then pick Scenario A or Scenario B. Copy the **pattern**, not the HT IDs, unless you are on the HT site itself.
 
 <Note>
-  Live URL: [https://ht-intra.mintlify.site/kb/web-analytics/server-side-tracking](https://ht-intra.mintlify.site/kb/web-analytics/server-side-tracking). Sign in with Mintlify. `ht-intra.mintlify.app` is the wrong host and 404s. The public marketing docs at `kw.hellenictechnologies.com` do not host this playbook.
+  Live URL: [https://ht-intra.mintlify.site/kb/web-analytics/server-side-tracking](https://ht-intra.mintlify.site/kb/web-analytics/server-side-tracking). Sign in with Mintlify. `ht-intra.mintlify.app` and `ht-intra.mintlify.io` are the wrong hosts and 404.
 </Note>
 
 ## Who this is for
 
-- Cursor agents fixing a live Stape \+ GTM \+ Cloudflare setup (Scenario A).
-- Cursor agents building a **new** Stape \+ web GTM \+ sGTM \+ consent stack (Scenario B).
+- Cursor agents fixing a live Stape \+ GTM setup (Scenario A). Same-origin only if we have Cloudflare.
+- Cursor agents building a **new** Stape \+ web GTM \+ sGTM \+ consent stack (Scenario B). Same-origin only if we have Cloudflare.
 - Humans who need the same checklist.
 
 **Reference implementation (HT-only IDs):** `https://hellenictechnologies.com` — repo `patrickabedin/ht-agency-website`. Public diagnostic: `https://hellenictechnologies.com/same-origin`. Service page: `/services/server-side-tracking`. Stape Cloudflare guide: [same origin through Cloudflare](https://stape.io/helpdesk/documentation/how-to-use-same-origin-through-cloudflare). Stape first-touch article: do **not** fire consent-gated pixels on All Pages.
@@ -39,16 +39,17 @@ This document exists so a Cursor agent can pick up a customer job **without repe
     10. **Do not delete folders in a multi-tenant SST container.** Only edit `HT | SST *` tags. Hostname-exception leftover tags.
     11. **Do not reuse another tenant's FB or TikTok token rows.** Use `LT - fb *` / `LT - Tiktok ID` for that hostname.
     12. **Do not write match cookies before iubenda purpose 5.**
-    13. **Do not add a Vercel reverse-proxy for /metrics.** Cloudflare Worker only.
+    13. **Do not add a Vercel reverse-proxy for /metrics.** Same-origin is a Cloudflare Worker only, and only when we have Cloudflare access.
     14. **Do not enable Click ID Restorer** on the HT multi-tenant container.
     15. **Do not commit Stape / Meta / LinkedIn tokens.** Rotate any key pasted in chat.
     16. **Do not claim 400-day Meta cookies or a Stape score of 100** unless a fresh scan shows it.
     17. **Do not load a second web GTM container.**
     18. **Bare Custom Loader URL without the encoded query is 404.**
+    19. **Do not apply same-origin unless we have Cloudflare access** on that customer zone. No Worker, no `/metrics` on the apex, no Generate Same Origin Path. The loader stays on `sgtm.customer.com`.
   </Accordion>
 
   <Accordion title="What Stape fingerprints">
-    Absolute `j.src` on the customer apex plus encoded query; official GTM HTML comments; Generate noscript iframe; no googletagmanager.com/gtag/js; first-touch pixels on consent-ready, not All Pages; Cookie Keeper off in the snippet.
+    Absolute `j.src` (customer apex when same-origin, `sgtm.customer.com` when we do not have Cloudflare) plus encoded query; official GTM HTML comments; Generate noscript iframe; no googletagmanager.com/gtm.js; first-touch pixels on consent-ready, not All Pages; Cookie Keeper off in the snippet.
   </Accordion>
 </AccordionGroup>
 
@@ -56,11 +57,22 @@ This document exists so a Cursor agent can pick up a customer job **without repe
 
 **Scenario A — Fix existing customer SST.** The customer already has Stape \+ web GTM \+ sGTM. Do not rebuild from scratch. Inventory first. Patch the same containers.
 
-**Scenario B — Greenfield SST.** New domain. Build in this order: DNS Stape subdomain, Cloudflare Worker same-origin, Stape Generate, consent first, web GTM, sGTM clients and tags, pixels, QA.
+**Scenario B — Greenfield SST.** New domain. Build in this order: DNS Stape subdomain, same-origin **only if we have Cloudflare**, Stape Generate, consent first, web GTM, sGTM clients and tags, pixels, QA.
 
-Shared stack: browser hits customer.com/{path}/\* (HT: /metrics) then Cloudflare Worker (HT: ht-sgtm-same-origin, header X-From-Cdn: cf-stape) then sgtm.customer.com (DNS-only) then sGTM then GA4 / Ads / Meta CAPI / TikTok Events API / LinkedIn CAPI.
+### Cloudflare access gate (same-origin yes / no)
 
-Web GTM still runs in the browser. Its library comes from the same-origin path, not Google's domain.
+Same-origin is **not** default for every customer. Decide this before you touch DNS, Generate, or the site snippet.
+
+| We have Cloudflare access? | What you do |
+| --- | --- |
+| **Yes** — we can log into that zone and create a Worker, routes, SSL rule, and cache bypass | Apply same-origin. Browser loads the Custom Loader from `https://customer.com/{path}/…` (HT: `/metrics`). Worker maps that path to `sgtm.customer.com` with `X-From-Cdn: cf-stape`. Keep `sgtm.` DNS-only. |
+| **No** — customer hosts DNS elsewhere, we cannot edit Cloudflare, or there is no Cloudflare | **Do not apply same-origin.** Do not invent a Worker, Vercel rewrite, nginx proxy, or `/metrics` route. Custom Loader `j.src` stays on `https://sgtm.customer.com/…`. Leave Generate **Same Origin Path** empty. |
+
+HT (`hellenictechnologies.com`) is the yes case. Copy that pattern only when the customer is also a yes.
+
+**Yes-case stack:** browser → `customer.com/{path}/*` → Cloudflare Worker → `sgtm.customer.com` (DNS-only) → sGTM → GA4 / Ads / Meta CAPI / TikTok Events API / LinkedIn CAPI. Web GTM still runs in the browser. Its library comes from the same-origin path, not Google's domain.
+
+**No-case stack:** browser → `sgtm.customer.com` Custom Loader → sGTM on that host. Still set `sgtm.` DNS-only to Stape if we control that record. Still do consent, `ht_consent_ready`, hybrid pixels, and hostname-scoped tokens. You just cannot first-party the GTM library.
 
 ## Canonical architecture
 
@@ -70,7 +82,7 @@ Web GTM still runs in the browser. Its library comes from the same-origin path, 
 | sGTM on Stape | Server clients plus CAPI / Ads / GA4 collect | `GTM-WKJ6FDLB` account 6202173174 container 169217628 |
 | Stape container | Host \+ Custom Loader | Name Multi-tenant, identifier `sespmfwe`, EU Center (Germany) |
 | Custom domain | sgtm.customer DNS-only to Stape | `sgtm.hellenictechnologies.com` |
-| Same-origin path | Cloudflare maps /{path}/\* to Stape | `/metrics` |
+| Same-origin path | Only if we have Cloudflare access. Worker maps /{path}/\* to Stape | HT: `/metrics`. Skip this row when we do not have Cloudflare. |
 | CMP | Consent Mode v2 Advanced, default denied | iubenda site `3941073` |
 | Site code | Head order \+ dataLayer \+ match cookies | `src/lib/analytics/*`, `src/lib/iubenda.ts` |
 
@@ -78,15 +90,17 @@ Web GTM still runs in the browser. Its library comes from the same-origin path, 
 
 1. CMP bootstrap \+ Google Consent Mode v2 defaults denied for ads/analytics.
 2. Native pixel holds: fbq consent revoke, ttq.holdConsent().
-3. gtag gateway: rewrite googletagmanager.com/gtag/\* to /{path}/gtag/\*.
+3. gtag gateway (same-origin only): rewrite googletagmanager.com/gtag/\* to /{path}/gtag/\*. Skip when we do not have Cloudflare.
 4. Custom Loader: exact Stape Generate IIFE \+ official HTML comments.
 5. CMP widget (once).
 
 HT files: `src/components/iubenda-consent.tsx`, `src/lib/analytics/sgtm.ts`, `src/lib/iubenda.ts`.
 
-### Same-origin Cloudflare (what Stape wants)
+### Same-origin Cloudflare (only if we have access)
 
-Follow the official Stape same-origin-through-Cloudflare guide.
+Skip this entire section when we do **not** have Cloudflare access on the customer. Then Generate Same Origin Path stays empty and `j.src` is `https://sgtm.customer.com/…`.
+
+When we **do** have access, follow the official Stape same-origin-through-Cloudflare guide.
 
 | Setting | Required value |
 | --- | --- |
@@ -116,7 +130,7 @@ Stape admin, container, Custom Loader, Generate:
 | Domain | sgtm.hellenictechnologies.com in the Generate UI. Browser src uses the apex. | That customer's Stape host |
 | Web GTM ID | GTM-TRPS26L | That site's web container |
 | Enhanced ad blocker | ON | ON |
-| Same Origin Path | /metrics | /metrics preferred |
+| Same Origin Path | /metrics | /metrics **only if we have Cloudflare**. Empty if we do not. |
 | Platform | Other | Other or the real CMS |
 | Data Layer variable | blank | blank unless renamed |
 | Use original GTM code | off | off |
@@ -152,7 +166,7 @@ Working host: `https://api.app.stape.io` with header `X-AUTH-TOKEN` (Account API
 
 `GET /api/v2/containers/{identifier}`
 
-`POST /api/v2/container/{identifier}/custom-loader` with body webGtmId, domain, source other, sameOriginPath /metrics
+`POST /api/v2/container/{identifier}/custom-loader` with body webGtmId, domain, source other. Add `sameOriginPath: /metrics` only when we have Cloudflare.
 
 HT identifier: `sespmfwe`. Store keys as STAPE\_ACCOUNT\_API\_KEY / STAPE\_CONTAINER\_API\_KEY in Cloud Agent secrets. Never commit. Never paste into this KB.
 
@@ -293,7 +307,7 @@ Use this when the customer already has Stape.
 
 <Steps>
   <Step title="Freeze scope">
-    Write down domain, web GTM ID, sGTM ID, Stape identifier, same-origin path, CMP, pixels, and whether the SST container is multi-tenant. If multi-tenant, you will not delete folders.
+    Write down domain, web GTM ID, sGTM ID, Stape identifier, CMP, pixels, multi-tenant yes/no, and **whether we have Cloudflare access**. Same-origin path exists only in the yes case. If multi-tenant, you will not delete folders.
   </Step>
   <Step title="Export live versions">
     In GTM note the Published version name and number for web and server. Do not publish Default Workspace if it is stale (HT lesson: 416 / 208).
@@ -301,14 +315,14 @@ Use this when the customer already has Stape.
   <Step title="Inventory tags, do not clean yet">
     List every Meta / TikTok / LinkedIn / Ads / GA4 tag. Mark hostname filters. Leftover FB - \* / other-tenant TikTok stay, but must exclude this hostname.
   </Step>
-  <Step title="Fix Cloudflare same-origin first">
-    Worker \+ X-From-Cdn: cf-stape \+ SSL Full \+ cache bypass \+ sgtm. DNS-only. Prove [https://customer.com/\{path\}/](https://customer.com/{path}/) is Stape (GTM preview works) and not the website.
+  <Step title="Decide same-origin (Cloudflare access or not)">
+    If we have Cloudflare: Worker \+ `X-From-Cdn: cf-stape` \+ SSL Full \+ cache bypass \+ `sgtm.` DNS-only. Prove `https://customer.com/{path}/` is Stape (GTM preview works) and not the website. If we do **not** have Cloudflare: skip the Worker and `/metrics`. Prove `https://sgtm.customer.com` is Stape and DNS-only. Do not invent a proxy.
   </Step>
   <Step title="Regenerate Custom Loader, then paste exactly">
-    Enhanced adblock ON, Same Origin Path set, Cookie Keeper off, Platform Other. Copy both snippets. Put them on the site byte-identical including HTML comments. Update code constants. Do not invent a new filename. Confirm /{file}.js?{query} is 200 and the bare file is 404.
+    Enhanced adblock ON. Same Origin Path set **only if Cloudflare same-origin is live**; otherwise leave it empty. Cookie Keeper off, Platform Other. Copy both snippets. Put them on the site byte-identical including HTML comments. Update code constants. Do not invent a new filename. Confirm the loader URL from Generate (apex `/{path}/file.js?query` **or** `sgtm.…/file.js?query`) is 200 and the bare file without query is 404.
   </Step>
-  <Step title="Install gtag gateway">
-    If PSI / Stape still fetches googletagmanager.com/gtag/js, add the head rewrite to /{path}/gtag/js before the loader.
+  <Step title="Install gtag gateway (same-origin only)">
+    Only if we have Cloudflare same-origin: if PSI / Stape still fetches googletagmanager.com/gtag/js, add the head rewrite to `/{path}/gtag/js` before the loader. Without Cloudflare, skip this rewrite — there is no first-party `/metrics/gtag` path.
   </Step>
   <Step title="Fix consent + first-touch">
     CMP Advanced, default denied. Add ht\_consent\_ready once. Move Meta / TikTok / LinkedIn base pixels off All Pages onto that event. Keep conversion tags on the ads trio. Hold fbq / ttq until purpose 5.
@@ -320,7 +334,7 @@ Use this when the customer already has Stape.
     If sGTM already sends Ads conversions, pause web awct / Ads gtag. Dedup with event\_id. Check Included in Conversions in the Ads UI by hand.
   </Step>
   <Step title="QA then publish only a named version">
-    GTM Preview via same-origin, GA4 DebugView, Meta Test Events, TikTok Events Manager, LinkedIn conversion diagnostics, Ads tag assistant. Publish a named version, not an old Default. Re-run the Stape scan. Do not chase Custom Loader \+4 by inventing a new file if Generate still returns the same hash.
+    GTM Preview via same-origin **or** `sgtm.customer.com` if we have no Cloudflare. Then GA4 DebugView, Meta Test Events, TikTok Events Manager, LinkedIn conversion diagnostics, Ads tag assistant. Publish a named version, not an old Default. Re-run the Stape scan. Do not chase Custom Loader \+4 by inventing a new file if Generate still returns the same hash.
   </Step>
 </Steps>
 
@@ -340,11 +354,11 @@ Use this on a new domain, or a customer who has no Stape yet.
   <Step title="Stape custom domain">
     sgtm.customer.com CNAME to Stape. Grey cloud. Wait for SSL on Stape.
   </Step>
-  <Step title="Cloudflare Worker same-origin">
-    Copy the HT pattern: path /metrics, header X-From-Cdn: cf-stape, SSL Full, cache bypass, no app route on exact path. Set web GTM server\_container\_url to [https://customer.com/metrics](https://customer.com/metrics).
+  <Step title="Same-origin only if we have Cloudflare">
+    If we have Cloudflare: copy the HT pattern (path `/metrics`, header `X-From-Cdn: cf-stape`, SSL Full, cache bypass, no app route on exact path). Set web GTM `server_container_url` to `https://customer.com/metrics`. If we do **not** have Cloudflare: skip this step. Do not invent a Worker or `/metrics` route. Set `server_container_url` to `https://sgtm.customer.com`.
   </Step>
   <Step title="Generate Custom Loader">
-    Enhanced adblock ON, Same Origin Path /metrics, Platform Other, Cookie Keeper off. Paste exact snippets into the site. Deactivate duplicate GTM plugins.
+    Enhanced adblock ON. Same Origin Path `/metrics` **only if Cloudflare same-origin is live**; otherwise leave it empty. Platform Other, Cookie Keeper off. Paste exact snippets into the site. Deactivate duplicate GTM plugins.
   </Step>
   <Step title="Consent before tags">
     iubenda (HT standard) or the customer's existing CMP. GCM v2 Advanced, default denied, purpose 5 then ht\_consent\_ready. Unblock pixel hosts. No All Pages base pixels.
@@ -363,7 +377,7 @@ Use this on a new domain, or a customer who has no Stape yet.
   </Step>
 </Steps>
 
-Greenfield Generate settings: Domain sgtm.CUSTOMER.com, Web GTM ID GTM-XXXX, Enhanced ad blocker ON, Same Origin Path /metrics, Platform Other, empty dataLayer name, Use original GTM code no, Generate with Cookie Keeper no.
+Greenfield Generate settings: Domain sgtm.CUSTOMER.com, Web GTM ID GTM-XXXX, Enhanced ad blocker ON, Same Origin Path `/metrics` only when we have Cloudflare (empty otherwise), Platform Other, empty dataLayer name, Use original GTM code no, Generate with Cookie Keeper no.
 
 If the customer is WordPress, still treat Platform as Other unless you will only use the official Stape plugin and it emits the same Generate snippets. Plugin plus hand-pasted loader = duplicates.
 
@@ -374,9 +388,9 @@ Network / HTML:
 - Homepage HTML contains the exact Generate IIFE plus official GTM comments.
 - Noscript matches Generate (HT: sgtm host /ns.html?id=GTM-TRPS26L, no extra title).
 - No googletagmanager.com/gtm.js and no second GTM container.
-- /{path}/{loader}.js?{query} returns 200 (large decoded GTM). Bare file without query is 404.
-- Scripts on the page are first-party /{path}/ (loader \+ gtag). Browser must not load sgtm. as a script host. The noscript iframe is the exception.
-- POST /{path}/g/collect with the GA4 tid.
+- Loader URL from Generate returns 200 (large decoded GTM). Bare file without query is 404. Same-origin: `/{path}/{loader}.js?{query}`. No Cloudflare: `https://sgtm.customer.com/{loader}.js?{query}`.
+- Same-origin only: scripts on the page are first-party `/{path}/` (loader \+ gtag). Browser must not load `sgtm.` as a script host. The noscript iframe is the exception. No Cloudflare: the script host **is** `sgtm.customer.com`.
+- Same-origin: POST `/{path}/g/collect` with the GA4 tid. No Cloudflare: collect hits `sgtm.customer.com`.
 - First-party FPAU / Google linker cookies appear after analytics consent.
 
 Consent:
@@ -388,7 +402,7 @@ Consent:
 
 Platforms:
 
-- GTM Preview through [https://customer.com/\{path\}](https://customer.com/{path}) (not a Next 404).
+- GTM Preview: same-origin via `https://customer.com/{path}` (not a Next 404). No Cloudflare: preview via `https://sgtm.customer.com`.
 - GA4 DebugView sees events plus Consent Mode.
 - Meta Test Events: browser \+ server, same event\_id, EMQ keys present.
 - TikTok Events Manager: web \+ Events API dedup.
@@ -419,7 +433,7 @@ Do not write tokens into Mintlify, Git, PR bodies, or artifacts.
 
 ## What to copy from HT vs what to create new
 
-Copy the pattern: same-origin /metrics, Generate IIFE fingerprint, gtag gateway, iubenda Advanced \+ ht\_consent\_ready, hybrid pixels, event\_id, match-key cookies after purpose 5, Ads conversions sGTM-only, hostname-scoped lookup tables, no page on exact /metrics.
+Copy the pattern: Generate IIFE fingerprint, consent \+ `ht_consent_ready`, hybrid pixels, event\_id, match-key cookies after purpose 5, Ads conversions sGTM-only, hostname-scoped lookup tables. Copy same-origin `/metrics` \+ gtag gateway **only when we have Cloudflare**. Without Cloudflare, copy the subdomain-only loader (`sgtm.customer.com`) and do not invent a `/metrics` path.
 
 Do not copy blindly: GTM-TRPS26L, GTM-WKJ6FDLB, sespmfwe, dw0iesespmfwe.js, the 6646uin query, iubenda site 3941073, pixel/partner IDs, Ads 736-760-0503, GA4 G-GYMSRM45JV, EUR 50/150, Worker name, /same-origin copy, multi-tenant folders.
 
@@ -428,14 +442,14 @@ Do not copy blindly: GTM-TRPS26L, GTM-WKJ6FDLB, sespmfwe, dw0iesespmfwe.js, the 
 - Same origin through Cloudflare (stape.io helpdesk)
 - Custom Loader / Generate in the Stape admin for that container
 - First-touch: consent-gated pixels on the landing page, not All Pages
-- Cookie Keeper: incompatible with this same-origin design for the snippet
+- Cookie Keeper: keep off in the snippet. Required off with same-origin. Do not turn it on for no-Cloudflare customers unless Patrick says so for that job.
 
-If a Stape UI label disagrees with a working Generate snippet, trust the Generate output and keep the site byte-identical. Do not change the IIFE to a relative /metrics src. Stape fingerprints the absolute [https://customer.com](https://customer.com) form.
+If a Stape UI label disagrees with a working Generate snippet, trust the Generate output and keep the site byte-identical. Do not change a same-origin IIFE to a relative `/metrics` src. Stape fingerprints the absolute `https://customer.com` form when Same Origin Path is set.
 
 ## When you are stuck
 
 1. Diff the live homepage HTML against Generate (head \+ noscript). If they differ, stop and paste Generate.
-2. Check you did not ship a Next/CMS route on exact /{path}.
+2. If this is a same-origin job, check you did not ship a Next/CMS route on exact `/{path}`. If we have no Cloudflare, check you did not invent `/metrics` anyway.
 3. Check sgtm. is grey-cloud.
 4. Check the pixel trigger is ht\_consent\_ready, not All Pages.
 5. Check you are not about to publish a stale Default Workspace or delete a multi-tenant folder.
