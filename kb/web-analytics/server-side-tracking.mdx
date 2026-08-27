@@ -14,7 +14,7 @@ This document exists so a Cursor agent can pick up a customer job **without repe
 Team Cursor prompts (audit first, then spec, then wait for approval):
 
 - [Existing Stape customer](/kb/web-analytics/cursor-prompt-existing-stape) — Scenario A, patch only.
-- [New customer](/kb/web-analytics/cursor-prompt-new-customer) — Scenario B, new dedicated stack.
+- [New customer](/kb/web-analytics/cursor-prompt-new-customer) — Scenario B, new web GTM \+ `sgtm.` domain on the HT Multi-tenant Stape container.
 
 <Note>
   Live URL: [https://ht-intra.mintlify.site/kb/web-analytics/server-side-tracking](https://ht-intra.mintlify.site/kb/web-analytics/server-side-tracking). Sign in with Mintlify. `ht-intra.mintlify.app` and `ht-intra.mintlify.io` are the wrong hosts and 404.
@@ -62,7 +62,7 @@ Team Cursor prompts (audit first, then spec, then wait for approval):
 
 **Scenario A — Fix existing customer SST.** The customer already has Stape \+ web GTM \+ sGTM. Do not rebuild from scratch. Inventory first. Patch the same containers.
 
-**Scenario B — Greenfield SST.** New domain. Build in this order: DNS Stape subdomain, same-origin **only if we have Cloudflare**, Stape Generate, consent first, web GTM, sGTM clients and tags, pixels, QA.
+**Scenario B — Greenfield SST.** New customer domain. Add `sgtm.customer.com` on the existing Multi-tenant Stape container (`sespmfwe` / `GTM-WKJ6FDLB`). Do not create a new Stape container. Then: DNS-only CNAME, same-origin **only if we have Cloudflare**, Generate for **this** web GTM \+ `sgtm.` host, consent first, hostname-scoped sGTM tags, pixels, QA.
 
 ### Cloudflare access gate (same-origin yes / no)
 
@@ -354,7 +354,7 @@ Use this on a new domain, or a customer who has no Stape yet.
     List real outcomes (lead, book, purchase). Get sign-off. B2B default = no purchase. One event\_id per hit.
   </Step>
   <Step title="Containers">
-    Create a new web GTM and a new sGTM. Prefer a dedicated Stape container per customer. Do not dump a new brand into HT sespmfwe / GTM-WKJ6FDLB unless Patrick explicitly says to.
+    Keep or create a **web** GTM for this customer only. Do **not** create a new Stape container. Add `sgtm.customer.com` as another custom domain on the existing HT Stape container (name Multi-tenant, identifier `sespmfwe`, sGTM `GTM-WKJ6FDLB`, EU Center Germany). That box already holds many customer `sgtm.` hosts (22/50 as of the last check). Hostname-scope every tag and lookup row. Do not use HT web `GTM-TRPS26L`, HT `/metrics`, or `dw0iesespmfwe.js`. Create a new Stape container only if Patrick explicitly says this customer is an exception.
   </Step>
   <Step title="Stape custom domain">
     sgtm.customer.com CNAME to Stape. Grey cloud. Wait for SSL on Stape.

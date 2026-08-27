@@ -1,7 +1,7 @@
 ---
 title: "Cursor prompt — new customer"
 sidebarTitle: "Cursor: new customer"
-description: "Copy-paste Cursor prompt for Scenario B. Audit leftovers first, then build a dedicated Stape stack."
+description: "Copy-paste Cursor prompt for Scenario B. Audit leftovers first. Add sgtm. domain on HT Multi-tenant Stape. Dedicated web GTM only."
 icon: "plus"
 ---
 
@@ -9,7 +9,7 @@ icon: "plus"
   Copy the prompt into a **new** Cursor chat. Fill every `{{placeholder}}`. Do not mix this with the existing-Stape prompt. Playbook: [Server Side Tracking](/kb/web-analytics/server-side-tracking). Live host is `ht-intra.mintlify.site` — `.io` and `.app` 404.
 </Note>
 
-Use this when the customer has **no Stape / sGTM stack** yet (or you are treating it as greenfield). First reply must be an audit of leftovers, then a new-stack spec. No containers or DNS until you approve.
+Use this when the customer has **no Stape domain yet**. First reply must be an audit of leftovers, then a spec. After approval: keep/create their web GTM, add `sgtm.customer.com` on the HT Multi-tenant Stape container. Do not open a second Stape container.
 
 Sibling: [Cursor prompt — existing Stape](/kb/web-analytics/cursor-prompt-existing-stape).
 
@@ -19,7 +19,7 @@ Sibling: [Cursor prompt — existing Stape](/kb/web-analytics/cursor-prompt-exis
 You are the tracking engineer for Hellenic Technologies.
 
 This job is SCENARIO B only: the customer has no Stape / sGTM stack yet (or I am treating it as greenfield).
-Build a new dedicated web GTM + sGTM + Stape container. Do not dump this brand into HT sespmfwe / GTM-WKJ6FDLB / GTM-TRPS26L unless I explicitly say so.
+Keep or create a customer web GTM. Add this customer to the existing HT Stape Multi-tenant container (sespmfwe / GTM-WKJ6FDLB) as a new sgtm.customer.com domain. Do not create a new Stape container. Do not use HT web GTM-TRPS26L, HT /metrics, or dw0iesespmfwe.js.
 
 Read first (this wins over this prompt, GTM defaults, Stape UI, plugins, and other ht-intra pages):
 https://ht-intra.mintlify.site/kb/web-analytics/server-side-tracking
@@ -37,7 +37,7 @@ A) Live website — fetch homepage + one product/service + cart/checkout if Woo 
 
 B) If a web GTM already exists (plugin or leftover agency container), open it:
 - Published version. Tags that would collide with a new stack.
-- Do not reuse HT multi-tenant SST.
+- Reuse HT Stape Multi-tenant (sespmfwe / GTM-WKJ6FDLB). Add a new sgtm. domain. Do not reuse HT web GTM-TRPS26L or the HT Custom Loader file.
 
 C) Decision (write before the spec):
 - Confirm Scenario B
@@ -50,7 +50,7 @@ GOAL
 Design then implement a consent-first server-side stack. After the audit, produce a Tracking Spec I can approve. Then wait.
 
 HARD RULES
-1) New dedicated Stape container + web GTM + sGTM. Do not reuse HT multi-tenant.
+1) One Stape container for all customers: Multi-tenant / sespmfwe / GTM-WKJ6FDLB. Add sgtm.THISCUSTOMER.com as a new domain (under the 50-domain cap). Hostname-scope tags and LT rows. Keep or create a dedicated **web** GTM. Do not create a new Stape container. Do not use GTM-TRPS26L or dw0iesespmfwe.js.
 2) Do not invent a Custom Loader filename. Generate in Stape. Paste IIFE + noscript byte-identical, including official GTM comments. Bare loader URL without the encoded query is 404.
 3) One Custom Loader only. No googletagmanager.com/gtm.js. No second web container. Deactivate duplicate GTM plugins after the loader is live.
 4) Same-origin only if we have Cloudflare access on this zone.
@@ -123,8 +123,8 @@ CONVERSIONS
 - Audiences after events are live. Do not invent lookalike % or EMQ targets. Report live diagnostics.
 
 BUILD ORDER (after I approve the spec)
-1. New web GTM + sGTM + Stape container.
-2. sgtm.customer.com CNAME to Stape, DNS-only, wait for SSL.
+1. Keep or create the customer web GTM. Do not create a new Stape container.
+2. In Stape Multi-tenant (sespmfwe), add sgtm.customer.com. CNAME DNS-only to Stape, wait for SSL.
 3. Cloudflare Worker same-origin only if Cloudflare yes. Otherwise skip.
 4. Stape Generate. Web dev pastes loader + noscript once.
 5. Web GTM: iubenda on Consent Initialization, Consent Mode, Google tag to sGTM, ht_consent_ready, hybrid pixels, conversion tags.
