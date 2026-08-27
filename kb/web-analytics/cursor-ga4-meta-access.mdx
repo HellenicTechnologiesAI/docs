@@ -35,6 +35,10 @@ If the secret is missing, stop and add it. Do not create a second service accoun
 
 ## GA4 — Account, not Property
 
+<Warning>
+  The GA4 **Add users** box turns `cursor@hellenicai.iam.gserviceaccount.com` red and says it is not a Google Account. That is a UI bug. The email is valid. Close the dialog. Add the service account with the Admin API below. Do not create a second service account and do not switch to a `@gmail.com`.
+</Warning>
+
 Property-level share is why Cursor only sees HT `properties/394561578`. Stop doing that.
 
 <Steps>
@@ -49,7 +53,31 @@ Property-level share is why Cursor only sees HT `properties/394561578`. Stop doi
   </Step>
 </Steps>
 
-If the UI rejects `*.iam.gserviceaccount.com`, use the Admin API. Run this **as yourself** (OAuth), scope `https://www.googleapis.com/auth/analytics.manage.users`.
+### UI is red — add it in OAuth Playground (2 minutes)
+
+Use the Google account that is already **Administrator** on goldengastro.de (or the parent Analytics account).
+
+1. Open [Google OAuth 2.0 Playground](https://developers.google.com/oauthplayground/).
+2. Gear (top right) → leave defaults (or tick **Use your own OAuth credentials** if you have a Desktop client). Close the gear.
+3. Left list: paste this scope only, then **Authorize APIs**: `https://www.googleapis.com/auth/analytics.manage.users`
+4. Sign in. **Allow**. **Exchange authorization code for tokens**.
+5. **Step 3** → HTTP method **POST** → this URL (account-level, preferred). Get **Account ID** from GA4 Admin → Account settings (digits only): `https://analyticsadmin.googleapis.com/v1beta/accounts/ACCOUNT_ID/accessBindings`
+6. Request body:
+
+```json
+{
+  "user": "cursor@hellenicai.iam.gserviceaccount.com",
+  "roles": ["predefinedRoles/editor"]
+}
+```
+
+7. **Send the request**. A `200` with a `name` like `accounts/…/accessBindings/…` means it worked. Reload GA4 User Management — the service account appears even though the form still refuses to type it.
+
+If you only have Admin on the **property** (not the account), POST to `https://analyticsadmin.googleapis.com/v1beta/properties/PROPERTY_ID/accessBindings` instead. Property ID is Admin → Property settings (digits, e.g. HT is `394561578`). Account-level is better so you do not repeat this for every site.
+
+Same pattern for GTM if that UI also rejects the email: POST `https://tagmanager.googleapis.com/tagmanager/v2/accounts/ACCOUNT_ID/user_permissions` with scope `https://www.googleapis.com/auth/tagmanager.manage.users` and body `{"emailAddress":"cursor@hellenicai.iam.gserviceaccount.com","accountAccess":{"permission":"admin"}}`.
+
+If the UI rejects `*.iam.gserviceaccount.com` and you prefer terminal, use the Admin API. Run this **as yourself** (OAuth), scope `https://www.googleapis.com/auth/analytics.manage.users`.
 
 ```bash
 export SA_EMAIL="paste-client-email-here"
