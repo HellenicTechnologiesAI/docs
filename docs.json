@@ -79,9 +79,7 @@
             "group": "Web Analytics",
             "icon": "chart-line",
             "pages": [
-              "kb/web-analytics/server-side-tracking",
-              "kb/web-analytics",
-              "kb/tracking-setup"
+              "kb/web-analytics/server-side-tracking"
             ]
           }
         ]
@@ -123,5 +121,17 @@
     "socials": {
       "linkedin": "https://linkedin.com/company/hellenic-technologies"
     }
-  }
+  },
+  "redirects": [
+    {
+      "source": "/kb/web-analytics",
+      "destination": "/kb/web-analytics/server-side-tracking",
+      "permanent": true
+    },
+    {
+      "source": "/kb/tracking-setup",
+      "destination": "/kb/web-analytics/server-side-tracking",
+      "permanent": true
+    }
+  ]
 }
