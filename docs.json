@@ -79,7 +79,8 @@
             "group": "Web Analytics",
             "icon": "chart-line",
             "pages": [
-              "kb/web-analytics/server-side-tracking"
+              "kb/web-analytics/server-side-tracking",
+              "kb/web-analytics/cursor-prompt-existing-stape"
             ]
           }
         ]
