@@ -4,6 +4,10 @@ sidebarTitle: "Tracking Setup"
 description: "Step-by-step GTM and GA4 implementation checklist for HT analytics staff. Covers container setup, events, consent mode, QA, and handover."
 ---
 
+<Warning>
+  This checklist is high-level only. Server-side tracking, Custom Loader, consent, and Stape pitfalls live in [**Server Side Tracking**](/kb/web-analytics/server-side-tracking). Do not fire `purchase` on B2B. Do not put Meta / TikTok / LinkedIn base pixels on All Pages. Do not invent a Custom Loader filename.
+</Warning>
+
 Use this checklist for every new client tracking implementation to ensure consistency, data quality, and GDPR compliance across all Hellenic Technologies analytics projects. Work through each step in order — do not skip steps even on smaller implementations.
 
 <Warning>
@@ -50,7 +54,7 @@ Use this checklist for every new client tracking implementation to ensure consis
     - CTA button clicks (primary conversion buttons)
     - eCommerce events (if applicable): `view_item`, `add_to_cart`, `begin_checkout`, `purchase`
     - Any other events specified in the measurement plan
-    - Use consistent event naming: snake_case, descriptive, GA4-compatible (no spaces, no special chars)
+    - Use consistent event naming: snake\_case, descriptive, GA4-compatible (no spaces, no special chars)
     - Add relevant event parameters (e.g., `form_name`, `button_text`, `page_location`)
   </Step>
   <Step title="Conversions">
@@ -69,7 +73,7 @@ Use this checklist for every new client tracking implementation to ensure consis
       - Use **Advanced Mode** where possible (allows modelled data for unconsenting users)
       - Use **Basic Mode** if the client's legal team requires no tags to fire before consent
     - Map CMP consent categories to Google Consent Mode signals (`analytics_storage`, `ad_storage`, `ad_user_data`, `ad_personalization`)
-    - Verify consent signals are passing to GA4 and any ad tags (use GA4 DebugView + Tag Assistant)
+    - Verify consent signals are passing to GA4 and any ad tags (use GA4 DebugView \+ Tag Assistant)
 
     <Note>
       Under GDPR, you must never fire analytics or advertising tags before the user has granted consent — unless those tags are classified as "strictly necessary." When in doubt, consult the Digital Compliance team before going live.
@@ -88,15 +92,7 @@ Use this checklist for every new client tracking implementation to ensure consis
     - Sign off the QA checklist before publishing
   </Step>
   <Step title="Server-Side Tracking (If in Scope)">
-    If the project includes server-side tracking:
-
-    - Set up the **GTM server-side container** (hosted via Stape.io per HT standard)
-    - Configure the server-side GA4 client and route GA4 events through the server container
-    - Route advertising tags (Google Ads, Meta CAPI) through the server container
-    - Set up **first-party cookies** via the server container to extend cookie lifetime
-    - Configure the custom domain for the server container (must be a subdomain of the client's domain)
-    - QA all server-side tags using the server container's Preview Mode
-    - Verify events appear correctly in GA4 and ad platforms after routing through server
+    Stop here and open [**Server Side Tracking**](/kb/web-analytics/server-side-tracking). That playbook is the only SST source of truth (Scenario A = fix existing Stape, Scenario B = greenfield). Do not host sGTM only on a third-party subdomain without Cloudflare same-origin. Do not enable Cookie Keeper with same-origin. Do not put a site page on exact `/metrics`.
   </Step>
   <Step title="Documentation">
     Update the client tracking documentation before handover:
