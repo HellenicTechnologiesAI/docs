@@ -1,0 +1,129 @@
+---
+title: "Grant Cursor access to all GA4 and Meta"
+sidebarTitle: "Cursor: GA4 + Meta access"
+description: "Give the Cursor service account and Meta system user every HT-owned GA4 account and Meta asset at once. Do not share properties or pixels one by one."
+icon: "key"
+---
+
+<Warning>
+  Cursor does **not** inherit your personal Google or Meta login. Agents use a Google service account (`GOOGLE_SERVICE_ACCOUNT_JSON`) and a Meta Business user / system user. If those identities only have HT (`properties/394561578` and the HT pixel), they cannot mark key events or pause Golden Gastro tags. Do not invent a customer pixel. Do not reuse the HT pixel.
+</Warning>
+
+Live URL: [https://ht-intra.mintlify.site/kb/web-analytics/cursor-ga4-meta-access](https://ht-intra.mintlify.site/kb/web-analytics/cursor-ga4-meta-access).
+
+Related: [SST playbook](/kb/web-analytics/server-side-tracking) · [Existing Stape prompt](/kb/web-analytics/cursor-prompt-existing-stape) · [New customer prompt](/kb/web-analytics/cursor-prompt-new-customer).
+
+## What you are granting
+
+| Surface | Who Cursor actually is | What one grant covers |
+| --- | --- | --- |
+| **GA4** | Service account email in `GOOGLE_SERVICE_ACCOUNT_JSON` → `client_email` (`…@….iam.gserviceaccount.com`) | **One add per GA4 Account** (not per property). All current and future properties under that account inherit Editor. |
+| **GTM** | Same JSON, Tag Manager API | Separate product. Account-level GTM access does **not** grant GA4. You already have GTM if publishes work. |
+| **Meta** | `HT-SysAdmin` **or** a dedicated system user in the HT Business portfolio | All ad accounts \+ datasets **owned or partner-shared into that portfolio**. Client Businesses you do not own still need one Partner accept. |
+
+Google Cloud IAM on the GCP project is **not** enough. GA4 access lives in Analytics Admin.
+
+## Find the service account email
+
+1. Open Cursor **Cloud Agents → Secrets**.
+2. Open `GOOGLE_SERVICE_ACCOUNT_JSON`.
+3. Copy `client_email` only. Never paste the private key into chat, Git, or this KB.
+
+If the secret is missing, stop and add it. Do not create a second service account unless the old JSON is lost.
+
+## GA4 — grant at Account, not Property
+
+Property-level share is why Cursor only sees HT `properties/394561578`. Stop doing that.
+
+<Steps>
+  <Step title="Open Account Access Management">
+    [analytics.google.com](https://analytics.google.com/) → **Admin** (gear) → confirm the **Account** dropdown (not Property) → **Account access management**. You need Administrator on that account.
+  </Step>
+  <Step title="Add the service account">
+    **\+** → **Add users**. Paste `client_email`. Uncheck notify-by-email. Role: **Editor** (key events, audiences, data streams). Use **Administrator** only if agents must add other users. Do not use Viewer.
+  </Step>
+  <Step title="Repeat once per GA4 Account you admin">
+    If customer properties live under many Analytics **accounts**, add the same email once to each account. That is still far fewer clicks than every property. New properties created later under those accounts inherit the grant.
+  </Step>
+</Steps>
+
+If the UI says the email is not a Google Account (common for `*.iam.gserviceaccount.com`), skip the form and use the Admin API below. The API accepts service accounts.
+
+### Bulk: every account you already admin
+
+Run this **as yourself** (OAuth), not as the service account. Scope: `https://www.googleapis.com/auth/analytics.manage.users`.
+
+```bash
+# 1. List every GA4 account your user can admin
+curl -sS -H "Authorization: Bearer $(gcloud auth print-access-token)" \
+  "https://analyticsadmin.googleapis.com/v1beta/accounts"
+
+# 2. For each accounts/ACCOUNT_ID, grant Editor to the Cursor SA
+export SA_EMAIL="paste-client-email-here"
+export ACCOUNT_ID="123456789"
+
+curl -sS -X POST \
+  "https://analyticsadmin.googleapis.com/v1beta/accounts/${ACCOUNT_ID}/accessBindings" \
+  -H "Authorization: Bearer $(gcloud auth print-access-token)" \
+  -H "Content-Type: application/json" \
+  -d "{\"user\": \"${SA_EMAIL}\", \"roles\": [\"predefinedRoles/editor\"]}"
+```
+
+Loop step 2 over the account IDs from step 1. Wait a few minutes, then ask Cursor to list properties. You should see every property under those accounts, not only HT.
+
+Accounts you do **not** admin (client-owned, you are only a property Editor) cannot be granted by this script. Those clients add the same `client_email` at **their** Account access management, or they add HT as a user on that account.
+
+Golden Gastro `G-LNPZX5HKQF` is in this bucket until its GA4 **account** includes the service account.
+
+## Meta — portfolio Full control, then Partner for client BMs
+
+`HT-SysAdmin` having no Golden Gastro ad account/pixel is expected if that asset lives in the **client** Business, or if it was never assigned inside HT.
+
+### A. Assets HT already owns (do this once)
+
+<Steps>
+  <Step title="Prefer a system user">
+    [business.facebook.com](https://business.facebook.com/) → **Settings** → **Users** → **System users** → add **HT Cursor** (Admin). People logins expire and 2FA-break agents. Keep `HT-SysAdmin` as a human fallback.
+  </Step>
+  <Step title="Give Full control on the HT portfolio">
+    **Settings** → **People** (or the system user) → HT-SysAdmin / HT Cursor → **Full control** of the business portfolio. Full control can see and assign every asset in **this** portfolio. Partial access does not.
+  </Step>
+  <Step title="Assign all ad accounts and datasets in one dialog">
+    Same person/system user → **Assign assets**. Open **Ad accounts**, select all HT-owned accounts, role Advertiser or Full control. Open **Datasets** (pixels), select all, **Manage dataset**. One dialog, not one pixel at a time. Optional: create a **Business asset group** named `HT tracking`, put every ad account \+ dataset in it, assign HT Cursor to the group once.
+  </Step>
+  <Step title="Token">
+    System user → **Generate token** with `ads_management`, `ads_read`, `business_management`. Store as `META_SYSTEM_USER_TOKEN` in Cloud Agent secrets. Do not commit. Adding more assets later does **not** require a new token.
+  </Step>
+</Steps>
+
+Do **not** create a new pixel for a customer that already has one. Do **not** point a customer sGTM tag at the HT pixel.
+
+### B. Client-owned Businesses (Golden Gastro and similar)
+
+There is no Meta button that dumps every client BM you can open as a person into Cursor. The client (or you, if you have Full control there) must share **into the HT portfolio**:
+
+1. Client Business Settings → **Partners** → add the **HT Business ID** (not a personal Facebook login).
+2. Share the **ad account** and the **dataset / pixel** (Advertise \+ Manage dataset).
+3. In **HT** Business Settings, accept the partner request.
+4. Assign those shared assets to **HT Cursor** / `HT-SysAdmin` (Assign assets). Shared assets do not appear for the system user until this step.
+
+One Partner accept per client Business covers every asset they attach to that request. Still one accept per client BM — that is the smallest Meta allows.
+
+If the client will not add a Partner, they add `HT-SysAdmin` as a **person** on their BM and assign the same two assets. Worse (login), but works.
+
+CAPI tokens pasted in chat are a last resort. Rotate them. Prefer the system-user token after the pixel is assigned.
+
+## What Cursor still must not do
+
+- Create a new Meta pixel because the API 404s. Pause the tag and report **not writable**.
+- Reuse HT pixel `638327806364040` or HT GA4 `G-GYMSRM45JV` on another hostname.
+- Treat GTM access as GA4 access.
+- Store tokens in Git, Mintlify, or the customer prompt.
+
+## Check it worked
+
+Ask a Cloud Agent (no customer write):
+
+1. List GA4 accounts/properties visible to `GOOGLE_SERVICE_ACCOUNT_JSON`. You should see more than `properties/394561578`.
+2. List Meta ad accounts and datasets visible to `HT-SysAdmin` / `META_SYSTEM_USER_TOKEN`. Golden Gastro should appear only after the Partner share.
+3. Then resume the customer job: key events on **that** property, `GG | SST Meta *` against **that** pixel.
