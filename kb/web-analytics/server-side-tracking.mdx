@@ -1,0 +1,438 @@
+---
+title: "Server Side Tracking — Agent Playbook"
+sidebarTitle: "Server Side Tracking"
+description: "Canonical HT playbook for Stape / GTM / same-origin / consent. Scenario A fixes existing customer SST. Scenario B is greenfield. Do not follow generic checklists that fire purchase or All Pages pixels."
+icon: "server"
+---
+
+<Warning>
+  This page is the **source of truth** for Hellenic Technologies server-side tracking. The older staff pages [Web Analytics](/kb/web-analytics) and [Tracking Setup](/kb/tracking-setup) are high-level commercial notes. They mention Cookiebot, All Pages GA4 config, and `purchase`. **Do not follow those SST steps.** Follow this playbook. Do not invent pixel IDs, conversion IDs, Stape loader filenames, or results.
+</Warning>
+
+This document exists so a Cursor agent can pick up a customer job **without repeating the three-day hellenictechnologies.com debug**. Read the hard rules first. Then pick Scenario A or Scenario B. Copy the **pattern**, not the HT IDs, unless you are on the HT site itself.
+
+## Who this is for
+
+- Cursor agents fixing a live Stape \+ GTM \+ Cloudflare setup (Scenario A).
+- Cursor agents building a **new** Stape \+ web GTM \+ sGTM \+ consent stack (Scenario B).
+- Humans who need the same checklist.
+
+**Reference implementation (HT-only IDs):** `https://hellenictechnologies.com` — repo `patrickabedin/ht-agency-website`. Public diagnostic: `https://hellenictechnologies.com/same-origin`. Service page: `/services/server-side-tracking`. Stape Cloudflare guide: [same origin through Cloudflare](https://stape.io/helpdesk/documentation/how-to-use-same-origin-through-cloudflare). Stape first-touch article: do **not** fire consent-gated pixels on All Pages.
+
+## Hard rules (read before any click)
+
+<AccordionGroup>
+  <Accordion title="Never do these — they cost days">
+    1. **Do not invent a Custom Loader filename.** Generate it in Stape. Paste the exact Generate IIFE and noscript into the site, byte-identical, including the official Google Tag Manager HTML comments.
+    2. **Do not load googletagmanager.com/gtm.js or /metrics/gtm.js.** One Custom Loader only.
+    3. **Do not put a Next.js / WordPress / app route on exact /metrics.** That path is Stape (GTM preview \+ loader). HT checklist lives at /same-origin so it does not steal /metrics.
+    4. **Do not orange-cloud the Stape subdomain** (sgtm.customer.com). DNS-only to Stape. Apex \+ www stay orange-clouded.
+    5. **Do not enable Cookie Keeper or Own CDN in the site snippet together with same-origin /metrics.** Generate-with-Cookie-Keeper still returns the same JS file when Same Origin Path is set.
+    6. **Do not fire base Meta / TikTok / LinkedIn pixels on All Pages.** Fire them on `ht_consent_ready` so UTMs and click IDs are still on the landing URL.
+    7. **Do not unpause web Google Ads conversion tags if sGTM already sends them.**
+    8. **Do not fire `purchase` on a B2B lead site.** HT does not.
+    9. **Do not publish stale GTM workspaces.** HT: never publish web 416 or SST 208. Live is web v412 and SST v214.
+    10. **Do not delete folders in a multi-tenant SST container.** Only edit `HT | SST *` tags. Hostname-exception leftover tags.
+    11. **Do not reuse another tenant's FB or TikTok token rows.** Use `LT - fb *` / `LT - Tiktok ID` for that hostname.
+    12. **Do not write match cookies before iubenda purpose 5.**
+    13. **Do not add a Vercel reverse-proxy for /metrics.** Cloudflare Worker only.
+    14. **Do not enable Click ID Restorer** on the HT multi-tenant container.
+    15. **Do not commit Stape / Meta / LinkedIn tokens.** Rotate any key pasted in chat.
+    16. **Do not claim 400-day Meta cookies or a Stape score of 100** unless a fresh scan shows it.
+    17. **Do not load a second web GTM container.**
+    18. **Bare Custom Loader URL without the encoded query is 404.**
+  </Accordion>
+
+  <Accordion title="What Stape fingerprints">
+    Absolute `j.src` on the customer apex plus encoded query; official GTM HTML comments; Generate noscript iframe; no googletagmanager.com/gtag/js; first-touch pixels on consent-ready, not All Pages; Cookie Keeper off in the snippet.
+  </Accordion>
+</AccordionGroup>
+
+## Two scenarios
+
+**Scenario A — Fix existing customer SST.** The customer already has Stape \+ web GTM \+ sGTM. Do not rebuild from scratch. Inventory first. Patch the same containers.
+
+**Scenario B — Greenfield SST.** New domain. Build in this order: DNS Stape subdomain, Cloudflare Worker same-origin, Stape Generate, consent first, web GTM, sGTM clients and tags, pixels, QA.
+
+Shared stack: browser hits customer.com/{path}/\* (HT: /metrics) then Cloudflare Worker (HT: ht-sgtm-same-origin, header X-From-Cdn: cf-stape) then sgtm.customer.com (DNS-only) then sGTM then GA4 / Ads / Meta CAPI / TikTok Events API / LinkedIn CAPI.
+
+Web GTM still runs in the browser. Its library comes from the same-origin path, not Google's domain.
+
+## Canonical architecture
+
+| Piece | Role | HT reference |
+| --- | --- | --- |
+| Web GTM | Browser tags, Consent Mode, dataLayer, hybrid pixels | `GTM-TRPS26L` account 1226191120 container 6516135 |
+| sGTM on Stape | Server clients plus CAPI / Ads / GA4 collect | `GTM-WKJ6FDLB` account 6202173174 container 169217628 |
+| Stape container | Host \+ Custom Loader | Name Multi-tenant, identifier `sespmfwe`, EU Center (Germany) |
+| Custom domain | sgtm.customer DNS-only to Stape | `sgtm.hellenictechnologies.com` |
+| Same-origin path | Cloudflare maps /{path}/\* to Stape | `/metrics` |
+| CMP | Consent Mode v2 Advanced, default denied | iubenda site `3941073` |
+| Site code | Head order \+ dataLayer \+ match cookies | `src/lib/analytics/*`, `src/lib/iubenda.ts` |
+
+### Head script order (mandatory)
+
+1. CMP bootstrap \+ Google Consent Mode v2 defaults denied for ads/analytics.
+2. Native pixel holds: fbq consent revoke, ttq.holdConsent().
+3. gtag gateway: rewrite googletagmanager.com/gtag/\* to /{path}/gtag/\*.
+4. Custom Loader: exact Stape Generate IIFE \+ official HTML comments.
+5. CMP widget (once).
+
+HT files: `src/components/iubenda-consent.tsx`, `src/lib/analytics/sgtm.ts`, `src/lib/iubenda.ts`.
+
+### Same-origin Cloudflare (what Stape wants)
+
+Follow the official Stape same-origin-through-Cloudflare guide.
+
+| Setting | Required value |
+| --- | --- |
+| Worker | Maps /{path} and /{path}/\* to [https://sgtm.customer.com](https://sgtm.customer.com) |
+| Header | X-From-Cdn: cf-stape |
+| Routes | customer.com/{path}\* and [www.customer.com/\{path\}](http://www.customer.com/{path})\* |
+| SSL | Zone Full. Config rule: URI Path starts with /{path} then SSL Full |
+| Cache | Bypass on /{path}. Query string sort off |
+| Apex \+ www | Orange-clouded |
+| sgtm. | DNS-only (grey cloud) to Stape |
+| Web GTM server\_container\_url | [https://customer.com/\{path\}](https://customer.com/{path}) (HT: [https://hellenictechnologies.com/metrics](https://hellenictechnologies.com/metrics)) |
+| Generate Same Origin Path | /{path} (HT: /metrics) |
+| Enhanced ad blocker | ON |
+| Platform | Other |
+| Cookie Keeper in Generate | Off |
+| Own CDN | Off with same-origin |
+| Exact /{path} | Must hit Stape, not an app page |
+
+Do not add a Next page on /metrics. `src/proxy.ts` excludes metrics and same-origin from the i18n matcher.
+
+### Custom Loader (Generate)
+
+Stape admin, container, Custom Loader, Generate:
+
+| Field | HT value | Customer value |
+| --- | --- | --- |
+| Domain | sgtm.hellenictechnologies.com in the Generate UI. Browser src uses the apex. | That customer's Stape host |
+| Web GTM ID | GTM-TRPS26L | That site's web container |
+| Enhanced ad blocker | ON | ON |
+| Same Origin Path | /metrics | /metrics preferred |
+| Platform | Other | Other or the real CMS |
+| Data Layer variable | blank | blank unless renamed |
+| Use original GTM code | off | off |
+| Generate with Cookie Keeper | off | off |
+
+HT final loader file: `dw0iesespmfwe.js`
+
+HT final query (required, otherwise 404):
+
+`6646uin=DBNbKiQ%2BSCc3JzVfRj9DBVhFSFxWFwtODRIKARUdDBAREgUFHhwJHAIeAx5eEAoeQwQJHU1cCBYRBQ8OAw%3D%3D`
+
+HT head IIFE `j.src` must be exactly:
+
+`https://hellenictechnologies.com/metrics/dw0iesespmfwe.js?` plus the query as the last IIFE argument.
+
+HT noscript iframe src must be exactly:
+
+`https://sgtm.hellenictechnologies.com/ns.html?id=GTM-TRPS26L`
+
+Height 0, width 0, style display none and visibility hidden. No title attribute. Wrap with the official Google Tag Manager noscript HTML comments.
+
+That filename is unique to Stape identifier `sespmfwe`. Another customer gets a different file. Never copy this filename onto a different container.
+
+Generate UI and Account API keep returning the same file plus query while same-origin /metrics is set. If the Stape scan still says update Custom Loader \+4 after a byte-identical paste, that leftover is Stape backend, not a new filename to invent.
+
+The /same-origin checklist may fetch /metrics/ns.html through the Worker because sgtm. often has no CORS. The live iframe must still be whatever Generate emitted.
+
+### Stape Account API (ops only)
+
+Working host: `https://api.app.stape.io` with header `X-AUTH-TOKEN` (Account API key). The EU host returns 401 for account keys. Container key format looks like `eug:{identifier}:...` and uses Bearer on container endpoints.
+
+`GET /api/v2/containers`
+
+`GET /api/v2/containers/{identifier}`
+
+`POST /api/v2/container/{identifier}/custom-loader` with body webGtmId, domain, source other, sameOriginPath /metrics
+
+HT identifier: `sespmfwe`. Store keys as STAPE\_ACCOUNT\_API\_KEY / STAPE\_CONTAINER\_API\_KEY in Cloud Agent secrets. Never commit. Never paste into this KB.
+
+Container power-ups may show cookieKeeperEnabled true while Generate useCookieKeeper is false. That is OK. Do not turn Cookie Keeper on in the snippet.
+
+## Consent (how it must work)
+
+HT uses iubenda Cookie Solution plus Google Consent Mode v2 Advanced. One CMP. Do not add Cookiebot or OneTrust on top.
+
+Purpose map:
+
+- 2 functionality -\> functionality\_storage
+- 3 experience -\> personalization\_storage
+- 4 measurement -\> analytics\_storage
+- 5 marketing -\> ad\_storage, ad\_user\_data, ad\_personalization
+
+Defaults before accept: ads trio denied, analytics\_storage denied, functionality\_storage granted, personalization\_storage denied, security\_storage granted, wait\_for\_update 2000, ads\_data\_redaction true, url\_passthrough true.
+
+On accept: grant the mapped keys. On reject: keep denied and expire HT match / click-ID cookies.
+
+Rules:
+
+- consentOnContinuedBrowsing false. Do not auto-grant after the widget loads.
+- When purpose 5 is granted, push once per page: `ht_consent_ready` and `gtmconsentupdate` with the same fresh event\_id.
+- Seed `_ht_vid` and `_ht_fbc` from fbclid.
+- Persist landing-url click IDs: ttclid, li\_fat\_id, gclid, wbraid, gbraid.
+- Unblock Advanced Mode domains so hybrid pixels can load after consent: Google hosts, connect.facebook.net, TikTok analytics hosts, snap.licdn.com, px.ads.linkedin.com, first-party host, sgtm host.
+- Footer is the only preferences entry (iubenda-cs-preferences-link). Hide the floating keyhole.
+
+What fires when:
+
+- Page load, ads denied: Custom Loader, Consent Mode defaults, pixel holds. No base Meta / TikTok / LinkedIn PageView.
+- Purpose 5 granted / ht\_consent\_ready: web Meta PageView, TikTok Pixel, LinkedIn Insight base tags. GTM ads-consent on those three is notSet. Meta template consent is off. Native fbq / ttq grant.
+- Later conversions: web conversion tags still require the ads trio. sGTM CAPI / Ads tags use adStorageConsent required (GCS G110 / G111 or consent\_state.ad\_storage). ED - gcs reads x-ga-gcs.
+- Purpose 5 denied: no match cookies. Pixels stay held.
+
+Stape first-touch: the landing hit must see the pixels on that same page after consent, while the URL still has fbclid / ttclid / gclid / UTMs.
+
+## Web GTM
+
+HT live: `GTM-TRPS26L` v412 (HT first-touch consent only). Never publish Default Workspace 416. server\_container\_url is [https://hellenictechnologies.com/metrics](https://hellenictechnologies.com/metrics). Constants: GA4 ID, Server container URL, Meta pixel ID, LinkedIn partner ID, DLV - event\_id.
+
+Keep live: Conversion Linker (auto-link hellenictechnologies.com, www, hta.gr only — no Vercel preview hosts). HT Google tag GA4 G-GYMSRM45JV via same-origin /metrics/gtag/js. ClickCease and deferred Clarity if already present. Web Meta / TikTok / LinkedIn base tags on ht\_consent\_ready only. Web conversion tags on the ads consent trio. HT GA4 events from the event table.
+
+Stay paused: HT Google tag Ads (tag 517) and web awct Contact / Calendly / Chat. Ads conversions fire sGTM only.
+
+Do not bring back: WordPress / WHMCS / thank-you triggers, Typeform, CallMe, OHE, UA ecommerce, old X / Pinterest / Trustpilot / previous TikTok IDs, purchase as a site event.
+
+Customer triggers: consent defaults in the page (CMP), CE - ht\_consent\_ready once per page, conversion events from dataLayer plus hostname equals this customer. All Pages only for Conversion Linker / GA4 Google tag — not for Meta / TikTok / LinkedIn base pixels.
+
+## Server GTM (Stape)
+
+HT live: `GTM-WKJ6FDLB` v214 (HT Meta EMQ match keys). Never publish Default Workspace 208. Multi-tenant: yes. Other clients live here. Only edit HT | SST \* tags. Never delete Aldemar / Gatsoulis / car-rental / OHE folders. Leftover Purchase / Lead / Calendly tags must keep a hostname exception so they do not fire on hellenictechnologies.com.
+
+Clients that must exist: GA4 client so /g/collect works on the same-origin path. Facebook / Data Client only from the hostname-scoped LT - fb \* row. TikTok Events API client using this domain's token row.
+
+Server tags: Send data if marketing consent is given (adStorageConsent required). Do not fire CAPI on G100.
+
+Set \_fbp / \_fbc on the first-party /{path} response as HttpOnly so Safari can keep them longer than the 7-day JS cookie. Do not advertise 400-day Meta cookies unless measured.
+
+## GA4
+
+HT ID G-GYMSRM45JV. Transport: first-party POST /{path}/g/collect. Google tag uses built-in Consent Mode Advanced. Library is /{path}/gtag/js never googletagmanager.com/gtag/js. HT key events: schedule, generate\_lead, chat\_lead. Observe only: book\_start, newsletter\_subscribe. Do not mark purchase on B2B or page\_view as a conversion. Debug via GA4 DebugView plus GTM Preview through [https://customer.com/\{path\}](https://customer.com/{path}).
+
+Ecommerce customers (Scenario B) may add view\_item / add\_to\_cart / begin\_checkout / purchase only with a signed measurement plan. Still send event\_id for Meta dedup.
+
+## Google Ads
+
+HT account 736-760-0503. Conversion ID AW-865777823 (confirm in Ads UI before copying). Conversions fire sGTM only: HT | SST Ads Contact / Calendly / Chat. Keep web Ads gtag and awct paused if sGTM already sends. Primary goal HT | Primary leads = Contact \+ Calendly. Biddable: SUBMIT\_LEAD\_FORM, BOOK\_APPOINTMENT, CONTACT on. PURCHASE, PAGE\_VIEW, and CallMe-style phone leads off. Linker is first-party on same-origin. Auto-link real hostnames only.
+
+UI trap: Included in Conversions is not writable via API. Turn off old GA4 imports (purchase, timer\_goal, widget.closed) in the Ads UI by hand.
+
+Greenfield: one conversion action per real business outcome. Send it from sGTM with the same event\_id you put on dataLayer. Do not also fire the web conversion tag for the same hit.
+
+## Meta Ads and Event Match Quality
+
+Stape wants Client and Server. Web Meta Pixel is live (PageView on ht\_consent\_ready). sGTM CAPI tags are live (HT | SST Meta PageView / Contact / Calendly / Chat / ViewContent). Same event\_id on both sides. Advanced Matching on the web pixel and hashed user\_data on CAPI. Do not pause the web pixel to go server-only.
+
+Pixel lives in GTM constant plus META\_PIXEL\_ID. Use LT - fb pixel id / LT - fb api token for hellenictechnologies.com. Never reuse leftover FB - \* rows. Web PageView trigger is CE - ht\_consent\_ready only. Template consent off on the base pixel. Native fbq consent revoke until purpose 5. CAPI events: page\_view, view\_item (ViewContent), generate\_lead (Lead), schedule (Schedule), chat\_lead (Lead). Next.js CAPI: POST /api/analytics/meta plus src/lib/analytics/server-conversions.ts.
+
+Match keys (code: src/lib/analytics/meta-match.ts and meta-user-data.ts):
+
+- `_ht_vid` 730 days = Meta external\_id / dataLayer user\_id
+- `_ht_mk` 180 days = JSON of email, phone, names, geo after a form/chat/newsletter, replayed on later PageView / ViewContent
+- `_ht_fbc` 90 days = built from fbclid as fb.1.ts.id
+- `_fbp` / `_fbc` = platform cookies. sGTM should also set HttpOnly on /{path}
+
+track() after ads consent attaches email\_address, phone\_number, first\_name, last\_name, user\_id, geo, fbp, fbc.
+
+Hashing: email lowercased; phone GR/CY digit rules; names stripped; country greece / ellada / ελ becomes gr. Server also reads x-vercel-ip-\* and Cloudflare geo headers.
+
+EMQ work: more quality keys (email \+ phone \+ name \+ external\_id \+ fbp \+ fbc \+ country) beat spraying empty fields. Do not send raw PII into this KB.
+
+## TikTok Ads
+
+HT pixel CV3IRQ3C77U0G6IA7NV0. Web HT | TikTok Pixel on ht\_consent\_ready. HTML calls ttq.holdConsent() before ttq.load. Purpose 5 grants. Persist ttclid. Server HT | SST TikTok \* (Stape cvt\_K8M24), adStorageConsent required. Token from LT - Tiktok ID row for this hostname only. Dedup with the same event\_id. Do not reuse another tenant's Events API token.
+
+## LinkedIn Ads
+
+Insight partner 47021. CAPI rules: Contact 30351433, Calendly booked 30351441. Web Insight Tag base on ht\_consent\_ready. Persist li\_fat\_id. Server HT | SST LinkedIn PageView stores li\_fat\_id on hostname-scoped page\_view. Contact / Calendly on triggers 280 / 281 with the same event\_id as Insight. adStorageConsent required. Token lives only as GTM constant LinkedIn CAPI token. Do not reuse Typeform / Callpage leftover Insight conversions.
+
+## Event catalog (copy this, then rename values)
+
+Canonical helper on HT: src/lib/analytics/data-layer.ts (track plus event\_id). Do not add a second helper.
+
+| Event | When | GA4 | Google Ads | Meta | TikTok | LinkedIn | EUR (HT) |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| ht\_consent\_ready | CMP grants ads, once/page | - | - | Pixel \+ CAPI PageView | Pixel | Insight | - |
+| page\_view | SPA / App Router path change | yes | - | CAPI PageView same event\_id | Pageview web\+sGTM | store li\_fat\_id | - |
+| view\_item | Service / product page | yes | remarketing if planned | ViewContent | if planned | - | - |
+| book\_start | Booking popup opens | observe | - | custom / audience | - | - | - |
+| schedule | Booking confirmed | key event | primary sGTM | Schedule | if planned | CAPI \+ Insight 30351441 | 150 |
+| generate\_lead | Contact form 200 | key event | primary sGTM | Lead | if planned | CAPI \+ Insight 30351433 | 50 |
+| chat\_lead | Chat CRM lead | key event | secondary sGTM only | Lead | - | - | 50 |
+| newsletter\_subscribe | Footer subscribe | observe | - | - | - | - | - |
+| purchase | Not on HT B2B | ecommerce only | only if real purchase | only if real | only if real | - | - |
+
+Every conversion carries event\_id. Chat tools return event\_id so the rail and CAPI can dedup (src/lib/analytics/chat-conversions.ts).
+
+## HT file map (when the site is this repo)
+
+- src/lib/analytics/sgtm.ts — path, loader file\+query, IIFE, noscript, gtag rewrite
+- src/lib/iubenda.ts — GCM, purpose 5, ht\_consent\_ready, click IDs, pixel hold/grant
+- src/components/iubenda-consent.tsx — head injection order
+- src/app/\[locale\]/layout.tsx — Generate noscript in the body
+- src/lib/analytics/data-layer.ts — track, values, browser CAPI beacon
+- src/lib/analytics/meta-match.ts and meta-user-data.ts — cookies and hashing
+- src/lib/analytics/server-conversions.ts and src/app/api/analytics/meta/route.ts — Meta Graph CAPI
+- src/components/metrics-origin-checklist.tsx — live /same-origin boxes
+- docs/STYLE\_GUIDE.md 7.12f / 7.12g — site design plus measurement lock
+- .env.example — NEXT\_PUBLIC\_GTM\_ID, NEXT\_PUBLIC\_SGTM\_URL, STAPE\_CONTAINER\_API\_KEY, META\_\*
+
+There is no in-repo GTM publish script. Do not commit tokens.
+
+## Scenario A — Fix existing SST
+
+Use this when the customer already has Stape.
+
+<Steps>
+  <Step title="Freeze scope">
+    Write down domain, web GTM ID, sGTM ID, Stape identifier, same-origin path, CMP, pixels, and whether the SST container is multi-tenant. If multi-tenant, you will not delete folders.
+  </Step>
+  <Step title="Export live versions">
+    In GTM note the Published version name and number for web and server. Do not publish Default Workspace if it is stale (HT lesson: 416 / 208).
+  </Step>
+  <Step title="Inventory tags, do not clean yet">
+    List every Meta / TikTok / LinkedIn / Ads / GA4 tag. Mark hostname filters. Leftover FB - \* / other-tenant TikTok stay, but must exclude this hostname.
+  </Step>
+  <Step title="Fix Cloudflare same-origin first">
+    Worker \+ X-From-Cdn: cf-stape \+ SSL Full \+ cache bypass \+ sgtm. DNS-only. Prove [https://customer.com/\{path\}/](https://customer.com/{path}/) is Stape (GTM preview works) and not the website.
+  </Step>
+  <Step title="Regenerate Custom Loader, then paste exactly">
+    Enhanced adblock ON, Same Origin Path set, Cookie Keeper off, Platform Other. Copy both snippets. Put them on the site byte-identical including HTML comments. Update code constants. Do not invent a new filename. Confirm /{file}.js?{query} is 200 and the bare file is 404.
+  </Step>
+  <Step title="Install gtag gateway">
+    If PSI / Stape still fetches googletagmanager.com/gtag/js, add the head rewrite to /{path}/gtag/js before the loader.
+  </Step>
+  <Step title="Fix consent + first-touch">
+    CMP Advanced, default denied. Add ht\_consent\_ready once. Move Meta / TikTok / LinkedIn base pixels off All Pages onto that event. Keep conversion tags on the ads trio. Hold fbq / ttq until purpose 5.
+  </Step>
+  <Step title="Hybrid pixels + EMQ">
+    Unblock pixel hosts in the CMP. Pass event\_id. Seed fbp / fbc / external\_id / email / phone after consent. sGTM CAPI adStorageConsent required. Use this domain's pixel \+ token row.
+  </Step>
+  <Step title="Ads conversions">
+    If sGTM already sends Ads conversions, pause web awct / Ads gtag. Dedup with event\_id. Check Included in Conversions in the Ads UI by hand.
+  </Step>
+  <Step title="QA then publish only a named version">
+    GTM Preview via same-origin, GA4 DebugView, Meta Test Events, TikTok Events Manager, LinkedIn conversion diagnostics, Ads tag assistant. Publish a named version, not an old Default. Re-run the Stape scan. Do not chase Custom Loader \+4 by inventing a new file if Generate still returns the same hash.
+  </Step>
+</Steps>
+
+HT-specific landmines on hellenictechnologies.com: live web v412 and SST v214; never publish 416 / 208; multi-tenant folders stay; LT - fb \* and LT - Tiktok ID rows for hellenictechnologies.com only; iubenda is the CMP; production deploy is npx vercel deploy --prod after push.
+
+## Scenario B — Greenfield SST
+
+Use this on a new domain, or a customer who has no Stape yet.
+
+<Steps>
+  <Step title="Measurement plan first">
+    List real outcomes (lead, book, purchase). Get sign-off. B2B default = no purchase. One event\_id per hit.
+  </Step>
+  <Step title="Containers">
+    Create a new web GTM and a new sGTM. Prefer a dedicated Stape container per customer. Do not dump a new brand into HT sespmfwe / GTM-WKJ6FDLB unless Patrick explicitly says to.
+  </Step>
+  <Step title="Stape custom domain">
+    sgtm.customer.com CNAME to Stape. Grey cloud. Wait for SSL on Stape.
+  </Step>
+  <Step title="Cloudflare Worker same-origin">
+    Copy the HT pattern: path /metrics, header X-From-Cdn: cf-stape, SSL Full, cache bypass, no app route on exact path. Set web GTM server\_container\_url to [https://customer.com/metrics](https://customer.com/metrics).
+  </Step>
+  <Step title="Generate Custom Loader">
+    Enhanced adblock ON, Same Origin Path /metrics, Platform Other, Cookie Keeper off. Paste exact snippets into the site. Deactivate duplicate GTM plugins.
+  </Step>
+  <Step title="Consent before tags">
+    iubenda (HT standard) or the customer's existing CMP. GCM v2 Advanced, default denied, purpose 5 then ht\_consent\_ready. Unblock pixel hosts. No All Pages base pixels.
+  </Step>
+  <Step title="Web GTM minimum">
+    Conversion Linker, GA4 Google tag (same-origin), ht\_consent\_ready trigger, hybrid Meta/TikTok/LinkedIn if those ads exist, conversion tags with ads trio. Pause web Ads conversions if you will send them from sGTM.
+  </Step>
+  <Step title="sGTM minimum">
+    GA4 client. Hostname-scoped lookup tables for pixel IDs and tokens. Meta CAPI \+ TikTok Events API \+ LinkedIn CAPI \+ Ads conversion tags with adStorageConsent required. HttpOnly \_fbp/\_fbc on the first-party path.
+  </Step>
+  <Step title="Site dataLayer">
+    One helper. Events from the catalog. Persist match keys only after marketing consent. Server CAPI for form endpoints if the site can see email/phone.
+  </Step>
+  <Step title="QA + Stape scan">
+    Same checks as Scenario A. Do not go live with two GTM snippets or googletagmanager.com/gtm.js.
+  </Step>
+</Steps>
+
+Greenfield Generate settings: Domain sgtm.CUSTOMER.com, Web GTM ID GTM-XXXX, Enhanced ad blocker ON, Same Origin Path /metrics, Platform Other, empty dataLayer name, Use original GTM code no, Generate with Cookie Keeper no.
+
+If the customer is WordPress, still treat Platform as Other unless you will only use the official Stape plugin and it emits the same Generate snippets. Plugin plus hand-pasted loader = duplicates.
+
+## QA checklist (both scenarios)
+
+Network / HTML:
+
+- Homepage HTML contains the exact Generate IIFE plus official GTM comments.
+- Noscript matches Generate (HT: sgtm host /ns.html?id=GTM-TRPS26L, no extra title).
+- No googletagmanager.com/gtm.js and no second GTM container.
+- /{path}/{loader}.js?{query} returns 200 (large decoded GTM). Bare file without query is 404.
+- Scripts on the page are first-party /{path}/ (loader \+ gtag). Browser must not load sgtm. as a script host. The noscript iframe is the exception.
+- POST /{path}/g/collect with the GA4 tid.
+- First-party FPAU / Google linker cookies appear after analytics consent.
+
+Consent:
+
+- Fresh browser: ads/analytics denied; no Meta PageView / TikTok / Insight.
+- Accept marketing: one ht\_consent\_ready; pixels fire on that landing URL.
+- Reject: _ht_\* cookies expire; pixels stay held.
+- Refresh after accept does not flash the banner (HT: data-iubenda-banner=hide when \_iub\_cs- exists).
+
+Platforms:
+
+- GTM Preview through [https://customer.com/\{path\}](https://customer.com/{path}) (not a Next 404).
+- GA4 DebugView sees events plus Consent Mode.
+- Meta Test Events: browser \+ server, same event\_id, EMQ keys present.
+- TikTok Events Manager: web \+ Events API dedup.
+- LinkedIn: Insight \+ CAPI, same event\_id.
+- Google Ads: one conversion per action from sGTM; web awct paused if that is the plan.
+
+Stape scan leftovers you will still see:
+
+- First touch \+9: almost always All Pages pixels or pixels firing before the landing URL is visible. Fix triggers, do not add more pixels.
+- Custom Loader \+4: after a verified byte-identical Generate paste, this is Stape backend, not a new filename. Do not invent gtm.js or a second file.
+- Page speed: leftover googletagmanager.com/gtag/js means the gateway is missing or runs after the loader.
+
+HT live diagnostic UI: [https://hellenictechnologies.com/same-origin](https://hellenictechnologies.com/same-origin)
+
+## Secrets and access
+
+| Secret | Where | Notes |
+| --- | --- | --- |
+| STAPE\_CONTAINER\_API\_KEY | Cloud Agent / Vercel | Generate loader. Never commit. |
+| STAPE\_ACCOUNT\_API\_KEY | Cloud Agent | X-AUTH-TOKEN on api.app.stape.io. Rotate if pasted in chat. |
+| META\_PIXEL\_ID / META\_CAPI\_ACCESS\_TOKEN | Vercel \+ GTM LT - fb \* | Hostname-scoped |
+| LinkedIn CAPI token | GTM constant only |  |
+| TikTok Events API token | GTM LT - Tiktok ID | Hostname-scoped |
+| GOOGLE\_SERVICE\_ACCOUNT\_JSON | Cloud Agent | GTM API if you automate publishes |
+| VERCEL\_TOKEN | Cloud Agent | HT production deploy only |
+
+Do not write tokens into Mintlify, Git, PR bodies, or artifacts.
+
+## What to copy from HT vs what to create new
+
+Copy the pattern: same-origin /metrics, Generate IIFE fingerprint, gtag gateway, iubenda Advanced \+ ht\_consent\_ready, hybrid pixels, event\_id, match-key cookies after purpose 5, Ads conversions sGTM-only, hostname-scoped lookup tables, no page on exact /metrics.
+
+Do not copy blindly: GTM-TRPS26L, GTM-WKJ6FDLB, sespmfwe, dw0iesespmfwe.js, the 6646uin query, iubenda site 3941073, pixel/partner IDs, Ads 736-760-0503, GA4 G-GYMSRM45JV, EUR 50/150, Worker name, /same-origin copy, multi-tenant folders.
+
+## Official Stape docs to keep open
+
+- Same origin through Cloudflare (stape.io helpdesk)
+- Custom Loader / Generate in the Stape admin for that container
+- First-touch: consent-gated pixels on the landing page, not All Pages
+- Cookie Keeper: incompatible with this same-origin design for the snippet
+
+If a Stape UI label disagrees with a working Generate snippet, trust the Generate output and keep the site byte-identical. Do not change the IIFE to a relative /metrics src. Stape fingerprints the absolute [https://customer.com](https://customer.com) form.
+
+## When you are stuck
+
+1. Diff the live homepage HTML against Generate (head \+ noscript). If they differ, stop and paste Generate.
+2. Check you did not ship a Next/CMS route on exact /{path}.
+3. Check sgtm. is grey-cloud.
+4. Check the pixel trigger is ht\_consent\_ready, not All Pages.
+5. Check you are not about to publish a stale Default Workspace or delete a multi-tenant folder.
+6. Re-read this page before inventing a new loader file.

@@ -4,6 +4,10 @@ sidebarTitle: "Web Analytics"
 description: "Internal reference for HT web analytics services — GTM setup, GA4 implementation, server-side tracking, and GDPR compliance guidance."
 ---
 
+<Warning>
+  This page is commercial overview only. For implementation, Cursor agents must use [**Server Side Tracking**](/kb/web-analytics/server-side-tracking). Do not follow Cookiebot, All Pages pixel, or purchase steps from older checklists.
+</Warning>
+
 The Web Analytics team implements and manages tracking for clients using Google Tag Manager, GA4, and server-side tracking. Services include analytics audits, browser tracking, server-side tracking, and digital compliance — ensuring every client has accurate, privacy-respecting data to inform their decisions.
 
 ## Service Components
@@ -12,15 +16,19 @@ The Web Analytics team implements and manages tracking for clients using Google 
   <Card title="Analytics Audit" icon="magnifying-glass-chart">
     Review the client's existing tracking setup, identify gaps in data collection, and surface data quality issues before any new implementation begins.
   </Card>
+
   <Card title="Browser Tracking" icon="browser">
     Client-side implementation using Google Tag Manager and GA4. Covers page views, events, conversions, and custom dimensions via the GTM web container.
   </Card>
+
   <Card title="Server-Side Tracking" icon="server">
     GTM server-side container setup for first-party data collection, improved attribution accuracy, and reduced dependency on client-side JavaScript.
   </Card>
+
   <Card title="GA4 Configuration" icon="chart-line">
     Full GA4 property setup including event tracking, custom dimensions, conversion configuration, and audience definitions.
   </Card>
+
   <Card title="Digital Compliance" icon="shield-check">
     Consent management platform integration, cookie banner setup, and GDPR-compliant tag firing — including Google Consent Mode v2.
   </Card>
@@ -60,7 +68,7 @@ Follow these steps for every new analytics engagement, from audit through to han
 ## Tools & Platforms
 
 | Tool | Purpose |
-|---|---|
+| --- | --- |
 | Google Tag Manager (Web) | Client-side tag management and event tracking |
 | Google Tag Manager (Server-Side) | Server-side data collection and tag routing |
 | GA4 | Core analytics property — events, conversions, audiences |

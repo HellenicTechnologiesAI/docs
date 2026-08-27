@@ -63,9 +63,7 @@
           {
             "group": "Data & Analytics",
             "pages": [
-              "kb/web-analytics",
-              "kb/hellenicbi",
-              "kb/tracking-setup"
+              "kb/hellenicbi"
             ]
           },
           {
@@ -75,6 +73,15 @@
               "kb/project-delivery",
               "kb/after-sales",
               "kb/retainers"
+            ]
+          },
+          {
+            "group": "Web Analytics",
+            "icon": "chart-line",
+            "pages": [
+              "kb/web-analytics/server-side-tracking",
+              "kb/web-analytics",
+              "kb/tracking-setup"
             ]
           }
         ]
