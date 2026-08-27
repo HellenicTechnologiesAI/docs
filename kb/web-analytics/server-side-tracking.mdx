@@ -15,6 +15,7 @@ Team Cursor prompts (audit first, then spec, then wait for approval):
 
 - [Existing Stape customer](/kb/web-analytics/cursor-prompt-existing-stape) — Scenario A, patch only.
 - [New customer](/kb/web-analytics/cursor-prompt-new-customer) — Scenario B, new web GTM \+ `sgtm.` domain on the HT Multi-tenant Stape container.
+- [Grant Cursor GA4 / GTM / Ads / Meta access](/kb/web-analytics/cursor-ga4-meta-access) — one account-level grant per product, not one property or container at a time.
 
 <Note>
   Live URL: [https://ht-intra.mintlify.site/kb/web-analytics/server-side-tracking](https://ht-intra.mintlify.site/kb/web-analytics/server-side-tracking). Sign in with Mintlify. `ht-intra.mintlify.app` and `ht-intra.mintlify.io` are the wrong hosts and 404.
@@ -431,7 +432,10 @@ HT live diagnostic UI: [https://hellenictechnologies.com/same-origin](https://he
 | META\_PIXEL\_ID / META\_CAPI\_ACCESS\_TOKEN | Vercel \+ GTM LT - fb \* | Hostname-scoped |
 | LinkedIn CAPI token | GTM constant only |  |
 | TikTok Events API token | GTM LT - Tiktok ID | Hostname-scoped |
-| GOOGLE\_SERVICE\_ACCOUNT\_JSON | Cloud Agent | GTM API if you automate publishes |
+| GOOGLE\_SERVICE\_ACCOUNT\_JSON | Cloud Agent | Same SA for GTM \+ GA4 Admin \+ Ads. Must also be added at **account / MCC** level — see [platform access](/kb/web-analytics/cursor-ga4-meta-access). |
+| GOOGLE\_ADS\_DEVELOPER\_TOKEN | Cloud Agent | From the MCC API Center. Never commit. |
+| GOOGLE\_ADS\_LOGIN\_CUSTOMER\_ID | Cloud Agent | MCC ID, digits only. |
+| META\_SYSTEM\_USER\_TOKEN | Cloud Agent | HT Cursor system user. Prefer over a personal login. |
 | VERCEL\_TOKEN | Cloud Agent | HT production deploy only |
 
 Do not write tokens into Mintlify, Git, PR bodies, or artifacts.
