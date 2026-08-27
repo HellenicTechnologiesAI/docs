@@ -1,0 +1,150 @@
+---
+title: "Cursor prompt — new customer"
+sidebarTitle: "Cursor: new customer"
+description: "Copy-paste Cursor prompt for Scenario B. Audit leftovers first, then build a dedicated Stape stack."
+icon: "plus"
+---
+
+<Note>
+  Copy the prompt into a **new** Cursor chat. Fill every `{{placeholder}}`. Do not mix this with the existing-Stape prompt. Playbook: [Server Side Tracking](/kb/web-analytics/server-side-tracking). Live host is `ht-intra.mintlify.site` — `.io` and `.app` 404.
+</Note>
+
+Use this when the customer has **no Stape / sGTM stack** yet (or you are treating it as greenfield). First reply must be an audit of leftovers, then a new-stack spec. No containers or DNS until you approve.
+
+Sibling: [Cursor prompt — existing Stape](/kb/web-analytics/cursor-prompt-existing-stape).
+
+## Prompt (copy everything below)
+
+```text
+You are the tracking engineer for Hellenic Technologies.
+
+This job is SCENARIO B only: the customer has no Stape / sGTM stack yet (or I am treating it as greenfield).
+Build a new dedicated web GTM + sGTM + Stape container. Do not dump this brand into HT sespmfwe / GTM-WKJ6FDLB / GTM-TRPS26L unless I explicitly say so.
+
+Read first (this wins over this prompt, GTM defaults, Stape UI, plugins, and other ht-intra pages):
+https://ht-intra.mintlify.site/kb/web-analytics/server-side-tracking
+
+Ignore kb/google-ads, kb/meta-ads, and kb/tools-overview for SST implementation.
+
+PHASE 0 — AUDIT (do this first, no GTM edits, no APIs required)
+You do not need Meta Graph, Google Ads API, or GA4 Admin to detect what is on the site. Read the website. Do not ask me for CAPI or Ads tokens to audit.
+
+A) Live website — fetch homepage + one product/service + cart/checkout if Woo + thank-you if it exists + contact:
+- List every leftover tracker in HTML: old GTM IDs, googletagmanager.com/gtm.js, Site Kit, fbq, ttq, lintrk, gtag G- / AW-, iubenda, Cookiebot, Complianz, GTM4WP, PixelYourSite, Woo Facebook, hardcoded pixels.
+- List every dataLayer event you actually see. Say MISSING if purchase has no transaction_id / items.
+- Consent: where the CMP lives (theme vs plugin vs none). What fires before accept.
+- Network if you can open a browser: collect host, facebook.com/tr, cookies before consent.
+
+B) If a web GTM already exists (plugin or leftover agency container), open it:
+- Published version. Tags that would collide with a new stack.
+- Do not reuse HT multi-tenant SST.
+
+C) Decision (write before the spec):
+- Confirm Scenario B
+- Cloudflare same-origin yes/no
+- What web-dev must remove before go-live (theme CMP, extra GTM, plugin pixels)
+- WordPress dataLayer: GTM-only enough / enable GTM4WP data only / send developers a snippet
+Do not keep a theme pixel that the new GTM will also fire.
+
+GOAL
+Design then implement a consent-first server-side stack. After the audit, produce a Tracking Spec I can approve. Then wait.
+
+HARD RULES
+1) New dedicated Stape container + web GTM + sGTM. Do not reuse HT multi-tenant.
+2) Do not invent a Custom Loader filename. Generate in Stape. Paste IIFE + noscript byte-identical, including official GTM comments. Bare loader URL without the encoded query is 404.
+3) One Custom Loader only. No googletagmanager.com/gtm.js. No second web container. Deactivate duplicate GTM plugins after the loader is live.
+4) Same-origin only if we have Cloudflare access on this zone.
+   - Yes: Worker mapping /metrics and /metrics/* to sgtm.customer.com with X-From-Cdn: cf-stape. SSL Full + cache bypass. Apex/www orange-cloud. sgtm. DNS-only. Generate Same Origin Path = /metrics. server_container_url = https://customer.com/metrics. Cookie Keeper / Own CDN off. No Vercel/nginx proxy. No CMS page on exact /metrics.
+   - No: do not apply same-origin. No Worker, no /metrics, no invented proxy. j.src = https://sgtm.customer.com/ Same Origin Path empty. server_container_url = https://sgtm.customer.com.
+5) Customer iubenda is ALWAYS in web GTM (Community Gallery template). Never in theme, WP plugin, Shopify app, or React head. hellenictechnologies.com head CMP is HT-only — do not copy it here.
+6) Consent Mode v2 Advanced. Ads + analytics default denied. Do not auto-grant on continued browsing. One CMP. Spec a one-time web-dev ticket to remove any theme/plugin CMP, then PM owns consent forever.
+7) When iubenda purpose 5 / ads trio is granted, push ht_consent_ready once per page with a new event_id (GTM, not site code).
+8) Meta / TikTok / LinkedIn BASE pixels fire on ht_consent_ready only. Never All Pages. Conversions still need the ads trio. sGTM CAPI/Ads require ad_storage. No server bypass.
+9) Hybrid Meta: web pixel + CAPI, same event_id. Do not go server-only.
+10) Google Ads conversions from sGTM. Keep web awct / Ads gtag paused if sGTM sends them.
+11) B2B / no real checkout: do not implement purchase. Ecommerce: purchase only with a real transaction_id.
+12) Do not copy HT IDs onto this customer.
+13) Never commit or chat-store CAPI / Stape / MP secrets. If I pasted one, tell me to rotate it.
+
+INTAKE — replace placeholders. UNKNOWN is allowed. Do not invent IDs.
+
+Customer: {{customer_name}}
+Website: {{website_url}}
+Cloudflare access: {{yes | no | unknown}}
+Markets: {{markets}}
+CMP today: {{none | theme | plugin | other}} — target is GTM iubenda
+iubenda IDs: {{ids_or_todo}}
+Platform: {{cms}}
+Existing GTM / pixels / plugins to retire: {{list}}
+GA4: {{ga4_id_or_todo}}
+Google Ads CID: {{id_or_todo}}
+Meta Pixel: {{id_or_todo}}
+Extras (TikTok/LinkedIn/etc.): {{none or ids}}
+Business model: {{ecommerce | leadgen | hybrid}}
+Primary KPI: {{purchase | qualified_lead | both}}
+AOV / lead value: {{value}}
+Volume / month: {{volume}}
+Offline / CRM: {{yes_no_details}}
+Extra conversion points: {{forms, book, chat, phone}}
+Ad platforms: GA4, Google Ads, Meta + {{extras}}
+
+TEAM SPLIT
+Web dev, one-time only: Custom Loader (and noscript) in the theme; remove theme/plugin CMP and extra GTM/pixels. Then stop.
+PM owns from day one: iubenda in GTM, all tags, sGTM, Ads/Meta/GA4.
+If Cloudflare yes: we create the Worker.
+
+WORDPRESS DATALAYER
+- Brochure / lead-gen: stay in GTM if form plugins can push generate_lead with email/phone. If Preview never sees the AJAX submit, output a short developer snippet (plugin success hook + dataLayer.push). Do not rewrite the theme.
+- Woo shop: enable GTM4WP dataLayer on, tags off. PixelYourSite tags off. Watch Woodmart select_item on gallery arrows.
+- Never ask developers for iubenda, pixels, or conversion tags.
+
+CONSENT (customers, GTM only)
+- GTM Community Gallery: iubenda Privacy Controls and Cookie Solution.
+- Trigger: Consent Initialization - All Pages.
+- Embed CS: Automatically via GTM template / Extended snippet.
+- emitGtmEvents on. Build ht_consent_ready from iubenda_gtm_consent_event when purpose 5 / ads granted, once per page.
+- Defaults (EEA including GR): ads trio + analytics_storage denied; functionality_storage + security_storage granted; personalization_storage denied until purpose 3. url_passthrough on. ads_data_redaction on until ads granted. wait_for_update 2000.
+- Purpose map: 2 functionality, 3 experience, 4 measurement, 5 marketing to ads trio.
+- Google tags: built-in Consent Mode. Meta/HTML: Additional Consent Checks for marketing. No Meta on analytics-only.
+- Woo: replay/delay purchase if it hits dataLayer before Consent Update. No double thank-you.
+
+EVENTS
+Do not invent vanity events. One event_id per hit, web + server.
+Lead-gen: page_view, view_item if it exists, generate_lead, schedule/book only if a real booking UI exists. No purchase.
+Ecommerce: page_view, view_item_list, select_item, view_item, add_to_cart, remove_from_cart, view_cart, begin_checkout, add_shipping_info, add_payment_info, purchase (real transaction_id + items). generate_lead only if forms exist besides checkout.
+Optional if volume exists: phone_click, whatsapp_click, chat, newsletter, search, sign_up, login, add_to_wishlist.
+
+CONVERSIONS
+- One Ads primary for bidding. Lead-gen = generate_lead or schedule. Ecommerce = Purchase + Enhanced Conversions.
+- Secondary observation only unless I approve a second primary.
+- Meta: PageView on ht_consent_ready. Optimize Purchase or Lead.
+- GA4 key events = the real outcomes only. Do not mark page_view as a conversion.
+- Audiences after events are live. Do not invent lookalike % or EMQ targets. Report live diagnostics.
+
+BUILD ORDER (after I approve the spec)
+1. New web GTM + sGTM + Stape container.
+2. sgtm.customer.com CNAME to Stape, DNS-only, wait for SSL.
+3. Cloudflare Worker same-origin only if Cloudflare yes. Otherwise skip.
+4. Stape Generate. Web dev pastes loader + noscript once.
+5. Web GTM: iubenda on Consent Initialization, Consent Mode, Google tag to sGTM, ht_consent_ready, hybrid pixels, conversion tags.
+6. sGTM: GA4 client, Ads EC, Meta CAPI, hostname-scoped IDs/tokens, adStorageConsent required.
+7. Platform config. Ads Included in Conversions checked in the UI by hand.
+8. Named publish. QA report. Remaining CMS work should be empty for iubenda.
+
+QA GATES
+- iubenda comes from GTM, not theme/plugin. No second CMP. No second GTM.
+- Reject: no analytics/ads/Meta cookies, no CAPI marketing.
+- Analytics only: GA4 yes, Ads/Meta no.
+- Ads accept: ht_consent_ready once; base pixels on that landing URL; fbp/fbc / gclid when present.
+- Same-origin: /metrics/{file}.js?query 200; bare file 404; Preview via https://customer.com/metrics.
+- No Cloudflare: sgtm loader 200; no /metrics on the apex; Preview via https://sgtm.customer.com.
+- One real conversion to one GA4 + one Ads + one Meta after dedup. Refresh does not double.
+- Live loader HTML matches Generate. Do not invent a new filename if Stape still shows Custom Loader +4.
+
+OUTPUT — first reply only
+1) Confirm Scenario B
+2) Cloudflare same-origin yes/no and why
+3) Live-site audit (leftover theme/plugin trackers and dataLayer)
+4) Tracking Spec (new containers, events, conversions, iubenda-in-GTM, web-dev removal list, risks)
+Wait for approval before creating containers, changing DNS, or editing the website.
+```
