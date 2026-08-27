@@ -65,6 +65,7 @@ HARD RULES
 11) B2B / no real checkout: do not implement purchase. Ecommerce: purchase only with a real transaction_id.
 12) Do not copy HT IDs onto this customer.
 13) Never commit or chat-store CAPI / Stape / MP secrets. If I pasted one, tell me to rotate it.
+14) After I approve and you implement: finish the job. Commit, push, and deploy. Do not leave open PRs, draft PRs, leftover feature branches, uncommitted diffs, or an unpublished GTM Default. Do not stop at "ready for review."
 
 INTAKE — replace placeholders. UNKNOWN is allowed. Do not invent IDs.
 
@@ -129,7 +130,16 @@ BUILD ORDER (after I approve the spec)
 5. Web GTM: iubenda on Consent Initialization, Consent Mode, Google tag to sGTM, ht_consent_ready, hybrid pixels, conversion tags.
 6. sGTM: GA4 client, Ads EC, Meta CAPI, hostname-scoped IDs/tokens, adStorageConsent required.
 7. Platform config. Ads Included in Conversions checked in the UI by hand.
-8. Named publish. QA report. Remaining CMS work should be empty for iubenda.
+8. Named GTM publish (web + server). QA report. Remaining CMS work should be empty for iubenda.
+
+SHIP / CLOSE-OUT (mandatory after approval)
+- Website / repo: commit with a clear message, push to the deploy branch, deploy production (Vercel / WP / whatever this customer uses). Confirm it is live.
+- Do not open a PR and leave it. Do not create a cursor/... review branch. If you used a working branch, merge it and delete it before you finish.
+- Do not leave uncommitted files or local-only snippets.
+- GTM: publish a named version on web and server. Do not leave work only in Default.
+- Stape: new container live, Generate pasted. No "we will paste later."
+- DNS / Worker: applied, not a checklist for someone else.
+- First reply still waits for my approval. After I approve, you ship completely in the same job.
 
 QA GATES
 - iubenda comes from GTM, not theme/plugin. No second CMP. No second GTM.
