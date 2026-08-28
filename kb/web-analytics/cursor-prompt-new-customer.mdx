@@ -66,6 +66,7 @@ HARD RULES
 12) Do not copy HT IDs onto this customer.
 13) Never commit or chat-store CAPI / Stape / MP secrets. If I pasted one, tell me to rotate it.
 14) After I approve and you implement: finish the job. Commit, push, and deploy. Do not leave open PRs, draft PRs, leftover feature branches, uncommitted diffs, or an unpublished GTM Default. Do not stop at "ready for review."
+15) Every job uses a private GitHub repo ht-<customer-slug> (example ht-goldengastro). Create it if missing. Commit and push audit, spec, QA, and STATUS.md as you go so another colleague can pick up in their own Cursor. Never commit credentials, tokens, or .env values. Cloud Agent secrets only. Read https://ht-intra.mintlify.site/kb/customer-github-repo
 
 INTAKE — replace placeholders. UNKNOWN is allowed. Do not invent IDs.
 
@@ -133,7 +134,7 @@ BUILD ORDER (after I approve the spec)
 8. Named GTM publish (web + server). QA report. Remaining CMS work should be empty for iubenda.
 
 SHIP / CLOSE-OUT (mandatory after approval)
-- Website / repo: commit with a clear message, push to the deploy branch, deploy production (Vercel / WP / whatever this customer uses). Confirm it is live.
+- Website / repo: work in GitHub `ht-<customer-slug>` (create if missing). Commit with a clear message, push, deploy production. Update STATUS.md. Confirm it is live. Never commit credentials.
 - Do not open a PR and leave it. Do not create a cursor/... review branch. If you used a working branch, merge it and delete it before you finish.
 - Do not leave uncommitted files or local-only snippets.
 - GTM: publish a named version on web and server. Do not leave work only in Default.
