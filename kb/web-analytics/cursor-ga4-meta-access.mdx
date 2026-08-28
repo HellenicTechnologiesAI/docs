@@ -6,74 +6,100 @@ icon: "key"
 ---
 
 <Warning>
-  **Do not create a Google service account. Do not invite `cursor@….iam.gserviceaccount.com` to GA4, GTM, or Google Ads.** The GA4 Add-users box turning that email red is irrelevant. Cursor already uses `digital@hellenictechnologies.com` via a long-lived OAuth refresh token. That identity already sees the full HT Google stack.
+  **Do not create or invite a Google service account.** Do not add `cursor@….iam.gserviceaccount.com` to GA4, GTM, or Ads. Agents read **Cloud Agent secrets** (environment variables) and refresh OAuth. Never print a token, never commit one, never paste one into chat or this KB.
 </Warning>
 
 Live URL: [https://ht-intra.mintlify.site/kb/web-analytics/cursor-ga4-meta-access](https://ht-intra.mintlify.site/kb/web-analytics/cursor-ga4-meta-access).
 
-Related: [SST playbook](/kb/web-analytics/server-side-tracking) · [Existing Stape prompt](/kb/web-analytics/cursor-prompt-existing-stape) · [New customer prompt](/kb/web-analytics/cursor-prompt-new-customer).
+Related: [SST playbook](/kb/web-analytics/server-side-tracking) · [Existing Stape](/kb/web-analytics/cursor-prompt-existing-stape) · [New customer](/kb/web-analytics/cursor-prompt-new-customer).
 
-## Who Cursor is
+## How agents authenticate
 
-| Surface | Identity | How agents authenticate |
-| --- | --- | --- |
-| **GA4, GTM, Sheets, Gmail, Calendar, GSC, Drive** | `digital@hellenictechnologies.com` | OAuth client \+ refresh token. REST. |
-| **Google Ads** | Same human, MCC `3568564840` | Separate OAuth client \+ refresh token. **`google-ads-api` gRPC only.** Never `googleads.googleapis.com` REST (returns HTML 404 from this environment). |
-| **DV360** | Same Google stack, Partner `1606967182` | Separate OAuth client. REST on `displayvideo.googleapis.com`. |
-| **Meta** | System user `HT-SysAdmin` | Long-lived Graph token. 57 ad accounts today. |
+Secrets are injected as env vars on Cloud Agents (`All Repositories`, Runtime Secret). Read `process.env` / `$NAME`. Names are case-sensitive.
 
-Tokens live in **Cloud Agent secrets** (and the marketing-data workspace `.env/`). Never in Git, Mintlify, or chat. If a token was pasted in chat, rotate it.
+| Surface | Identity | Secret names (use these) | Call style |
+| --- | --- | --- | --- |
+| **GA4 / GTM / Sheets / GSC** | `digital@hellenictechnologies.com` | `GOOGLE_OAUTH_CLIENT_ID` `GOOGLE_OAUTH_CLIENT_SECRET` `GOOGLE_OAUTH_REFRESH_TOKEN` | REST. Refresh, then Bearer. |
+| **Google Ads** | same human, MCC | `GOOGLE_ADS_CLIENT_ID` `GOOGLE_ADS_CLIENT_SECRET` `GOOGLE_ADS_REFRESH_TOKEN` `Google_Ads_developer_token` `GOOGLE_ADS_MCC_ID` | **`google-ads-api` gRPC only.** Never REST `googleads.googleapis.com` (HTML 404). |
+| **DV360** | Partner `1606967182` | `DV360_CLIENT_ID` `DV360_CLIENT_SECRET` `DV360_REFRESH_TOKEN` `DV360_PARTNER_ID` | REST `displayvideo.googleapis.com`. |
+| **Meta** | `HT-SysAdmin` | Prefer `META_ADS_ACCESS_TOKEN`. Fallback `META_ADS_TOKEN` then `META_ACCESS_TOKEN`. | Graph REST. |
 
-## Verified inventory (do not assume HT-only)
+Aliases: `GOOGLE_ADS_MCC_ID` is the login-customer-id (digits, no dashes). `Google_Ads_developer_token` is the Ads developer token (that exact casing). `GOOGLE_SERVICE_ACCOUNT_JSON` is Drive/KB only — not this stack.
 
-Checked live against `digital@` / `HT-SysAdmin`:
+<Note>
+  If `GOOGLE_OAUTH_*` is missing, GA4 Admin and GTM APIs will fail even when Ads/Meta work. Add those three secrets. Do not fall back to inviting the service account.
+</Note>
 
-| Product | Visible now | Golden Gastro |
-| --- | --- | --- |
-| GA4 | 84 accounts / 192 properties | **Yes.** Account `396117908`, property `539367952`, measurement `G-LNPZX5HKQF` |
-| GTM | 210 accounts | **Yes.** Account `6357803150`, web container `GTM-N8ZFXBTK` (`253795963`) |
-| Google Ads | 124 accounts under MCC `3568564840` | Use `customer_client` via gRPC. Do not invent a CID. |
-| Meta | 57 ad accounts | **No.** Not in `me/adaccounts`. Needs a Partner share of the Golden Gastro ad account \+ dataset into HT. Do not create a pixel. Do not reuse the HT pixel. |
+## Refresh a Google access token
 
-Known IDs agents may reuse (do not copy onto another customer): HT GA4 `394561578`, HT web GTM `1226191120`, HT SST GTM `6202173174`.
+Do this in-process. Do not log the response body.
 
-## Agent rules
+```bash
+curl -sS -X POST https://oauth2.googleapis.com/token \
+  -d "client_id=$GOOGLE_OAUTH_CLIENT_ID" \
+  -d "client_secret=$GOOGLE_OAUTH_CLIENT_SECRET" \
+  -d "refresh_token=$GOOGLE_OAUTH_REFRESH_TOKEN" \
+  -d "grant_type=refresh_token"
+```
 
-1. Need GA4 data or Admin writes (key events, audiences)? Refresh the **digital@** token, then `accountSummaries` / `properties/{id}`. Prefer the 192-property list over guesses.
-2. Need GTM reads/writes? Same token. `GET …/tagmanager/v2/accounts` then `…/accounts/{id}/containers`.
-3. Need Google Ads? `google-ads-api` \+ MCC `3568564840` as `login-customer-id`. Never raw REST to `googleads.googleapis.com`.
-4. Need Meta? `HT-SysAdmin` token. If the customer ad account or pixel is missing from the 57, stop and report **not writable**. Partner-share that BM into HT, then assign the asset to `HT-SysAdmin`.
-5. A previous agent that said it only had HT `properties/394561578` was using the **service account**, not this OAuth. Ignore that report.
+Ads and DV360 use the same token URL with their own `CLIENT_ID` / `CLIENT_SECRET` / `REFRESH_TOKEN`.
 
-## When a _new_ client is missing
+Then:
 
-Invite the **human** `digital@hellenictechnologies.com`, not a service account.
+- GA4 list: `GET https://analyticsadmin.googleapis.com/v1beta/accountSummaries?pageSize=200`
+- GA4 report: `POST https://analyticsdata.googleapis.com/v1beta/properties/{id}:runReport`
+- GTM list: `GET https://tagmanager.googleapis.com/tagmanager/v2/accounts`
+- Meta list: `GET https://graph.facebook.com/v19.0/me/adaccounts?fields=id,name,currency` with `META_ADS_ACCESS_TOKEN`
+- Ads children: `google-ads-api` `customer_client` on `GOOGLE_ADS_MCC_ID`. Header login-customer-id = that MCC.
+- DV360: `GET https://displayvideo.googleapis.com/v4/advertisers?partnerId=$DV360_PARTNER_ID`
 
-| Product | What to add |
+Expected sizes when healthy: GA4 ~84 accounts / ~192 properties; GTM ~210 accounts; Ads ~124 MCC children; Meta ~57 ad accounts.
+
+## Verified fixtures (do not copy onto another customer)
+
+| Product | Golden Gastro |
 | --- | --- |
-| GA4 | Account access management → add `digital@hellenictechnologies.com` as Editor or Administrator. The UI accepts this email. |
-| GTM | Account User Management → add `digital@` as Account Admin. |
-| Google Ads | Link the advertiser under MCC `3568564840`. `digital@` already sits on the MCC. |
-| Meta | Client BM → Partners → HT Business ID → share ad account \+ dataset → assign to `HT-SysAdmin`. |
+| GA4 | Account `396117908`, property `539367952`, `G-LNPZX5HKQF` |
+| GTM | Account `6357803150`, `GTM-N8ZFXBTK` |
+| Meta | **Not** in the 57. Partner-share into HT, assign to `HT-SysAdmin`. Do not create a pixel. |
 
-One add per **account / MCC / Business**. Not per property, container, or pixel.
+HT-only: GA4 `394561578`, web GTM `1226191120`, SST GTM `6202173174`.
 
-## Secrets (names only)
+## New client missing from the list
 
-Store in Cloud Agent secrets. Do not paste values into this KB.
+Invite **`digital@hellenictechnologies.com`** (human), or link under MCC / Partner-share Meta. One grant per account, MCC, or Business — not per property.
 
-- `GOOGLE_OAUTH_CLIENT_ID` / `GOOGLE_OAUTH_CLIENT_SECRET` / `GOOGLE_OAUTH_REFRESH_TOKEN` — digital@ (GA4, GTM, Sheets, …)
-- `GOOGLE_ADS_CLIENT_ID` / `GOOGLE_ADS_CLIENT_SECRET` / `GOOGLE_ADS_REFRESH_TOKEN` / `GOOGLE_ADS_DEVELOPER_TOKEN` / `GOOGLE_ADS_LOGIN_CUSTOMER_ID` (`3568564840`)
-- `DV360_CLIENT_ID` / `DV360_CLIENT_SECRET` / `DV360_REFRESH_TOKEN`
-- `META_SYSTEM_USER_TOKEN` — HT-SysAdmin
-- Stape / TikTok / others stay in their existing secret names
+## Connection-test prompt (paste into a new Cloud Agent)
 
-`GOOGLE_SERVICE_ACCOUNT_JSON` is **not** the marketing stack. Do not invite that SA onto customer GA4/GTM/Ads.
+```text
+Read https://ht-intra.mintlify.site/kb/web-analytics/cursor-ga4-meta-access
 
-## What Cursor still must not do
+Read Cloud Agent secrets from the environment. Do not print any secret, token, or JSON key.
+Do not create or invite a Google service account.
 
-- Create or invite `*.iam.gserviceaccount.com` users.
-- Create a Meta pixel or Ads account because an API 404s.
-- Reuse HT pixel, HT GA4 `G-GYMSRM45JV`, HT web `GTM-TRPS26L`, or HT Ads `736-760-0503` on another hostname.
-- Call `googleads.googleapis.com` over REST.
-- Store tokens in Git, Mintlify, or a customer prompt.
+Connection test only. For each surface report PASS/FAIL + counts + the secret names you found (names only):
+
+1) Google Ads — refresh GOOGLE_ADS_* ; Google_Ads_developer_token ; GOOGLE_ADS_MCC_ID.
+   Use npm google-ads-api (gRPC). Never hit googleads.googleapis.com REST.
+   Query customer_client under the MCC. Expect ~124 accounts.
+
+2) Meta — META_ADS_ACCESS_TOKEN (fallback META_ADS_TOKEN / META_ACCESS_TOKEN).
+   GET me/adaccounts. Expect ~57. Say whether goldengastro is in the list (it should not be).
+
+3) DV360 — refresh DV360_* ; GET advertisers?partnerId=$DV360_PARTNER_ID.
+
+4) GA4 + GTM — refresh GOOGLE_OAUTH_*.
+   GET accountSummaries (expect ~84 / ~192). GET tagmanager/v2/accounts (expect ~210).
+   Confirm goldengastro.de property 539367952 and GTM-N8ZFXBTK.
+   If GOOGLE_OAUTH_* is missing, mark GA4/GTM FAIL missing-secret. Do not invent a workaround.
+
+Stop after the table. No GTM edits, no publishes, no website changes.
+```
+
+## What Cursor must not do
+
+- Invite `*.iam.gserviceaccount.com`
+- Print or commit tokens
+- Call `googleads.googleapis.com` over REST
+- Create a Meta pixel because Graph 404s
+- Reuse HT pixel / HT GA4 / HT web GTM on another hostname
