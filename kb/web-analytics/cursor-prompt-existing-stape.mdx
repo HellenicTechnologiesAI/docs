@@ -14,7 +14,7 @@ icon: "wrench"
 
   Cookie Keeper is **after** the first loader and tags work. First Generate: Cookie Keeper **off**. After named publish \+ QA: Generate **with** Cookie Keeper, user identifier **Stape User ID**, and tell web-dev to **replace** the previous IIFE (do not add a second snippet). Do not pick the Cookie identifier unless a compliant server-set master cookie already exists.
 
-  Worked example: [Golden Gastro](/kb/web-analytics/customers/golden-gastro).
+  **Yes Cloudflare:** Worker \+ `/metrics` (or the path already live) to `sgtm.` with `X-From-Cdn: cf-stape`. Leave `sgtm.` grey-cloud. Do not enable Own CDN with same-origin. Worked yes-case: [Golden Gastro](/kb/web-analytics/customers/golden-gastro) — `/metrics` Worker live, Cookie Keeper \+ `/metrics` already pasted. Do not send that site another loader.
 </Warning>
 
 Use this when the customer **already has** Stape \+ web GTM \+ sGTM. First reply must be an audit, then a patch spec. No GTM edits until you approve.
