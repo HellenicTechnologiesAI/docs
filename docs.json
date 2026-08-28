@@ -42,7 +42,9 @@
               {
                 "group": "Customers",
                 "icon": "users",
-                "pages": []
+                "pages": [
+                  "kb/web-analytics/customers/golden-gastro"
+                ]
               }
             ]
           }
