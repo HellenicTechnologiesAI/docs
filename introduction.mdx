@@ -1,51 +1,31 @@
 ---
-title: "Hellenic Technologies Internal Staff Knowledge Base"
+title: "Hellenic Technologies internal KB"
 sidebarTitle: "Introduction"
-description: "Welcome to the Hellenic Technologies internal knowledge base. Find guides, SOPs, service documentation, and team resources in one place."
+description: "Internal HT knowledge base. Only the live tracking and Cursor pages — no demo articles."
 ---
 
-Welcome to the Hellenic Technologies internal knowledge base — the central reference hub for every team member across all departments. Whether you're onboarding a new client, configuring a hellenicAI assistant, running a performance campaign, or looking up an internal process, this is where you'll find the authoritative guides, SOPs, and service documentation that keep our agency running smoothly. This page gives you a quick map of everything available and explains how to get the most out of this resource.
-
-## Explore by Section
+This is the Hellenic Technologies **internal** knowledge base. Only pages we maintain live here. There are no demo or template articles.
 
 <CardGroup cols={2}>
-  <Card title="AI Services" icon="robot" href="/kb/hellenicai-platform">
-    Guides for the hellenicAI platform, AI Assistants, OmniChannel Chatbot, B2B AI Outreach, and all AI-powered products.
+  <Card title="Server Side Tracking playbook" icon="server" href="/kb/web-analytics/server-side-tracking">
+    Source of truth for Stape, GTM, consent, and same-origin.
   </Card>
-  <Card title="Digital Marketing" icon="bullhorn" href="/kb/digital-marketing-overview">
-    SOPs and best practices for Google Ads, Meta Ads, TikTok, LinkedIn, SEO/AEO, Social Media, and Performance Marketing.
+
+  <Card title="Cursor: existing Stape" icon="wrench" href="/kb/web-analytics/cursor-prompt-existing-stape">
+    Copy-paste prompt. Scenario A. Audit, then patch.
   </Card>
-  <Card title="Web & Design" icon="globe" href="/kb/web-development">
-    Documentation for Falcon, Lynx, and Mammoth web projects, eCommerce, Agentic Websites, Creative Design, and Figma workflows.
+
+  <Card title="Cursor: new customer" icon="plus" href="/kb/web-analytics/cursor-prompt-new-customer">
+    Copy-paste prompt. Scenario B. Multi-tenant Stape, dedicated web GTM.
   </Card>
-  <Card title="Data & Analytics" icon="chart-bar" href="/kb/web-analytics">
-    References for GA4, GTM, server-side tracking, hellenicBI dashboards, data pipelines, and marketing attribution.
+
+  <Card title="Cursor: platform access" icon="key" href="/kb/web-analytics/cursor-ga4-meta-access">
+    digital@ OAuth, Ads gRPC, DV360, HT-SysAdmin. No service-account invites.
   </Card>
-  <Card title="Client Management" icon="handshake" href="/kb/onboarding-process">
-    Client onboarding checklists, account management guidelines, after-sales processes, and retainer management.
-  </Card>
-  <Card title="Processes & SOPs" icon="list-check" href="/sops/new-client-workflow">
-    Step-by-step standard operating procedures for new client workflows, escalation paths, and cross-department processes.
+
+  <Card title="Customer GitHub repo" icon="github" href="/kb/customer-github-repo">
+    Every job is `ht-<slug>`. Save progress. Never commit credentials.
   </Card>
 </CardGroup>
 
-## How to Use This Knowledge Base
-
-<Steps>
-  <Step title="Search for Your Topic">
-    Use the search bar at the top of the page to find articles by keyword, service name, tool, or process. Most answers are a single search away.
-  </Step>
-  <Step title="Browse by Service Area or Section">
-    Use the left-hand sidebar to navigate by department or service. Each section is organised to match the way our teams are structured, so you can drill down from a high-level overview to detailed SOPs.
-  </Step>
-  <Step title="Flag Missing Content to Ops">
-    If you can't find what you're looking for, don't assume it doesn't exist — flag the gap to the Operations team so we can prioritise creating or migrating that content.
-  </Step>
-  <Step title="Suggest Updates via the Team Channel">
-    Spotted something outdated or incorrect? Post a note in the designated knowledge base update channel so the responsible team lead can review and action it promptly. Keeping this resource accurate is a shared responsibility.
-  </Step>
-</Steps>
-
-<Note>
-  This knowledge base is strictly **internal and confidential**. All content is intended solely for Hellenic Technologies staff. Do not share links, screenshots, or content from this portal with clients, vendors, or external parties without explicit approval from your team lead or the Operations department.
-</Note>
+Sign in at [https://ht-intra.mintlify.site](https://ht-intra.mintlify.site). Hosts ending in `.app` or `.io` 404.
