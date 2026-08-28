@@ -136,6 +136,106 @@
       "source": "/kb/tracking-setup",
       "destination": "/kb/web-analytics/server-side-tracking",
       "permanent": true
+    },
+    {
+      "source": "/kb/website-packages",
+      "destination": "/introduction",
+      "permanent": true
+    },
+    {
+      "source": "/kb/creative-design",
+      "destination": "/introduction",
+      "permanent": true
+    },
+    {
+      "source": "/kb/agentic-websites",
+      "destination": "/introduction",
+      "permanent": true
+    },
+    {
+      "source": "/kb/hellenicbi",
+      "destination": "/introduction",
+      "permanent": true
+    },
+    {
+      "source": "/kb/project-delivery",
+      "destination": "/introduction",
+      "permanent": true
+    },
+    {
+      "source": "/kb/after-sales",
+      "destination": "/introduction",
+      "permanent": true
+    },
+    {
+      "source": "/kb/retainers",
+      "destination": "/introduction",
+      "permanent": true
+    },
+    {
+      "source": "/kb/ai-assistants",
+      "destination": "/introduction",
+      "permanent": true
+    },
+    {
+      "source": "/kb/omnichannel-chatbot",
+      "destination": "/introduction",
+      "permanent": true
+    },
+    {
+      "source": "/kb/b2b-outreach",
+      "destination": "/introduction",
+      "permanent": true
+    },
+    {
+      "source": "/sops/project-kickoff",
+      "destination": "/introduction",
+      "permanent": true
+    },
+    {
+      "source": "/sops/quality-assurance",
+      "destination": "/introduction",
+      "permanent": true
+    },
+    {
+      "source": "/sops/handover-checklist",
+      "destination": "/introduction",
+      "permanent": true
+    },
+    {
+      "source": "/sops/brand-guidelines",
+      "destination": "/introduction",
+      "permanent": true
+    },
+    {
+      "source": "/sops/gdpr-compliance",
+      "destination": "/introduction",
+      "permanent": true
+    },
+    {
+      "source": "/sops/security-practices",
+      "destination": "/introduction",
+      "permanent": true
+    },
+    {
+      "source": "/sops/communication-standards",
+      "destination": "/introduction",
+      "permanent": true
+    },
+    {
+      "source": "/sops/escalation-process",
+      "destination": "/introduction",
+      "permanent": true
+    },
+    {
+      "source": "/sops/sla-guidelines",
+      "destination": "/introduction",
+      "permanent": true
+    },
+    {
+      "source": "/sops/support-tiers",
+      "destination": "/introduction",
+      "permanent": true
     }
   ]
 }
