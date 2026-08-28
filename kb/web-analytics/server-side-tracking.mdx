@@ -52,6 +52,7 @@ Team Cursor prompts (audit first, then spec, then wait for approval):
     17. **Do not load a second web GTM container.**
     18. **Bare Custom Loader URL without the encoded query is 404.**
     19. **Do not apply same-origin unless we have Cloudflare access** on that customer zone. No Worker, no `/metrics` on the apex, no Generate Same Origin Path. The loader stays on `sgtm.customer.com`.
+    20. **Every customer job lives in GitHub `ht-<slug>`.** Commit and push audit, spec, QA, and STATUS as you go. Never commit credentials. A colleague must be able to pick up from that repo in their own Cursor. See [Customer GitHub repo](/kb/customer-github-repo).
   </Accordion>
 
   <Accordion title="What Stape fingerprints">

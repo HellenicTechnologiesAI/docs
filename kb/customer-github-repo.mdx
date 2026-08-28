@@ -1,0 +1,76 @@
+---
+title: "Customer GitHub repo — every job"
+sidebarTitle: "Customer GitHub repo"
+description: "Every customer job lives in a private GitHub repo named after the customer. No credentials. Another colleague can pick up in their own Cursor."
+icon: "github"
+---
+
+<Warning>
+  **Every customer job needs a GitHub repo named after that customer.** Audits, specs, GTM notes, site diffs, QA, and STATUS must be committed and pushed there as you go. Chat is not the archive. **Never commit credentials.** A colleague with their own Cursor and Cloud Agent secrets must be able to clone the repo and continue.
+</Warning>
+
+Live URL: [https://ht-intra.mintlify.site/kb/customer-github-repo](https://ht-intra.mintlify.site/kb/customer-github-repo).
+
+Related: [SST playbook](/kb/web-analytics/server-side-tracking) · [Cursor platform access](/kb/web-analytics/cursor-ga4-meta-access) · [Onboarding](/kb/onboarding-process).
+
+## Rule
+
+1. Before you write a spec or edit GTM, find or **create** a **private** repo named `ht-<slug>`.
+2. Slug = customer name, lowercase, ASCII, hyphens. Examples: `ht-goldengastro`, `ht-aldemar-olympian-village`.
+3. If that repo already exists, **use it**. Do not open a second repo for the same customer.
+4. Commit and push after every meaningful step (audit, spec, implementation, QA). Do not leave progress only in Cursor chat or on a local disk.
+5. **No secrets in the repo.** Tokens stay in Cloud Agent secrets. See [platform access](/kb/web-analytics/cursor-ga4-meta-access).
+
+Exceptions (do not rename these):
+
+| Work | Repo |
+| --- | --- |
+| HT website | `ht-agency-website` |
+| This staff KB | `HellenicTechnologiesAI/docs` |
+| OmniAI customer bot | `ht-bot-<slug>` only |
+
+All other customer delivery (tracking, SST, landing pages, one-off integrations) uses `ht-<slug>`.
+
+## What must live in the repo
+
+| Path | Purpose |
+| --- | --- |
+| `README.md` | Who the customer is, website, what this repo is for |
+| `STATUS.md` | Current state, last action, **next action**, blocker, date, agent/human |
+| `docs/audit.md` | Live-site / GTM audit |
+| `docs/tracking-spec.md` | Approved spec (or draft until approved) |
+| `docs/qa.md` | QA results, GTM version names, Stape scan notes |
+| Site / GTM / Worker code | If we own or patch it |
+| `.env.example` | Secret **names** only |
+| `.gitignore` | Must ignore `.env`, `*.pem`, `*service-account*.json` |
+
+Write IDs that are already visible in GTM/GA4 (container IDs, measurement IDs, account numbers) and published version names. Do not write tokens.
+
+## Never commit
+
+- OAuth client secrets, refresh tokens, access tokens
+- Meta / TikTok / LinkedIn CAPI tokens
+- Stape Account or Container API keys
+- Passwords, `GOOGLE_SERVICE_ACCOUNT_JSON`, Cloudflare keys
+- A filled `.env`
+- Anything pasted in chat that looks like a key — tell the human to rotate it and store it in Cloud Agent secrets
+
+If you find a secret already in the repo, delete it, commit, and tell Patrick to rotate.
+
+## Handoff (another Cursor user)
+
+1. Clone `ht-<slug>`.
+2. Read `STATUS.md` then the latest spec/audit.
+3. Use **their** Cursor. Secrets come from the shared Cloud Agent secret list, not from the repo.
+4. Continue on the same repo. Update `STATUS.md` before you stop.
+
+Do not start a parallel chat-only thread with no repo. Do not keep a private working copy that never gets pushed.
+
+## Agent checklist
+
+- [ ] Repo `ht-<slug>` exists and is the working tree for this job
+- [ ] `STATUS.md` updated this session
+- [ ] Audit / spec / QA files committed if you produced them
+- [ ] `git push` done (not only local commit)
+- [ ] Search the tree for `token`, `secret`, `BEGIN PRIVATE`, `ya29.`, `EAA`, `GOCSPX` is clean
+- [ ] A colleague could pick up from `STATUS.md` without this chat
