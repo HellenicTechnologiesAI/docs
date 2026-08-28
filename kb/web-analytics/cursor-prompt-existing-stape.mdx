@@ -9,9 +9,17 @@ icon: "wrench"
   Copy the prompt into a **new** Cursor chat. Fill every `{{placeholder}}`. Do not mix this with the new-customer prompt. Playbook: [Server Side Tracking](/kb/web-analytics/server-side-tracking). Live host is `ht-intra.mintlify.site` — `.io` and `.app` 404.
 </Note>
 
+<Warning>
+  **No Cloudflare / no same-origin:** leave Generate **Same Origin Path empty**. Do not copy HT `/metrics`. Hellenic.com passed Safari ITP because its loader **is** same-origin (`j.src = "/metrics/…"`), not because of a second Cookie Keeper file. Filling `/metrics` without a Worker **breaks** the loader.
+
+  Cookie Keeper is **after** the first loader and tags work. First Generate: Cookie Keeper **off**. After named publish \+ QA: Generate **with** Cookie Keeper, user identifier **Stape User ID**, and tell web-dev to **replace** the previous IIFE (do not add a second snippet). Do not pick the Cookie identifier unless a compliant server-set master cookie already exists.
+
+  Worked example: [Golden Gastro](/kb/web-analytics/customers/golden-gastro).
+</Warning>
+
 Use this when the customer **already has** Stape \+ web GTM \+ sGTM. First reply must be an audit, then a patch spec. No GTM edits until you approve.
 
-Sibling: [Cursor prompt — new customer](/kb/web-analytics/cursor-prompt-new-customer). Platform access: [digital@ OAuth — do not invite a service account](/kb/web-analytics/cursor-ga4-meta-access).
+Sibling: [Cursor prompt — new customer](/kb/web-analytics/cursor-prompt-new-customer). Platform access: [digital@ OAuth — do not invite a service account](/kb/web-analytics/cursor-ga4-meta-access). Customers folder: [Golden Gastro](/kb/web-analytics/customers/golden-gastro).
 
 ## Prompt (copy everything below)
 
@@ -46,7 +54,7 @@ C) Decision (write before the spec):
 - Cloudflare same-origin yes/no
 - iubenda: already in GTM / must move from theme / missing
 - WordPress dataLayer: GTM-only enough / enable GTM4WP data only / send developers a snippet
-- One-time web-dev ticket (loader + removals) vs PM-only in GTM
+- One-time first web-dev ticket (loader WITHOUT Cookie Keeper + removals) vs PM-only in GTM. Cookie Keeper REPLACE is a second ticket after tags.
 Do not propose new events that already exist. Do not add a pixel that is already in the theme.
 
 GOAL
@@ -60,7 +68,7 @@ HARD RULES
 5) One Custom Loader only. No googletagmanager.com/gtm.js. No second web container.
 6) Same-origin only if we have Cloudflare access on this zone.
    - Yes: Worker + /metrics (or the path already live) to sgtm. with X-From-Cdn: cf-stape. sgtm. DNS-only. Generate Same Origin Path set. Cookie Keeper / Own CDN off in the snippet. No Vercel/nginx proxy. No CMS route on exact /{path}.
-   - No: do not apply same-origin. No Worker, no /metrics, no invented proxy. j.src stays on https://sgtm.customer.com/ Same Origin Path empty.
+   - No: do not apply same-origin. No Worker, no /metrics, no invented proxy. j.src stays on https://sgtm.customer.com/ Same Origin Path empty. Do NOT copy hellenictechnologies.com /metrics. HT ITP passed because that loader IS same-origin (j.src = "/metrics/…"), not because of a second Cookie Keeper file. Filling /metrics without a Worker breaks the loader.
 7) Customer iubenda is ALWAYS in web GTM (Community Gallery template). Never in theme, WP plugin, Shopify app, or React head. hellenictechnologies.com head CMP is HT-only — do not copy it here.
 8) Consent Mode v2 Advanced. Ads + analytics default denied. Do not auto-grant on continued browsing. One CMP. If a theme/plugin CMP exists, spec a one-time web-dev removal; then PM owns consent.
 9) When iubenda purpose 5 / ads trio is granted, push ht_consent_ready once per page with a new event_id (GTM, not site code).
@@ -72,6 +80,9 @@ HARD RULES
 15) Never commit or chat-store CAPI / Stape / MP secrets. If I pasted one, tell me to rotate it.
 16) After I approve and you implement: finish the job. Commit, push, and deploy. Do not leave open PRs, draft PRs, leftover feature branches, uncommitted diffs, or an unpublished GTM Default. Do not stop at "ready for review."
 17) Every job uses a private GitHub repo ht-<customer-slug> (example ht-goldengastro). Create it if missing. Commit and push audit, spec, QA, and STATUS.md as you go so another colleague can pick up in their own Cursor. Never commit credentials, tokens, or .env values. Cloud Agent secrets only. Read https://ht-intra.mintlify.site/kb/customer-github-repo
+18) Cookie Keeper is a SECOND Generate, sent AFTER the first loader + tags work. First Generate: Cookie Keeper OFF so GTM/sGTM can go live. After named publish + QA of consent/events: Generate WITH Cookie Keeper, Same Origin Path still empty when there is no Cloudflare, Enhanced adblock ON, User identifier = Stape User ID (not Cookie / localStorage / DOM / JS unless a compliant server-set master cookie already exists on a matching IP). Stape may auto-enable User ID power-up — that is OK.
+19) Cookie Keeper power-up ON on the shared multi-tenant container does not mean this site's loader has Cookie Keeper. Diff the live IIFE. If the first paste had CK unchecked, Generate again.
+20) Tell web-dev: REPLACE the previous Stape IIFE. Do not add a second snippet. Keep one noscript https://sgtm.customer.com/ns.html?id=GTM-XXXX. Purge HTML cache (Flying Press, Cloudflare, WP). Do not invent a filename. Worked example: https://ht-intra.mintlify.site/kb/web-analytics/customers/golden-gastro
 
 INTAKE — replace placeholders. UNKNOWN is allowed. Do not invent IDs.
 
@@ -103,8 +114,10 @@ Extra conversion points: {{forms, book, chat, phone}}
 Ad platforms: GA4, Google Ads, Meta + {{extras}}
 
 TEAM SPLIT
-Web dev, one-time only: paste/fix Custom Loader if Generate does not match; remove theme/plugin CMP and extra GTM/pixels. Then stop.
-PM owns: iubenda in GTM, all tags, sGTM, Ads/Meta/GA4.
+Web-dev, two tickets max:
+1) First paste: Custom Loader WITHOUT Cookie Keeper (if Generate does not match live). Remove theme/plugin CMP and extra GTM/pixels.
+2) AFTER tags are live and QA'd: REPLACE the IIFE with Cookie Keeper Generate (Stape User ID). Same Origin Path empty if no Cloudflare. Then stop.
+PM owns: iubenda in GTM, all tags, sGTM, Ads/Meta/GA4. PM generates both snippets. PM does not paste.
 
 WORDPRESS DATALAYER
 - Brochure / lead-gen: stay in GTM if form plugins can push generate_lead with email/phone. If Preview never sees the AJAX submit, output a short developer snippet (plugin success hook + dataLayer.push). Do not rewrite the theme.
@@ -138,16 +151,17 @@ ORDER
 1. Phase 0 audit.
 2. Spec: patch list, same-origin yes/no, event table, hostname exceptions, iubenda move-to-GTM, WordPress dataLayer decision, risks.
 3. Wait for approval.
-4. Patch: loader if needed, iubenda into GTM + remove site CMP, ht_consent_ready, move base pixels off All Pages, sGTM consent + CAPI, Ads dedup.
+4. Patch: first loader if needed (Cookie Keeper OFF), iubenda into GTM + remove site CMP, ht_consent_ready, move base pixels off All Pages, sGTM consent + CAPI, Ads dedup.
 5. Named GTM publish (web + server). QA report.
+6. THEN Generate Cookie Keeper (Stape User ID, Same Origin Path empty if no Cloudflare) and send a REPLACE ticket to web-dev. Do not send Cookie Keeper in the first ticket.
 
 SHIP / CLOSE-OUT (mandatory after approval)
 - Website / repo: work in GitHub `ht-<customer-slug>` (create if missing). Commit with a clear message, push, deploy production. Update STATUS.md. Confirm it is live. Never commit credentials.
 - Do not open a PR and leave it. Do not create a cursor/... review branch. If you used a working branch, merge it and delete it before you finish.
 - Do not leave uncommitted files or local-only snippets.
 - GTM: publish a named version on web and server. Do not leave work only in Default.
-- Stape: Generate pasted and live. No "we will paste later."
-- DNS / Worker: applied, not a checklist for someone else.
+- Stape: first Generate pasted and live (Cookie Keeper off). Cookie Keeper Generate is a second REPLACE paste after tags work — not forgotten, and not in the first ticket.
+- DNS / Worker: applied, not a checklist for someone else. No Worker if we have no Cloudflare.
 - First reply still waits for my approval. After I approve, you ship completely in the same job.
 
 QA GATES
@@ -155,8 +169,9 @@ QA GATES
 - Reject: no analytics/ads/Meta cookies, no CAPI marketing.
 - Analytics only: GA4 yes, Ads/Meta no.
 - Ads accept: ht_consent_ready once; base pixels on that landing URL; fbp/fbc / gclid when present.
-- Same-origin: /{path}/{file}.js?query 200; bare file 404; Preview via https://customer.com/{path}.
-- No Cloudflare: sgtm loader 200; no /metrics invented; Preview via https://sgtm.customer.com.
+- Same-origin: /{path}/{file}.js?query 200; bare file 404; Preview via https://customer.com/{path}. Cookie Keeper stays OFF in the snippet when same-origin is on.
+- No Cloudflare: sgtm loader 200; Same Origin Path empty; no /metrics invented; Preview via https://sgtm.customer.com.
+- Cookie Keeper (after the second paste only): still one IIFE; no second gtm.js; identifier is Stape User ID; live HTML matches the Cookie Keeper Generate; noscript still https://sgtm.customer.com/ns.html?id=GTM-XXXX.
 - One real conversion to one GA4 + one Ads + one Meta after dedup. Refresh does not double.
 - Live loader HTML matches Generate. Do not invent a new filename if Stape still shows Custom Loader +4.
 

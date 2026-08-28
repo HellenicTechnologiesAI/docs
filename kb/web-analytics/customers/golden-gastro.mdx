@@ -1,0 +1,271 @@
+---
+title: "Golden Gastro"
+sidebarTitle: "Golden Gastro"
+description: "Start-to-finish SST setup for goldengastro.de: Stape multi-tenant, no same-origin, Cookie Keeper replace after tags, GTM / Ads / GA4 / Meta."
+icon: "utensils"
+---
+
+<Warning>
+  Multi-tenant domain add. Do **not** create a new Stape or sGTM container. Do **not** publish sGTM Default Workspace **208**. Same-origin is **off**. Cookie Keeper is a **second** Generate — send it to web-dev **after** tags work, as a **replace**, not a second snippet.
+</Warning>
+
+Start-to-finish record for [goldengastro.de](https://goldengastro.de/) (27–28 Aug 2026). Playbooks: [Server Side Tracking](/kb/web-analytics/server-side-tracking), [Cursor: existing Stape](/kb/web-analytics/cursor-prompt-existing-stape), [Cursor: new customer](/kb/web-analytics/cursor-prompt-new-customer), [Customer GitHub repo](/kb/customer-github-repo).
+
+Customer handbook repo: private `ht-goldengastro`. Full markdown twin: `docs/05-setup-record.md`. Never commit CAPI, Stape API keys, or Measurement Protocol secrets.
+
+<Note>
+  Live host is `ht-intra.mintlify.site`. `ht-intra.mintlify.io` and `.app` 404. Stape identifier and sGTM container ID are the Multi-tenant values on the [SST playbook](/kb/web-analytics/server-side-tracking) — do not create a second container.
+</Note>
+
+## Why this is not Hellenic.com
+
+|  | hellenictechnologies.com | goldengastro.de |
+| --- | --- | --- |
+| Stape | Same **Multi-tenant** container | Same container — **add a domain** |
+| sGTM | Shared HT server container | Same — hostname-scope only |
+| Web GTM | `GTM-TRPS26L` | **`GTM-N8ZFXBTK` only** |
+| Loader | `/metrics/…` **same-origin** (Cloudflare Worker) | `https://sgtm.goldengastro.de/…` **no same-origin** |
+| ITP | Passed because of `/metrics`, not a second Cookie Keeper file | Needs **Cookie Keeper Generate** (Stape User ID), then **replace** the first loader |
+| iubenda | HT site `3941073` | GG site **`4547427`** |
+| GA4 | `G-GYMSRM45JV` (do not use) | **`G-LNPZX5HKQF`** |
+
+HT ITP passed with “only Custom Loader” because that loader **is** same-origin (`j.src = "/metrics/dw0ie….js?"`). Golden Gastro has **no Cloudflare zone access**. **Do not type `/metrics` in Same Origin Path** — Stape will rewrite the loader and the site will break.
+
+## Hard locks
+
+- Do **not** create a new Stape or sGTM container.
+- Stape: existing **Multi-tenant** container (same identifier as the [SST playbook](/kb/web-analytics/server-side-tracking)), EU Center (Germany).
+- sGTM: same shared server container as the playbook (account `6202173174`, container `169217628`). Live **v219** `GG Meta CAPI live`.
+- **Never publish Default Workspace 208** (stale, 79 tags). Fork **live v219** for further sGTM edits.
+- Web GTM: keep `GTM-N8ZFXBTK` (account `6357803150`, container `253795963`). No second web container. Live **v13**.
+- Custom domain: `sgtm.goldengastro.de` — CNAME `eug.stape.io`, DNS-only (grey cloud), SSL verified.
+- Same-origin: **off**. No Worker, no `/metrics`, no Google tag gateway.
+- `server_container_url` = `https://sgtm.goldengastro.de`.
+- Custom Loader filename is shared on this multi-tenant container; **query selects the site**. Bare file without query = 404.
+- Do **not** deactivate GTM4WP. Container \+ plugin tags off. Woo ecommerce toggle can stay off — GTM builder fills events.
+- Do **not** unpause web `GG | Google tag Ads` / `GG | Ads *` awct.
+- Do **not** start GTM “Measure purchases in Google Ads” wizard.
+- Do **not** use HT env `META_PIXEL_ID` / `META_CAPI_ACCESS_TOKEN` (those are the HT website).
+
+## Public IDs
+
+| System | Value |
+| --- | --- |
+| Site | [https://goldengastro.de/](https://goldengastro.de/) |
+| Stack | WordPress \+ WooCommerce 11 \+ Woodmart 8.5 \+ child `gastro` \+ WPML `de`/`el`/`en` \+ GTM4WP \+ Ninja Forms \+ Flying Press \+ Cloudflare |
+| Web GTM | `GTM-N8ZFXBTK` — live **v13** `GG replay view_item after consent` |
+| sGTM | Shared Multi-tenant — live **v219** `GG Meta CAPI live` |
+| GA4 | Account `396117908`, property `539367952`, `G-LNPZX5HKQF` |
+| Google tag extra ID in GTM Overview | `GT-552QS2NQ` (auto wrapper for the same GA4 tag — not a second container) |
+| Google Ads | CID `5014800688` / `501-480-0688`, conversion tracking `AW-17898264142` |
+| Ads Purchase | `kOSxCJbe9OgcEM6sx9ZC` (**primary**) |
+| Ads Begin checkout | `YB4OCKmQ6-gcEM6sx9ZC` (observe) |
+| Ads Generate lead | `PdFUCMnh9OgcEM6sx9ZC` (observe) |
+| Ads Phone click | `sDK4CKPS9egcEM6sx9ZC` (observe) |
+| iubenda site | `4547427` (CS en `79927600` / de `48545265` / el `81343492`) |
+| Phone | `tel:+493046691189` |
+| Meta ad account | `act_2885307635233937` GOLDENGASTRO (HT-SysAdmin) |
+| Meta Pixel | `1593994702440618` |
+
+## Timeline — start to finish
+
+<Steps>
+  <Step title="Phase 0 — audit (27 Aug)">
+    Fetched homepage, PDP `/produkt/eiswuerfelmaschine-ntf-sl35aq-20kg-14gr/`, cart, checkout, privacy, contact.
+
+    - GTM4WP injected official `googletagmanager.com/gtm.js?id=GTM-N8ZFXBTK`. Noscript broken (`data-lazy-src`).
+    - No Meta / TikTok / LinkedIn in HTML. No Site Kit.
+    - dataLayer: `pagePostType` only. **No** Woo `view_item` / `add_to_cart` / `purchase`.
+    - Thank-you `/bestellung-erhalten/` 404. Real path is `/kasse/order-received/` plus the order id. Empty `/kasse/order-received/` still says “Vielen Dank” **without** an order number — must not fire `purchase`.
+    - Author `pagePostAuthor: SupportHT`.
+    - Cloudflare HTML cache HIT \+ Flying Press. HT Cloudflare token does **not** see this zone → same-origin **no**.
+  </Step>
+  <Step title="Phase 1 — Stape domain + first Custom Loader (Cookie Keeper off)">
+    1. Add `sgtm.goldengastro.de` on Multi-tenant (next domain on the 50 cap).
+    2. CNAME to `eug.stape.io`, DNS-only. Wait SSL.
+    3. **First Generate (tags first, ITP later):** Domain `sgtm.goldengastro.de`, Web GTM `GTM-N8ZFXBTK`, Enhanced ad blocker **ON**, Same Origin Path **empty**, Platform **Other**, Cookie Keeper **off**, Use original GTM code **off**.
+    4. Web-dev pasted IIFE \+ noscript **byte-identical**. Turned GTM4WP container injection **off**. Purged Flying Press \+ Cloudflare.
+    5. Live proof: no `googletagmanager.com/gtm.js`. `j.src` = `https://sgtm.goldengastro.de/` plus the shared loader file and encoded query. Noscript `https://sgtm.goldengastro.de/ns.html?id=GTM-N8ZFXBTK`.
+
+    This first paste is **required** so GTM/sGTM tags can go live. It does **not** bypass Safari ITP.
+  </Step>
+  <Step title="Phase 2 — web GTM GTM-N8ZFXBTK (v6 → v13)">
+    Consent Initialization: iubenda Community Gallery site `4547427` \+ Consent Mode defaults (ads \+ analytics **denied**).
+
+    `ht_consent_ready` once when purpose 5 granted, new `event_id`.
+
+    | Live | Notes |
+    | --- | --- |
+    | Google tag `G-LNPZX5HKQF` | `server_container_url` = `https://sgtm.goldengastro.de` |
+    | Conversion Linker | **`ht_consent_ready` only** \+ `ad_storage` — stopped `_gcl_au` on first land |
+    | `phone_click` | `tel:+493046691189` |
+    | GA4 Event tags | `ht_consent_ready`, `phone_click`, `purchase`, `begin_checkout`, `generate_lead`, `view_item`, `add_to_cart` |
+    | Meta hybrid | Base on `ht_consent_ready` only. ViewContent / AddToCart / InitiateCheckout / Purchase / Lead / Contact / Search / CompleteRegistration / AddToWishlist. Additional consent `ad_storage`. Same `event_id` as CAPI |
+    | Paused | `GG \| Google tag Ads`, `GG \| Ads *` awct — **do not unpause** |
+    | v11–v13 | `GG \| Woo ecommerce dataLayer`, `GG \| iubenda accept-all fix`, `GG \| Privacy tracking notice`. v13 **replays** `view_item` / `view_cart` / `begin_checkout` after purpose 5 so Meta ViewContent is not lost |
+
+    iubenda remote CS still shows “Speichern und weitersurfen”. GTM interceptor relabels first-layer to **Alle akzeptieren** and `storeConsent` / `acceptAll` purposes 1–5. Customize Save is not intercepted.
+
+    Constant `C - Meta Pixel ID` = `1593994702440618`.
+  </Step>
+  <Step title="Phase 3 — sGTM shared Multi-tenant (v215 → v219)">
+    Always fork **live**, never workspace 208.
+
+    Lookup tables, hostname-scoped to `goldengastro.de`:
+
+    | Variable | Output |
+    | --- | --- |
+    | `LT - ga4 id` | `G-LNPZX5HKQF` |
+    | `LT - g-ads conversion id` | `17898264142` |
+    | `LT - g-ads conversion label [purchase]` | `kOSxCJbe9OgcEM6sx9ZC` |
+    | `LT - g-ads conversion label [begin_checkout]` | `YB4OCKmQ6-gcEM6sx9ZC` |
+    | `LT - g-ads conversion label [lead]` | `PdFUCMnh9OgcEM6sx9ZC` |
+    | `LT - g-ads conversion label [phone_call_click]` | `sDK4CKPS9egcEM6sx9ZC` |
+    | `LT - fb pixel id` | `1593994702440618` |
+    | `LT - fb api token` | HT-SysAdmin ads token **in sGTM only** |
+
+    Live tags: `GG | SST GA4`, Ads Purchase / Begin checkout / Lead / Phone, `GG | SST Ads Remarketing` on `GG | SST All GA4`, `GG | SST Conversion Linker` on `ht_consent_ready`, `GG | SST Meta *` (PageView on trigger **307 / ht\_consent\_ready only**). `adStorageConsent` required.
+
+    Leftover shared `Conversion Linker` (tag 38) and `G-ADS - Remarketing` **blocked** on `goldengastro.de` (that leftover linker was the `_gcl_au` leak). HT Meta tags stay scoped to hellenictechnologies.com. No TikTok / LinkedIn rows.
+  </Step>
+  <Step title="Phase 4 — Google Ads 5014800688">
+    Four conversions created. Purchase **primary**. Other three `primary_for_goal = false`.
+
+    `include_in_conversions_metric` is **immutable via API** — human must uncheck **Included in Conversions** in the Ads UI on the three observe actions.
+
+    Remarketing: Audience manager data segments \+ `GG Audience | *` wrappers. Size 0 until consented traffic.
+  </Step>
+  <Step title="Phase 5 — GA4 539367952">
+    Key events: **purchase \+ generate\_lead only**. Linked to Ads `5014800688`. Audiences created (visitors, PDP no cart, cart/checkout abandon, purchasers, leads, category).
+  </Step>
+  <Step title="Phase 6 — Meta Ads Manager">
+    Pixel `1593994702440618` confirmed by customer, then wired hybrid (web \+ CAPI, same `event_id`).
+
+    Optimize **Purchase**. Use **Lead** on form campaigns. Do not invent EMQ. Lookalikes not created on empty seeds.
+  </Step>
+  <Step title="Phase 7 — volume blockers (fixed in GTM, not WP admin)">
+    1. **Woo dataLayer:** GTM4WP ecommerce was off. `GG | Woo ecommerce dataLayer` reads Woo Store API \+ PDP markup (`#product-41017`, SKU `014.0831`, €966). Form.cart submit \+ `added_to_cart`. No `purchase` without `transaction_id`. Gallery arrows ignored.
+    2. **iubenda first layer:** Accept-all interceptor (see Phase 2).
+    3. **Privacy:** GTM notice on `/datenschutzerklaerung/`, `/en/privacy-policy/`, `/el/privacy-policy/`. WP editor copy still old.
+
+    Playwright (v13): first land no `_fbp` / `_gcl_au` / `_ga`; Accept-all → purpose 5 \+ `ht_consent_ready`; Meta pixel `1593994702440618` PageView \+ ViewContent (replay); AddToCart; `view_cart`; `begin_checkout`; empty thank-you **no** purchase; `phone_click`.
+  </Step>
+  <Step title="Phase 8 — Cookie Keeper (send to web-dev AFTER tags)">
+    Cookie Keeper power-up is **ON** for the whole multi-tenant container (Extend: Stape, GA, Ads, TikTok, Facebook, LinkedIn, Bing, DV360).
+
+    Power-up ON ≠ the site loader has Cookie Keeper. First GG Generate had Cookie Keeper **unchecked**. That was correct for Phase 1.
+
+    **28 Aug Generate (PM, ready to send):**
+
+    | Field | Value |
+    | --- | --- |
+    | Domain | `sgtm.goldengastro.de` |
+    | Web GTM ID | `GTM-N8ZFXBTK` |
+    | Enhanced ad blocker | **ON** |
+    | Same Origin Path | **empty** |
+    | Platform | Other |
+    | Data Layer name | empty |
+    | Use original GTM code | **off** |
+    | Generate with Cookie Keeper | **on** |
+    | User identifier type | **Stape User ID** (not Cookie / localStorage / DOM / JS). User ID power-up auto-on is OK |
+
+    **Tell web-dev: REPLACE the previous Stape IIFE. Do not add a second snippet.** Keep one noscript `https://sgtm.goldengastro.de/ns.html?id=GTM-N8ZFXBTK`. Purge Flying Press \+ Cloudflare. Do not invent a filename. Do not add `/metrics`.
+
+    Stape “Cookie” identifier would need a server-set master cookie on a matching IP. Golden Gastro does not have that. **Stape User ID** is the fallback Stape documents for this case.
+  </Step>
+</Steps>
+
+## Stape — every setting used
+
+<AccordionGroup>
+  <Accordion title="Container (do not clone)">
+    - Name: Multi-tenant
+    - Identifier and sGTM ID: same values as the [SST playbook](/kb/web-analytics/server-side-tracking)
+    - Region: EU Center (Germany)
+    - Job: add custom domain `sgtm.goldengastro.de` — do not open a second container
+  </Accordion>
+
+  <Accordion title="Custom domain">
+    - Host: `sgtm.goldengastro.de`
+    - CNAME target: `eug.stape.io`
+    - Cloudflare / DNS: **DNS-only** (grey cloud). Do not orange-cloud `sgtm.`
+    - SSL: verified in Stape
+    - Same Origin Path: **empty** (no Worker on this zone)
+  </Accordion>
+
+  <Accordion title="Power-ups vs Generate">
+    Cookie Keeper power-up can be ON for the shared container while a given site's Generate still has Cookie Keeper **unchecked**. Diff the live IIFE. First GG paste = CK off. Second paste = CK on \+ Stape User ID.
+  </Accordion>
+
+  <Accordion title="What not to copy from HT">
+    Do not copy HT web `GTM-TRPS26L`, HT `/metrics`, HT loader query, HT iubenda `3941073`, HT GA4 `G-GYMSRM45JV`, or HT env `META_PIXEL_ID` / `META_CAPI_ACCESS_TOKEN`. The loader filename is shared on this container; the **query** selects Golden Gastro.
+  </Accordion>
+</AccordionGroup>
+
+## Web GTM — live v13
+
+Pattern matches HT `GTM-TRPS26L` v412, with **this** site's IDs.
+
+- iubenda, Consent Mode defaults, `ht_consent_ready`, Google tag → `https://sgtm.goldengastro.de`, Conversion Linker, `phone_click`.
+- **Live GA4 Event tags:** `GG | GA4 ht_consent_ready` / `phone_click` / `purchase` / `begin_checkout` / `generate_lead` / `view_item` / `add_to_cart`.
+- **`GG | Conversion Linker`** fires on **`ht_consent_ready`** only. Additional consent = `ad_storage`.
+- **Paused (do not enable):** `GG | Google tag Ads` (`AW-17898264142`) and `GG | Ads Purchase` / `Begin checkout` / `Lead` / `Phone`. Live Ads stay on sGTM.
+- **Live Meta (not All Pages):** `GG | Meta Pixel base` on `ht_consent_ready` \+ event tags listed in Phase 2.
+- **v13 volume tags:** `GG | Woo ecommerce dataLayer`, `GG | iubenda accept-all fix`, `GG | Privacy tracking notice`. Sources in the customer repo `docs/snippets/`.
+
+## sGTM — live v219
+
+- Leftover shared **Conversion Linker** **blocked** on `goldengastro.de` (that was the `_gcl_au` leak before any click).
+- New **`GG | SST Conversion Linker`** on `GG | SST ht_consent_ready`.
+- `GG | SST GA4` \+ four conversion tags \+ **`GG | SST Ads Remarketing`** on `GG | SST All GA4`. Ads tags have `adStorageConsent` required.
+- Leftover shared `G-ADS - Remarketing` stays **blocked** on `goldengastro.de`.
+- `GG | SST Meta *` **live** (PageView on `ht_consent_ready` only). Match keys: em, ph, fn, ln, ct, st, zp, country, external\_id, fbp, fbc.
+- Extra CAPI: Contact (`phone_click`), Search, CompleteRegistration, AddToWishlist.
+- No TikTok / LinkedIn on this job.
+
+## Meta custom conversions and audiences
+
+| Custom conversion | ID |
+| --- | --- |
+| GG \| Purchase | `1105098045187146` |
+| GG \| Lead | `1579804890448482` |
+| GG \| Initiate checkout | `1066510659091648` |
+| GG \| Add to cart | `1523838146183142` |
+| GG \| View content | `1749133129538442` |
+| GG \| Contact | `2009590069746586` |
+| GG \| Search | `1013479455109399` |
+| GG \| Complete registration | `2201473110768779` |
+| GG \| Add to wishlist | `1765508151311325` |
+
+| Website audience | ID |
+| --- | --- |
+| All visitors 30d / 180d | `120248337917060278` / `120248337917640278` |
+| ViewContent 30d | `120248337917990278` |
+| AddToCart 30d | `120248337918770278` |
+| InitiateCheckout 14d | `120248337919270278` |
+| Purchasers 180d | `120248337919850278` |
+| Leads 90d | `120248337920390278` |
+| Contacts 90d | `120248337920850278` |
+
+Custom conversions filter: URL contains `goldengastro.de` AND the event. Audience size 0 until consented traffic.
+
+## Auth notes (no tokens in git or this KB)
+
+- GA4/GTM: OAuth as `digital@hellenictechnologies.com`. Service account used only to publish (`tagmanager.edit.containerversions` \+ `tagmanager.publish`).
+- Meta: `META_ADS_ACCESS_TOKEN` as HT-SysAdmin for `act_2885307635233937`. CAPI token only in sGTM `LT - fb api token`.
+- Stape REST from the agent VM was Cloudflare 1010 / 404 — Generate is done in the Stape UI.
+
+## Still open
+
+| Item | Owner |
+| --- | --- |
+| Paste Cookie Keeper loader (**replace**) \+ cache purge | Web-dev (PM already generated) |
+| Ads UI: uncheck Included in Conversions on 3 observe actions | Human in Ads |
+| Real Purchase \+ Meta EMQ | Live order with email/phone |
+| Merge privacy paragraph in WP editor | Web-dev / PM |
+| Same-origin `/metrics` | Only if HT later gets this zone in Cloudflare. **Last.** |
+| Lookalikes | After audience size is real |
+
+<Check>
+  Tracking tags are finished and live. The only extra chosen after go-live is Cookie Keeper replace. Do not rebuild.
+</Check>
