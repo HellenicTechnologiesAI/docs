@@ -38,7 +38,12 @@
               "kb/web-analytics/cursor-prompt-existing-stape",
               "kb/web-analytics/cursor-prompt-new-customer",
               "kb/web-analytics/cursor-ga4-meta-access",
-              "kb/customer-github-repo"
+              "kb/customer-github-repo",
+              {
+                "group": "Customers",
+                "icon": "users",
+                "pages": []
+              }
             ]
           }
         ]
