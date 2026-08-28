@@ -27,53 +27,7 @@
           {
             "group": "Getting Started",
             "pages": [
-              "introduction",
-              "kb/team-structure",
-              "kb/tools-overview"
-            ]
-          },
-          {
-            "group": "AI Services",
-            "pages": [
-              "kb/hellenicai-platform",
-              "kb/ai-assistants",
-              "kb/omnichannel-chatbot",
-              "kb/b2b-outreach"
-            ]
-          },
-          {
-            "group": "Digital Marketing",
-            "pages": [
-              "kb/digital-marketing-overview",
-              "kb/google-ads",
-              "kb/meta-ads",
-              "kb/seo-aeo",
-              "kb/social-media"
-            ]
-          },
-          {
-            "group": "Web & Design",
-            "pages": [
-              "kb/web-development",
-              "kb/website-packages",
-              "kb/creative-design",
-              "kb/agentic-websites"
-            ]
-          },
-          {
-            "group": "Data & Analytics",
-            "pages": [
-              "kb/hellenicbi"
-            ]
-          },
-          {
-            "group": "Client Management",
-            "pages": [
-              "kb/onboarding-process",
-              "kb/customer-github-repo",
-              "kb/project-delivery",
-              "kb/after-sales",
-              "kb/retainers"
+              "introduction"
             ]
           },
           {
@@ -83,38 +37,8 @@
               "kb/web-analytics/server-side-tracking",
               "kb/web-analytics/cursor-prompt-existing-stape",
               "kb/web-analytics/cursor-prompt-new-customer",
-              "kb/web-analytics/cursor-ga4-meta-access"
-            ]
-          }
-        ]
-      },
-      {
-        "tab": "Processes & SOPs",
-        "groups": [
-          {
-            "group": "Workflows",
-            "pages": [
-              "sops/new-client-workflow",
-              "sops/project-kickoff",
-              "sops/quality-assurance",
-              "sops/handover-checklist"
-            ]
-          },
-          {
-            "group": "Standards",
-            "pages": [
-              "sops/brand-guidelines",
-              "sops/communication-standards",
-              "sops/gdpr-compliance",
-              "sops/security-practices"
-            ]
-          },
-          {
-            "group": "Support & Escalation",
-            "pages": [
-              "sops/support-tiers",
-              "sops/escalation-process",
-              "sops/sla-guidelines"
+              "kb/web-analytics/cursor-ga4-meta-access",
+              "kb/customer-github-repo"
             ]
           }
         ]
@@ -135,6 +59,66 @@
     {
       "source": "/kb/tracking-setup",
       "destination": "/kb/web-analytics/server-side-tracking",
+      "permanent": true
+    },
+    {
+      "source": "/kb/team-structure",
+      "destination": "/introduction",
+      "permanent": true
+    },
+    {
+      "source": "/kb/tools-overview",
+      "destination": "/introduction",
+      "permanent": true
+    },
+    {
+      "source": "/kb/google-ads",
+      "destination": "/introduction",
+      "permanent": true
+    },
+    {
+      "source": "/kb/meta-ads",
+      "destination": "/introduction",
+      "permanent": true
+    },
+    {
+      "source": "/untitled-page",
+      "destination": "/kb/web-analytics/server-side-tracking",
+      "permanent": true
+    },
+    {
+      "source": "/kb/digital-marketing-overview",
+      "destination": "/introduction",
+      "permanent": true
+    },
+    {
+      "source": "/kb/seo-aeo",
+      "destination": "/introduction",
+      "permanent": true
+    },
+    {
+      "source": "/kb/social-media",
+      "destination": "/introduction",
+      "permanent": true
+    },
+    {
+      "source": "/kb/web-development",
+      "destination": "/introduction",
+      "permanent": true
+    },
+    {
+      "source": "/kb/onboarding-process",
+      "destination": "/introduction",
+      "permanent": true
+    },
+    {
+      "source": "/kb/hellenicai-platform",
+      "destination": "/introduction",
+      "permanent": true
+    },
+    {
+      "source": "/sops/new-client-workflow",
+      "destination": "/introduction",
       "permanent": true
     }
   ]
