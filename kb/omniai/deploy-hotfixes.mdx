@@ -1,48 +1,50 @@
 ---
-title: "OmniAI ship fixes without rebuilds"
-sidebarTitle: "Ship fixes"
-description: "Default path for Ruby and Super Admin changes. Restart, never recreate. When a full image is required."
+title: "OmniAI staging to live (no downtime)"
+sidebarTitle: "Staging to live"
+description: "Copy files on staging, check, copy the same files to live. Restart, never recreate. Compile only when the image must change."
 icon: "wrench"
 ---
 
-Default for small fixes: **do not compile, do not take live down.**
+Normal path: **staging first, then the same files on live.** No Docker compile. Live stays up except a few seconds while Rails restarts.
 
-This covers Ruby, ERB, `en.yml`, Super Admin views, and a migration-only change.
+Use this for Ruby, ERB, `en.yml`, Super Admin views, and a migration-only change. Same playbook lives in repo `AGENTS.md`.
 
 <Warning>
-  `docker compose up -d` after a hotfix **recreates** containers. Recreate boots the old image and drops every file you copied in. Use **restart** only.
+  Do not run `deploy.sh` on these boxes. Do not `docker compose up -d` after a file copy. That **recreates** containers, boots the old image, and drops the copied files. Use **restart** only.
 </Warning>
 
-Pushing `omniai` still runs the AWS ECS workflow. That does not patch the Droplet.
+Pushing `omniai` still runs the old AWS ECS workflow. That does not update the live Droplet.
 
-## Small fix (default)
+## Default path (almost every change)
 
 <Steps>
   <Step title="Merge to omniai">
     Production branch is `omniai`. Do not leave the product PR open.
   </Step>
-  <Step title="Copy files to the Droplet tree">
-    rsync only the changed files to `/opt/omniai`. Never replace `/opt/omniai/.env` or the live compose file.
+  <Step title="Staging first">
+    Copy only the changed files to `/opt/omniai` on `164.92.220.232`. Never replace `.env` or the compose image line. `docker cp` each file into `omniai-rails-1` and `omniai-sidekiq-1` at `/app/...`.
   </Step>
-  <Step title="Copy into running containers">
-    `docker cp` each file into `omniai-rails-1` and `omniai-sidekiq-1` at the matching `/app/...` path.
+  <Step title="Restart staging">
+    `docker compose -f docker-compose.production.yaml -f docker-compose.staging-db.yaml restart rails sidekiq`
+
+    Migrate only if you added a migration (same compose files, `exec -T rails bundle exec rails db:migrate`).
   </Step>
-  <Step title="Migrate only if you added a migration">
-    From `/opt/omniai`: `docker compose -f docker-compose.production.yaml exec -T rails bundle exec rails db:migrate`
+  <Step title="Check staging">
+    Cloudflare Access PIN, then the app at `https://staging.omniaichatbot.com`.
   </Step>
-  <Step title="Restart, never recreate">
-    `docker compose -f docker-compose.production.yaml restart rails sidekiq`
+  <Step title="Same files on live">
+    Repeat the copy \+ `docker cp` on `188.166.84.105`. Then `docker compose -f docker-compose.production.yaml restart rails sidekiq`. Live stays up except a few seconds while Rails restarts.
   </Step>
 </Steps>
 
-Example that already shipped this way: the Super Admin feature-flag overflow fix (`feature_flags_2` plus `Featurable`). After a later compose recreate for Resend, those copied files vanished and had to be copied in again.
+This is how `Operator console` on Super Admin login was shipped.
 
-## Full image rebuild (rare)
+## Rare path (image must change)
 
-Only when the image itself must change: Gemfile, native gems, Dockerfile, or compiled frontend assets.
+Only if Gemfile, native gems, Dockerfile, or compiled frontend changed.
 
-- Build a new `chatwoot:production` image **in the background** while current containers keep serving.
-- Preferred: compile on **staging**, then run `/opt/omniai/scripts/promote-staging-to-live.sh` (or `DRY_RUN=1` to copy the image only).
-- Do not stop Rails or Sidekiq just to compile.
-- The 8 GB box runs out of memory if you compile `grpc` (`force_ruby_platform`) while both containers stay up. Last resort: 4G swap already exists; stop compose only if a human accepts downtime, `nohup` the build, then bring the site back.
-- After the new image is tagged `chatwoot:production`, swap compose to it. That recreate **is** expected for an image change. Any previous `docker cp` hotfixes must already be in the new image or you will lose them again.
+1. Build on **staging** as `chatwoot:staging`. Leave live running.
+2. From a machine that has `~/.ssh/omniai_do`, run `/opt/omniai/scripts/promote-staging-to-live.sh`. That copies the image, then does a short live recreate. `DRY_RUN=1` copies only.
+3. Never compile on live. Never `docker compose down` on live to build.
+
+File-copy hotfixes vanish on that recreate unless they are already in the new image.
