@@ -6,7 +6,7 @@
 ## About this project
 
 - This is the Hellenic Technologies **internal** knowledge base, built on [Mintlify](https://mintlify.com)
-- Live site: [https://ht-intra.mintlify.io](https://ht-intra.mintlify.io)
+- Live site: [https://intra.hellenictechnologies.com](https://intra.hellenictechnologies.com)
 - Pages are MDX files with YAML frontmatter
 - Configuration lives in `docs.json`
 - Use the Mintlify MCP server, `https://mcp.mintlify.com`, to edit content and settings via MCP
@@ -22,7 +22,8 @@
 
 ## Branding
 
-- Visual identity matches the public docs site at [https://kw.hellenictechnologies.com](https://kw.hellenictechnologies.com): Luma theme, HT wordmark, brand blue `#0445AF`, dark default, navbar, and footer
+- Visual identity matches the public docs site at [https://kw.hellenictechnologies.com](https://kw.hellenictechnologies.com): Luma theme, HT wordmark, brand blue `#0445AF`, and dark default
+- This is internal documentation. Do not add public CTAs. No `navbar.links`, no `navbar.primary` (hellenicAI, Book a Call, Get Started), and no marketing footer
 - **Keep the existing Font Awesome sidebar icons.** Do not switch `icons.library` to Lucide or Tabler
 - Do not replace page or group icons (`chart-line`, `comments`, `server`, `wrench`, `github`, `utensils`, `flag`, `flask`, and the rest)
 

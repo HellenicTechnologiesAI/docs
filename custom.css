@@ -1,0 +1,5 @@
+/* Internal KB: no public marketing footer */
+#footer,
+footer.advanced-footer {
+  display: none !important;
+}
