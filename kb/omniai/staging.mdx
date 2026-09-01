@@ -5,7 +5,7 @@ description: "Staging is up at staging.omniaichatbot.com. Local Postgres and Red
 icon: "flask"
 ---
 
-Status on **1 September 2026 (afternoon)**: staging is **up**. Open [https://staging.omniaichatbot.com](https://staging.omniaichatbot.com) and log in the same way as live.
+Status on **1 September 2026 (afternoon)**: staging is **up** and behind **Cloudflare Access**. Open [https://staging.omniaichatbot.com](https://staging.omniaichatbot.com). You get a Cloudflare PIN login first. Allowed emails only: `abedin@hellenictechnologies.com`, `michelidis@hellenictechnologies.com`, `web@hellenictechnologies.com`. Then log in to OmniAI the same way as live.
 
 <Warning>
   Do not change Cloudflare `app` or `hc`. Do not point staging at the live managed clusters you see in the DigitalOcean project (`omniai-prod-pg`, `omniai-prod-valkey`). Those are live only. Staging mail fetch from live mailboxes is off so it cannot pull or send live mail.
