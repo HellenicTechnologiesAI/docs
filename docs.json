@@ -94,7 +94,8 @@
               "kb/omniai/access-secrets",
               "kb/omniai/super-admin-features",
               "kb/omniai/staging",
-              "kb/omniai/product-repo"
+              "kb/omniai/product-repo",
+              "kb/omniai/keep-custom-work"
             ]
           }
         ]

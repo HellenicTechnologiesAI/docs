@@ -1,0 +1,20 @@
+---
+title: "OmniAI keep custom work"
+sidebarTitle: "Keep custom work"
+description: "How custom OmniAI work stays on omniai through a Chatwoot update. Never reset onto upstream."
+icon: "shield"
+---
+
+Custom OmniAI work is safe only when it is committed on `omniai`.
+
+<Warning>
+  Do not take a Chatwoot update unless a human says yes. Do not reset `omniai` onto Chatwoot. Do not leave paid work only on `dev` or only on a Droplet.
+</Warning>
+
+If it is not on `omniai`, it is not kept. After any upstream merge run `scripts/check-custom-work.sh`.
+
+Must survive: Viber, Web App inboxes, widget consents, `feature_flags_2` (never reorder `config/features.yml`), OmniAI Super Admin login, `AGENTS.md`.
+
+If a human still asks for a Chatwoot update: branch from `omniai`, **merge** a Chatwoot tag into that branch, keep OmniAI files on conflict, run the check script, try **staging only**. Do not go live until they say the custom channels still work. Default is do not upgrade (4.17 would re-break Viber and Web App).
+
+New custom work: branch from `omniai`, merge back, add any new must-keep path to `scripts/check-custom-work.sh`. Do not park work on `dev`.
