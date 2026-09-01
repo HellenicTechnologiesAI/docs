@@ -5,16 +5,75 @@ description: "How custom OmniAI work stays on omniai through a Chatwoot update. 
 icon: "shield"
 ---
 
-Custom OmniAI work is safe only when it is committed on `omniai`.
+The public URL is [**https://ht-intra.mintlify.site/kb/omniai/keep-custom-work**](https://ht-intra.mintlify.site/kb/omniai/keep-custom-work) (sign in). `ht-intra.mintlify.io` is the wrong host and 404s.
+
+This page is the playbook for **agents**. Follow it every time Chatwoot has a new version, and every time you finish custom work.
 
 <Warning>
   Do not take a Chatwoot update unless a human says yes. Do not reset `omniai` onto Chatwoot. Do not leave paid work only on `dev` or only on a Droplet.
 </Warning>
 
-If it is not on `omniai`, it is not kept. After any upstream merge run `scripts/check-custom-work.sh`.
+## The rule that saves the work
 
-Must survive: Viber, Web App inboxes, widget consents, `feature_flags_2` (never reorder `config/features.yml`), OmniAI Super Admin login, `AGENTS.md`.
+`omniai` is the only copy that counts.
 
-If a human still asks for a Chatwoot update: branch from `omniai`, **merge** a Chatwoot tag into that branch, keep OmniAI files on conflict, run the check script, try **staging only**. Do not go live until they say the custom channels still work. Default is do not upgrade (4.17 would re-break Viber and Web App).
+If a change is only on `dev`, only copied onto a droplet, or only in a chat — the next Chatwoot update will wipe it.
 
-New custom work: branch from `omniai`, merge back, add any new must-keep path to `scripts/check-custom-work.sh`. Do not park work on `dev`.
+1. Finish the work on a branch from `omniai`.
+2. Merge that branch into `omniai`.
+3. Add a check to `scripts/check-custom-work.sh` if the work is a new file or a new channel.
+4. Then ship to staging, then live. See [Ship to live](/kb/omniai/deploy-hotfixes).
+
+## What must survive every Chatwoot update
+
+These exist today. An update that drops any of them is a failed update.
+
+- Viber inbox (`app/javascript/dashboard/routes/dashboard/settings/inbox/channels/Viber.vue`, `app/javascript/widget/api/viberChannel.js`, `lib/integrations/viber/processor_service.rb`, `app/javascript/dashboard/helper/featureFlags.js` `VIBER`)
+- Web App inbox (`WebApp.vue`, `webAppChannel.js`, `lib/integrations/web_app/`)
+- Widget consents (`app/javascript/widget/components/template/ConsentForm.vue`)
+- Feature flags (`config/features.yml` order never changes, `feature_flags_2` column, `Featurable`)
+- OmniAI Super Admin (`app/views/super_admin/application/_navigation.html.erb`, login page text **Operator console**)
+- Brand (`omniai` / `OmniAI` in `config/installation_config.yml`)
+- Ship rules in `AGENTS.md`
+
+## Before you call any update done
+
+On a Cursor cloud machine with the repo:
+
+```bash
+bash scripts/check-custom-work.sh
+```
+
+If that script fails, stop. Do not ship.
+
+## How to take a future Chatwoot version (do this, not a reset)
+
+A human must ask for the upgrade. Do not start it yourself.
+
+**Never** run `git reset --hard` of `omniai` onto Chatwoot. That deletes our work.
+
+1. Fetch Chatwoot. Remote name is usually `chatwoot`. Tag example: `v4.10.1` (use the tag the human named).
+2. `git checkout omniai` then `git checkout -b cursor/chatwoot-upgrade-<tag>-c4b2`.
+3. `git merge <chatwoot-tag>`.
+4. On every conflict: keep the OmniAI file unless the human said to take Chatwoot.
+5. `bash scripts/check-custom-work.sh` — must pass.
+6. Copy the result to **staging only**. Check Viber and Web App still create and send.
+7. Do not touch live until a human says those channels work.
+
+Default: do **not** jump to Chatwoot 4.17. That rewrite can break Viber and Web App.
+
+## How future custom work stays safe
+
+When you add a new OmniAI file or channel:
+
+1. Commit it on `omniai` (not only `dev`).
+2. Add a `need` line in `scripts/check-custom-work.sh` so the next upgrade cannot drop it.
+3. Add one bullet on this page under **What must survive**.
+
+That is how work we do later is protected the same way as Viber and Web App.
+
+## Related
+
+- [Ship to live](/kb/omniai/deploy-hotfixes)
+- [Product and repo](/kb/omniai/product-and-repo)
+- [Start here](/kb/omniai)
