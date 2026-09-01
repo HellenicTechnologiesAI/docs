@@ -1,14 +1,14 @@
 ---
 title: "OmniAI staging"
 sidebarTitle: "Staging"
-description: "Staging Droplet exists and DNS is flipped. App containers are not running yet."
+description: "Staging is up at staging.omniaichatbot.com. Local Postgres and Redis. Do not point it at live data."
 icon: "flask"
 ---
 
-Status on **1 September 2026**: the staging Droplet exists and Cloudflare already points `staging.omniaichatbot.com` at it. The app is **not running**. Public check through Cloudflare returns **502**.
+Status on **1 September 2026 (afternoon)**: staging is **up**. Open [https://staging.omniaichatbot.com](https://staging.omniaichatbot.com) and log in the same way as live.
 
 <Warning>
-  Do not change Cloudflare `app` or `hc` while finishing staging. Do not point staging at the live managed Postgres or Valkey.
+  Do not change Cloudflare `app` or `hc`. Do not point staging at the live managed Postgres or Valkey. Staging mail fetch from live mailboxes is off so it cannot pull or send live mail.
 </Warning>
 
 | Field | Value |
@@ -21,20 +21,10 @@ Status on **1 September 2026**: the staging Droplet exists and Cloudflare alread
 | SSH | `ssh -i ~/.ssh/omniai_do root@164.92.220.232` |
 | Cost | about 48 USD / month extra. Live managed DB bill stays unchanged |
 
-Already done: Droplet created, assigned to the OmniAI project, 4G swap, Docker installed, Caddy installed and listening on 80/443, Caddyfile has `staging.omniaichatbot.com` reverse-proxy to `127.0.0.1:3000`, Cloudflare A record proxied to `164.92.220.232`.
+What is running: Caddy to `127.0.0.1:3000`; `omniai-rails-1` and `omniai-sidekiq-1` on `chatwoot:production`; local Postgres (`pgvector/pgvector:pg17`, compose host `postgres`) with a read-only copy of live data; local Redis 7. `FRONTEND_URL` is `https://staging.omniaichatbot.com`. Promote script: `/opt/omniai/scripts/promote-staging-to-live.sh` (`DRY_RUN=1` copies the image only).
 
-## Not done yet
+## How to use it
 
-`/opt/omniai` on staging is an empty directory. No Docker image is loaded. No Postgres or Redis on the box. No containers.
+Try small fixes on staging first. Build full images on staging, then promote. Never compile on live. Never point staging at the live managed database.
 
-Finish in this order:
-
-1. Install Postgres 17 and Redis 7 **on the staging Droplet** (no second managed-DB bill).
-2. One-time **read-only** dump from live managed Postgres into `chatwoot_staging`. Never point staging env at live `POSTGRES_HOST` or live `REDIS_URL`.
-3. Copy `/opt/omniai` from live (exclude live `.env`). `docker save` / `docker load` image `chatwoot:production` so you do not compile.
-4. Staging `.env` only changes URLs (`https://staging.omniaichatbot.com`), a new `SECRET_KEY_BASE`, and local database / Redis URLs.
-5. Start Rails and Sidekiq. Prove `https://staging.omniaichatbot.com` returns 200.
-6. Re-copy hotfix files into staging containers if the baked image is older than `omniai` (feature flag overflow fix).
-7. Later: build images **on staging**, then copy the image to live. Never compile on live.
-
-Plan file on the last agent VM (do not edit): `/opt/cursor/artifacts/plans/do_staging_sync_7a800493.plan.md`.
+Those bootstrap steps are **already done**. Do not install a second database or dump live again unless a human asks to refresh the copy.

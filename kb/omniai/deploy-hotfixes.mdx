@@ -42,7 +42,7 @@ Example that already shipped this way: the Super Admin feature-flag overflow fix
 Only when the image itself must change: Gemfile, native gems, Dockerfile, or compiled frontend assets.
 
 - Build a new `chatwoot:production` image **in the background** while current containers keep serving.
-- Preferred: compile on **staging** once that app exists, then `docker save` / copy / `docker load` on live, then a short restart.
+- Preferred: compile on **staging**, then run `/opt/omniai/scripts/promote-staging-to-live.sh` (or `DRY_RUN=1` to copy the image only).
 - Do not stop Rails or Sidekiq just to compile.
 - The 8 GB box runs out of memory if you compile `grpc` (`force_ruby_platform`) while both containers stay up. Last resort: 4G swap already exists; stop compose only if a human accepts downtime, `nohup` the build, then bring the site back.
 - After the new image is tagged `chatwoot:production`, swap compose to it. That recreate **is** expected for an image change. Any previous `docker cp` hotfixes must already be in the new image or you will lose them again.
