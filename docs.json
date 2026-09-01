@@ -1,21 +1,53 @@
 {
   "$schema": "https://mintlify.com/docs.json",
   "name": "Hellenic Technologies",
-  "theme": "maple",
+  "theme": "luma",
+  "description": "AI-powered digital agency helping businesses grow faster, work smarter, and reduce operational costs.",
   "logo": {
-    "light": "/logo/light.svg",
-    "dark": "/logo/dark.svg"
+    "light": "/logo/light.jpg",
+    "dark": "/logo/dark.svg",
+    "href": "/"
   },
-  "favicon": "/favicon.svg",
+  "favicon": "/favicon.png",
   "colors": {
-    "primary": "#ef7025",
-    "light": "#eec9bc",
-    "dark": "#4fa1ab"
+    "primary": "#0445AF",
+    "light": "#2563eb",
+    "dark": "#0445AF"
+  },
+  "appearance": {
+    "default": "dark"
+  },
+  "background": {
+    "color": {
+      "light": "#FFFFFF",
+      "dark": "#0A0B0F"
+    },
+    "image": {
+      "light": "/images/page-background-light.svg",
+      "dark": "/images/page-background-dark.svg"
+    }
+  },
+  "icons": {
+    "library": "lucide"
+  },
+  "styling": {
+    "latex": false,
+    "codeblocks": "system"
   },
   "navbar": {
+    "links": [
+      {
+        "label": "hellenicAI",
+        "href": "https://app.hellenicai.com"
+      },
+      {
+        "label": "Book a Call",
+        "href": "https://cal.com/hellenictechnologies"
+      }
+    ],
     "primary": {
       "type": "button",
-      "label": "Dashboard",
+      "label": "Get Started",
       "href": "https://app.hellenicai.com"
     }
   },
@@ -50,7 +82,7 @@
           },
           {
             "group": "OmniAI",
-            "icon": "comments",
+            "icon": "messages-square",
             "pages": [
               "kb/omniai/start-here",
               "kb/omniai/current-architecture",
@@ -71,8 +103,126 @@
   },
   "footer": {
     "socials": {
-      "linkedin": "https://linkedin.com/company/hellenic-technologies"
-    }
+      "linkedin": "https://www.linkedin.com/company/hellenic-technologies"
+    },
+    "links": [
+      {
+        "header": "Services",
+        "items": [
+          {
+            "label": "AI Solutions",
+            "href": "https://kw.hellenictechnologies.com/ai/overview"
+          },
+          {
+            "label": "Digital Marketing",
+            "href": "https://kw.hellenictechnologies.com/digital-marketing/overview"
+          },
+          {
+            "label": "Web Development",
+            "href": "https://kw.hellenictechnologies.com/web-development/overview"
+          },
+          {
+            "label": "Web Analytics",
+            "href": "https://kw.hellenictechnologies.com/web-analytics/overview"
+          },
+          {
+            "label": "Business Intelligence",
+            "href": "https://kw.hellenictechnologies.com/bi-solutions/overview"
+          },
+          {
+            "label": "Creative Design",
+            "href": "https://kw.hellenictechnologies.com/creative-design/overview"
+          },
+          {
+            "label": "Managed DevOps",
+            "href": "https://kw.hellenictechnologies.com/devops/overview"
+          },
+          {
+            "label": "After Sales",
+            "href": "https://kw.hellenictechnologies.com/after-sales/overview"
+          }
+        ]
+      },
+      {
+        "header": "Products",
+        "items": [
+          {
+            "label": "hellenicAI",
+            "href": "https://kw.hellenictechnologies.com/ai/hellenic-ai/overview"
+          },
+          {
+            "label": "AssistantsAI",
+            "href": "https://kw.hellenictechnologies.com/ai/ai-assistants/overview"
+          },
+          {
+            "label": "OmniAI",
+            "href": "https://kw.hellenictechnologies.com/ai/ai-omnichannel-chatbot/overview"
+          },
+          {
+            "label": "OutreachAI",
+            "href": "https://kw.hellenictechnologies.com/ai/ai-b2b-outreach/overview"
+          }
+        ]
+      },
+      {
+        "header": "Company",
+        "items": [
+          {
+            "label": "About",
+            "href": "https://kw.hellenictechnologies.com/about/introduction"
+          },
+          {
+            "label": "Case Studies",
+            "href": "https://kw.hellenictechnologies.com/about/case-studies"
+          },
+          {
+            "label": "Portfolio",
+            "href": "https://kw.hellenictechnologies.com/about/portfolio"
+          },
+          {
+            "label": "Careers",
+            "href": "https://kw.hellenictechnologies.com/about/careers"
+          },
+          {
+            "label": "Partnerships",
+            "href": "https://kw.hellenictechnologies.com/partnerships/overview"
+          },
+          {
+            "label": "Contact",
+            "href": "https://kw.hellenictechnologies.com/contact/introduction"
+          },
+          {
+            "label": "Book a Call",
+            "href": "https://cal.com/hellenictechnologies"
+          }
+        ]
+      },
+      {
+        "header": "Legal & ISO",
+        "items": [
+          {
+            "label": "Privacy Policy",
+            "href": "https://kw.hellenictechnologies.com/legal/privacy-policy"
+          },
+          {
+            "label": "Terms & Conditions",
+            "href": "https://kw.hellenictechnologies.com/legal/terms-and-conditions"
+          },
+          {
+            "label": "Cookie Policy",
+            "href": "https://kw.hellenictechnologies.com/legal/cookie-policy"
+          },
+          {
+            "label": "GDPR Agency",
+            "href": "https://kw.hellenictechnologies.com/legal/privacy-policy"
+          },
+          {
+            "label": "ISO 27001:2019",
+            "href": "https://liberoassurance.org/verification"
+          }
+        ]
+      }
+    ]
   },
   "redirects": [
     {
