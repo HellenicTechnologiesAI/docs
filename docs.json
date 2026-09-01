@@ -27,6 +27,9 @@
       "dark": "/images/page-background-dark.svg"
     }
   },
+  "icons": {
+    "library": "fontawesome"
+  },
   "styling": {
     "latex": false,
     "codeblocks": "system"
