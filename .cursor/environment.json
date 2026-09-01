@@ -1,0 +1,17 @@
+{
+  "name": "Hellenic Technologies Docs",
+  "install": "npm config set prefix \"$HOME/.npm-global\" && npm install -g mint",
+  "terminals": [
+    {
+      "name": "mint dev",
+      "command": "export PATH=\"$HOME/.npm-global/bin:$PATH\" && mint dev",
+      "description": "Runs the Mintlify local documentation preview server on port 3000."
+    }
+  ],
+  "ports": [
+    {
+      "name": "docs preview",
+      "port": 3000
+    }
+  ]
+}
