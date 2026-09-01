@@ -22,7 +22,7 @@ Facts below were verified on 1 September 2026.
 | Hostname | What serves it |
 | --- | --- |
 | Live `app` and `hc` | Droplet `omniai-prod-ams3` at `188.166.84.105`, Cloudflare proxied |
-| `staging.omniaichatbot.com` | Cloudflare already points at `omniai-staging-ams3` `164.92.220.232`. App process is not running (Cloudflare 502). Old AWS ECS staging still exists. |
+| `staging.omniaichatbot.com` | Droplet `omniai-staging-ams3` `164.92.220.232`, Cloudflare proxied. App is up. Log in the same way as live. |
 | Marketing `www` and apex | Framer. Not this repo. |
 | AWS prod ECS | Rollback only. Not the public `app` origin. |
 
@@ -55,7 +55,7 @@ Facts below were verified on 1 September 2026.
     Same deploy rules live in `AGENTS.md` (`CLAUDE.md` is a symlink). This KB is the expanded runbook.
   </Step>
   <Step title="Decide hotfix vs image rebuild">
-    Ruby, ERB, `en.yml`, Super Admin, one migration → hotfix. Gemfile, native gems, Dockerfile, compiled Vue → rebuild on staging once that app exists. [Ship fixes](/kb/omniai/deploy-hotfixes).
+    Ruby, ERB, `en.yml`, Super Admin, one migration → hotfix. Gemfile, native gems, Dockerfile, compiled Vue → rebuild on staging, then promote. [Ship fixes](/kb/omniai/deploy-hotfixes).
   </Step>
   <Step title="Merge to omniai, then patch the Droplet">
     Code on GitHub is not live. After merge, copy files into `/opt/omniai` and into the running containers.
@@ -74,7 +74,7 @@ Facts below were verified on 1 September 2026.
 | [DNS and Cloudflare](/kb/omniai/dns-cloudflare) | Every hostname |
 | [Access and secrets](/kb/omniai/access-secrets) | Token names, SSH |
 | [Super Admin flags](/kb/omniai/super-admin-features) | Create-account 500 |
-| [Staging](/kb/omniai/staging) | Droplet exists, app not up |
+| [Staging](/kb/omniai/staging) | Up at staging.omniaichatbot.com. Try fixes there first. |
 | [Product and repo](/kb/omniai/product-repo) | Custom fork map |
 
 ## If you only remember four facts
@@ -82,4 +82,4 @@ Facts below were verified on 1 September 2026.
 1. Live = Droplet `188.166.84.105` behind Cloudflare. Not ECS.
 2. Small fix = copy files into the container \+ **restart**. Never recreate.
 3. Secrets stay in `/opt/omniai/.env` and Cursor Cloud secrets.
-4. Staging hostname already points at `164.92.220.232` but the staging app is not up (502).
+4. Staging is `https://staging.omniaichatbot.com`. Try fixes there first. Do not point it at the live database.
