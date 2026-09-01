@@ -49,6 +49,8 @@ Live app sender is Resend on `hi.omniaichatbot.com`. Inbound conversation mail s
 
 The `omniaichatbot.com` zone is **DNS plus orange-cloud proxy** for `app`, `hc`, and `staging`. Free plan.
 
+**Cloudflare Access (Zero Trust)** is on `staging.omniaichatbot.com` only. App name: OmniAI staging. Policy: allow those three Hellenic Technologies emails. Login host: `hellenictechnologies.cloudflareaccess.com` (one-time PIN to the email). Do **not** put Access on `app` or `hc`.
+
 There is **no** OmniAI Cloudflare Worker, no WAF custom rules we rely on, and no Cloudflare R2. TLS for `app` / `hc` is Cloudflare at the edge plus Caddy on the Droplet (`FORCE_SSL=false` in the app because Caddy already terminates TLS).
 
 Marketing apex and `www` stay on Framer (grey cloud).
