@@ -9,6 +9,8 @@ OmniAI is Hellenic Technologies Chatwoot fork. Production branch is `omniai`. Li
 
 Customers hit Droplet `omniai-prod-ams3` at `188.166.84.105` behind Cloudflare. GitHub Actions still ship to AWS ECS. That does not update the live Droplet.
 
+DigitalOcean console project **OmniAI** (AMS3) should show exactly two droplets, two managed databases (`omniai-prod-pg`, `omniai-prod-valkey`), and one Spaces bucket. That map is on [Current architecture](/kb/omniai/current-architecture). The two managed databases are **live only**. Staging has its own Postgres and Redis on the staging droplet.
+
 <Warning>
   Internal Hellenic Technologies only. Do not brief outside devops that live sits on DigitalOcean unless they already operate this box. Never write passwords, SSH keys, or a filled env file into this KB or Git.
 </Warning>
