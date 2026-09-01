@@ -57,7 +57,7 @@ Facts below were verified on 1 September 2026.
     Same deploy rules live in `AGENTS.md` (`CLAUDE.md` is a symlink). This KB is the expanded runbook.
   </Step>
   <Step title="Decide hotfix vs image rebuild">
-    Ruby, ERB, `en.yml`, Super Admin, one migration → hotfix. Gemfile, native gems, Dockerfile, compiled Vue → rebuild on staging, then promote. [Ship fixes](/kb/omniai/deploy-hotfixes).
+    Almost everything: copy files on staging, check, copy the same files on live, **restart**. [Staging to live](/kb/omniai/deploy-hotfixes). Compile only if the image itself must change.
   </Step>
   <Step title="Merge to omniai, then patch the Droplet">
     Code on GitHub is not live. After merge, copy files into `/opt/omniai` and into the running containers.
@@ -71,7 +71,7 @@ Facts below were verified on 1 September 2026.
 | [Current architecture](/kb/omniai/current-architecture) | What is live right now |
 | [AWS architecture](/kb/omniai/aws-architecture) | Rollback stack |
 | [Migration](/kb/omniai/migration) | How the cutover happened |
-| [Ship fixes](/kb/omniai/deploy-hotfixes) | Restart vs recreate |
+| [Staging to live](/kb/omniai/deploy-hotfixes) | Default: copy files on staging, then the same files on live. Restart only. |
 | [Email and Resend](/kb/omniai/email-resend) | Transactional mail |
 | [DNS and Cloudflare](/kb/omniai/dns-cloudflare) | Every hostname |
 | [Access and secrets](/kb/omniai/access-secrets) | Token names, SSH |

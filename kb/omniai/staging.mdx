@@ -25,6 +25,6 @@ What is running: Caddy to `127.0.0.1:3000`; `omniai-rails-1` and `omniai-sidekiq
 
 ## How to use it
 
-Try small fixes on staging first. Build full images on staging, then promote. Never compile on live. Never point staging at the live managed database.
+How to ship: [Staging to live](/kb/omniai/deploy-hotfixes). Copy files here first, check, then the same files on live. Restart, never recreate. Never compile on live. Never point staging at the live managed database.
 
 Those bootstrap steps are **already done**. Do not install a second database or dump live again unless a human asks to refresh the copy.
