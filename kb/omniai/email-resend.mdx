@@ -1,0 +1,52 @@
+---
+title: "OmniAI email and Resend"
+sidebarTitle: "Email and Resend"
+description: "Transactional mail, domain hi.omniaichatbot.com, inbound chat mail, and the known SMTP port issue."
+icon: "envelope"
+---
+
+Live transactional mail is **Resend**, not AWS SES.
+
+From-address domain: `hi.omniaichatbot.com` (verified in Resend). Sender shown to users: `OmniAI <hello@hi.omniaichatbot.com>`.
+
+A backup of the previous env file lives on the Droplet as `/opt/omniai/.env.bak-resend`. Do not print it.
+
+App mailer config is `config/initializers/mailer.rb`. It reads `SMTP_*` env keys. There is no Resend-specific Ruby adapter in the app.
+
+## Live SMTP keys (names and non-secret values)
+
+| Key | Live value |
+| --- | --- |
+| `SMTP_ADDRESS` | `smtp.resend.com` |
+| `SMTP_PORT` | `587` |
+| `SMTP_USERNAME` | `resend` |
+| `SMTP_AUTHENTICATION` | `plain` |
+| `SMTP_ENABLE_STARTTLS_AUTO` | `true` |
+| `SMTP_DOMAIN` | `hi.omniaichatbot.com` |
+| `MAILER_SENDER_EMAIL` | `OmniAI <hello@hi.omniaichatbot.com>` |
+| `SMTP_PASSWORD` | set (Resend API key). Do not print |
+
+Removed on purpose: `SMTP_SSL` and `SMTP_TLS`. If those are `true`, Ruby forces implicit TLS and Resend on 587 fails.
+
+## Known issue: port 587 from the Droplet
+
+Outbound TCP 587 (and 465) to `smtp.resend.com` **times out** from `omniai-prod-ams3`. Rails SMTP delivery therefore fails.
+
+Resend HTTPS `https://api.resend.com/emails` **works** from the same box (test to `ai@hellenictechnologies.com` returned HTTP 200).
+
+Invitation and password emails through the app mailer may still fail until 587 is allowed, or until the app sends via the HTTPS API. Do not change AWS / DNS / DigitalOcean firewall for that unless a human asks.
+
+DNS for Resend: TXT `resend._domainkey.hi.omniaichatbot.com` (DKIM). See [DNS and Cloudflare](/kb/omniai/dns-cloudflare).
+
+## Inbound and leftover providers
+
+| Use | Provider | Notes |
+| --- | --- | --- |
+| Staff / company mail on the apex | Google Workspace | MX on apex |
+| Inbound conversation mail | SendGrid | `chat.omniaichatbot.com`, env `MAILER_INBOUND_EMAIL_DOMAIN` |
+| Old transactional | SES | `mail.` and `send.hi.` records still exist. App SMTP no longer points here |
+| Current transactional | Resend | `SMTP_ADDRESS=smtp.resend.com` |
+
+Other mailer-related env keys may still be present (`MAILGUN_INGRESS_SIGNING_KEY`, `MANDRILL_INGRESS_API_KEY`). Treat them as leftover unless a human says they are live.
+
+Related app keys: `RAILS_INBOUND_EMAIL_SERVICE`, `RAILS_INBOUND_EMAIL_PASSWORD`. Do not print values.

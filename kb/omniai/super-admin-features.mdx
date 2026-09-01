@@ -1,0 +1,32 @@
+---
+title: "OmniAI Super Admin and feature flags"
+sidebarTitle: "Super Admin flags"
+description: "Why select-all used to 500, the second flag column, and the YAML order rule."
+icon: "sliders"
+---
+
+POST `/super_admin/accounts` used to return 500 when almost every feature was checked.
+
+Cause: `accounts.feature_flags` is a signed 64-bit integer. FlagShihTzu can only store bits 1 to 63. `config/features.yml` has more flags than that, so select-all overflowed (`ActiveModel::RangeError`).
+
+## Fix that is live
+
+- Bits 1 to 63 stay on `feature_flags`. **Do not reorder** `config/features.yml`.
+- Overflow flags live on `feature_flags_2` (migration `db/migrate/20260901120000_add_feature_flags_2_to_accounts.rb`).
+- `app/models/concerns/featurable.rb` splits columns. Custom `selected_feature_flags=` writes both.
+- Duplicate `linear_integration` in `features.yml` (around lines 145 and 185) is skipped by name. Bit 50 is unused. **Do not delete the duplicate** — that would shift bits.
+- Super Admin feature forms select all plus a small inline script so a Vite rebuild is not required.
+- Earlier create-account fix still applies: strip `manually_managed_features` before `Account.new`, sanitize blank limits, validate name.
+
+Create form: `enterprise/app/views/fields/account_features_field/_form.html.erb`.
+
+## How it was shipped
+
+Merged to `omniai` (commits include `014f7a232`, `fd4826f17`, `303bca113`) and copied into live containers. If someone recreates Rails or Sidekiq from the old image, copy these files back in:
+
+- `app/models/concerns/featurable.rb`
+- `app/models/account.rb` (schema comment only if needed)
+- `db/migrate/20260901120000_add_feature_flags_2_to_accounts.rb` (already applied on live)
+- Super Admin feature field views under `enterprise/app/views/fields/`
+
+Then `restart` Rails and Sidekiq. Run the migration only if `feature_flags_2` is missing (`\d accounts` in `psql`).

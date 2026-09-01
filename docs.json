@@ -47,6 +47,23 @@
                 ]
               }
             ]
+          },
+          {
+            "group": "OmniAI",
+            "icon": "comments",
+            "pages": [
+              "kb/omniai/start-here",
+              "kb/omniai/current-architecture",
+              "kb/omniai/aws-architecture",
+              "kb/omniai/migration",
+              "kb/omniai/deploy-hotfixes",
+              "kb/omniai/email-resend",
+              "kb/omniai/dns-cloudflare",
+              "kb/omniai/access-secrets",
+              "kb/omniai/super-admin-features",
+              "kb/omniai/staging",
+              "kb/omniai/product-repo"
+            ]
           }
         ]
       }

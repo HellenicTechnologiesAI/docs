@@ -1,0 +1,32 @@
+---
+title: "OmniAI product and repo map"
+sidebarTitle: "Product and repo"
+description: "Custom fork notes, enterprise overlay, i18n, and the files that matter."
+icon: "code"
+---
+
+Repo: `hellenictechnologies/omniai`. Production branch: `omniai`.
+
+This is a custom Chatwoot fork, not a stock install. Do not treat upstream upgrade notes as safe.
+
+Brand in the UI is OmniAI. Super Admin lives at `/super_admin`. Custom channels include Viber and Web App inboxes.
+
+Widget terms, ChatGPT-like view, and the unlimited / Hellenic Technologies plan also live in this fork.
+
+Only edit `en.yml` and `en.json` for translations. Vue is Composition API. Message bubbles: `components-next/`.
+
+## Files that matter
+
+- `AGENTS.md` — deploy rules. `CLAUDE.md` is a symlink.
+- `config/features.yml` — never reorder.
+- `app/models/concerns/featurable.rb` — split flag columns.
+- `enterprise/app/views/fields/account_features_field/_form.html.erb` — Super Admin checkboxes.
+- `config/initializers/mailer.rb` — SMTP from env.
+- `config/storage.yml` — `s3_compatible` plus `STORAGE_*`.
+- `docker-compose.production.yaml` — repo copy says `omniai:development`. Live must stay `chatwoot:production`.
+- `docker/Dockerfile` — full image.
+- `.github/workflows/build_and_push_aws.yml` — ECS on push to `omniai`.
+- `.github/workflows/build_and_push_aws_stage.yml` — ECS staging on `omniai_staging` / `staging`.
+- `enterprise/` — search both trees before editing core behavior.
+
+Do not jump to Chatwoot 4.17 unless a human accepts a full rewrite.

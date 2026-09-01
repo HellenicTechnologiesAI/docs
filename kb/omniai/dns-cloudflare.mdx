@@ -1,0 +1,56 @@
+---
+title: "OmniAI DNS and Cloudflare"
+sidebarTitle: "DNS and Cloudflare"
+description: "Authoritative nameservers, every hostname, and what you may change."
+icon: "globe"
+---
+
+Authoritative DNS for `omniaichatbot.com` is **Cloudflare** (full zone, Free plan, status Active).
+
+| Field | Value |
+| --- | --- |
+| Zone ID | `fc5ee7d2fa250054a67bf692b257b676` |
+| Nameservers | `cheryl.ns.cloudflare.com`, `david.ns.cloudflare.com` |
+| Previous nameservers | Route53 `awsdns-*` (still listed as original NS on the zone) |
+| Plan | Free Website |
+
+Some resolvers still cache the old Route53 plus CloudFront answers. Query `1.1.1.1` or `8.8.8.8` if a host looks wrong.
+
+## Records that matter for the app
+
+| Type | Name | Content | Proxied |
+| --- | --- | --- | --- |
+| A | `app.omniaichatbot.com` | `188.166.84.105` | yes |
+| A | `hc.omniaichatbot.com` | `188.166.84.105` | yes |
+| A | `staging.omniaichatbot.com` | `164.92.220.232` | yes |
+| A | apex `omniaichatbot.com` | Framer `31.43.160.6` and `31.43.161.6` | no |
+| CNAME | `www` | `sites.framer.app` | no |
+
+Do not change `app` or `hc` when working on staging. Do not orange-cloud the Framer records.
+
+## Mail and auth records
+
+| Type | Name | Points at |
+| --- | --- | --- |
+| MX | apex | Google Workspace (`aspmx.l.google.com` and alts) |
+| TXT | apex SPF | Google \+ SendGrid \+ SES |
+| TXT | apex | two Google site verifications |
+| TXT | `_dmarc` | `v=DMARC1; p=none` |
+| MX | `chat.omniaichatbot.com` | SendGrid (`mx.sendgrid.net`) — inbound Chatwoot mail domain |
+| CNAME | `52254506` | `sendgrid.net` |
+| CNAME | `s1._domainkey` / `s2._domainkey` | SendGrid DKIM |
+| MX \+ TXT | `mail.omniaichatbot.com` | SES `eu-central-1` |
+| MX \+ TXT | `send.hi.omniaichatbot.com` | SES `eu-west-1` (legacy) |
+| TXT | `resend._domainkey.hi.omniaichatbot.com` | Resend DKIM for transactional |
+
+Live app sender is Resend on `hi.omniaichatbot.com`. Inbound conversation mail still uses `MAILER_INBOUND_EMAIL_DOMAIN=chat.omniaichatbot.com` (SendGrid).
+
+## What Cloudflare is (and is not) for OmniAI
+
+The `omniaichatbot.com` zone is **DNS plus orange-cloud proxy** for `app`, `hc`, and `staging`. Free plan.
+
+There is **no** OmniAI Cloudflare Worker, no WAF custom rules we rely on, and no Cloudflare R2. TLS for `app` / `hc` is Cloudflare at the edge plus Caddy on the Droplet (`FORCE_SSL=false` in the app because Caddy already terminates TLS).
+
+Marketing apex and `www` stay on Framer (grey cloud).
+
+Token name for API edits: `CLOUDFLARE_API_TOKEN` in Cloud Agent secrets. Zone ID `fc5ee7d2fa250054a67bf692b257b676`.

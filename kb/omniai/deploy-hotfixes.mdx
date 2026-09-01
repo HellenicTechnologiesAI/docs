@@ -1,0 +1,48 @@
+---
+title: "OmniAI ship fixes without rebuilds"
+sidebarTitle: "Ship fixes"
+description: "Default path for Ruby and Super Admin changes. Restart, never recreate. When a full image is required."
+icon: "wrench"
+---
+
+Default for small fixes: **do not compile, do not take live down.**
+
+This covers Ruby, ERB, `en.yml`, Super Admin views, and a migration-only change.
+
+<Warning>
+  `docker compose up -d` after a hotfix **recreates** containers. Recreate boots the old image and drops every file you copied in. Use **restart** only.
+</Warning>
+
+Pushing `omniai` still runs the AWS ECS workflow. That does not patch the Droplet.
+
+## Small fix (default)
+
+<Steps>
+  <Step title="Merge to omniai">
+    Production branch is `omniai`. Do not leave the product PR open.
+  </Step>
+  <Step title="Copy files to the Droplet tree">
+    rsync only the changed files to `/opt/omniai`. Never replace `/opt/omniai/.env` or the live compose file.
+  </Step>
+  <Step title="Copy into running containers">
+    `docker cp` each file into `omniai-rails-1` and `omniai-sidekiq-1` at the matching `/app/...` path.
+  </Step>
+  <Step title="Migrate only if you added a migration">
+    From `/opt/omniai`: `docker compose -f docker-compose.production.yaml exec -T rails bundle exec rails db:migrate`
+  </Step>
+  <Step title="Restart, never recreate">
+    `docker compose -f docker-compose.production.yaml restart rails sidekiq`
+  </Step>
+</Steps>
+
+Example that already shipped this way: the Super Admin feature-flag overflow fix (`feature_flags_2` plus `Featurable`). After a later compose recreate for Resend, those copied files vanished and had to be copied in again.
+
+## Full image rebuild (rare)
+
+Only when the image itself must change: Gemfile, native gems, Dockerfile, or compiled frontend assets.
+
+- Build a new `chatwoot:production` image **in the background** while current containers keep serving.
+- Preferred: compile on **staging** once that app exists, then `docker save` / copy / `docker load` on live, then a short restart.
+- Do not stop Rails or Sidekiq just to compile.
+- The 8 GB box runs out of memory if you compile `grpc` (`force_ruby_platform`) while both containers stay up. Last resort: 4G swap already exists; stop compose only if a human accepts downtime, `nohup` the build, then bring the site back.
+- After the new image is tagged `chatwoot:production`, swap compose to it. That recreate **is** expected for an image change. Any previous `docker cp` hotfixes must already be in the new image or you will lose them again.

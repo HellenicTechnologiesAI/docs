@@ -1,0 +1,85 @@
+---
+title: "OmniAI — start here (agent pickup)"
+sidebarTitle: "Start here"
+description: "Read this first. Live product host, git branch, and the pages another agent needs."
+icon: "flag"
+---
+
+OmniAI is Hellenic Technologies Chatwoot fork. Production branch is `omniai`. Live URL is `https://app.omniaichatbot.com`. Super Admin is `/super_admin`.
+
+Customers hit Droplet `omniai-prod-ams3` at `188.166.84.105` behind Cloudflare. GitHub Actions still ship to AWS ECS. That does not update the live Droplet.
+
+<Warning>
+  Internal Hellenic Technologies only. Do not brief outside devops that live sits on DigitalOcean unless they already operate this box. Never write passwords, SSH keys, or a filled env file into this KB or Git.
+</Warning>
+
+Staff URL: [https://ht-intra.mintlify.site/kb/omniai/start-here](https://ht-intra.mintlify.site/kb/omniai/start-here). Sign in with Mintlify. The `.io` and `.app` hosts 404.
+
+Facts below were verified on 1 September 2026.
+
+## Hostnames today
+
+| Hostname | What serves it |
+| --- | --- |
+| Live `app` and `hc` | Droplet `omniai-prod-ams3` at `188.166.84.105`, Cloudflare proxied |
+| `staging.omniaichatbot.com` | Cloudflare already points at `omniai-staging-ams3` `164.92.220.232`. App process is not running (Cloudflare 502). Old AWS ECS staging still exists. |
+| Marketing `www` and apex | Framer. Not this repo. |
+| AWS prod ECS | Rollback only. Not the public `app` origin. |
+
+## Hard rules
+
+1. After a file copy into a running container, **restart** Rails and Sidekiq. Do not recreate them. Recreate boots the old image and drops copied files.
+2. Do not overwrite `/opt/omniai/.env` or the live compose line `image: chatwoot:production`. The repo compose may say `omniai:development`.
+3. Do not compile a full image on live for Ruby, ERB, `en.yml`, Super Admin views, or a migration-only change.
+4. Do not stop the live site just to compile. Native gem compiles run out of memory on the 8 GB box if Rails and Sidekiq stay up.
+5. Do not point staging at the live managed database or Valkey.
+6. Do not change Cloudflare `app` or `hc` when working on staging.
+7. Do not reorder `config/features.yml`. Duplicate `linear_integration` stays. See [Super Admin flags](/kb/omniai/super-admin-features).
+8. Do not mention DigitalOcean or the cutover to outside devops unless they already operate this box.
+9. Do not commit the SSH key, the live env file, Spaces keys, `DIGITALOCEAN_ACCESS_TOKEN`, `CLOUDFLARE_API_TOKEN`, or mailer passwords.
+10. Do not leave product pull requests open. Merge finished work into `omniai`.
+11. Do not assume GitHub Actions updated live.
+12. Do not upgrade to Chatwoot 4.17 unless a human accepts a full rewrite of the custom fork.
+
+## First 10 minutes on a new agent
+
+<Steps>
+  <Step title="Use the Cloud environment that already has the SSH key">
+    Launch on the personal Cursor Cloud environment **hellenictechnologies/omniai**: [environment e/9847f7d0-a526-11f1-a7d1-d6b4613131ce](https://cursor.com/dashboard/cloud-agents/environments/e/9847f7d0-a526-11f1-a7d1-d6b4613131ce).
+
+    Confirm: `test -f ~/.ssh/omniai_do && ssh -i ~/.ssh/omniai_do -o BatchMode=yes -o ConnectTimeout=8 root@188.166.84.105 hostname`
+
+    Expected print: `omniai-prod-ams3`. Details: [Access and secrets](/kb/omniai/access-secrets).
+  </Step>
+  <Step title="Read AGENTS.md">
+    Same deploy rules live in `AGENTS.md` (`CLAUDE.md` is a symlink). This KB is the expanded runbook.
+  </Step>
+  <Step title="Decide hotfix vs image rebuild">
+    Ruby, ERB, `en.yml`, Super Admin, one migration → hotfix. Gemfile, native gems, Dockerfile, compiled Vue → rebuild on staging once that app exists. [Ship fixes](/kb/omniai/deploy-hotfixes).
+  </Step>
+  <Step title="Merge to omniai, then patch the Droplet">
+    Code on GitHub is not live. After merge, copy files into `/opt/omniai` and into the running containers.
+  </Step>
+</Steps>
+
+## Child pages
+
+| Page | Use when |
+| --- | --- |
+| [Current architecture](/kb/omniai/current-architecture) | What is live right now |
+| [AWS architecture](/kb/omniai/aws-architecture) | Rollback stack |
+| [Migration](/kb/omniai/migration) | How the cutover happened |
+| [Ship fixes](/kb/omniai/deploy-hotfixes) | Restart vs recreate |
+| [Email and Resend](/kb/omniai/email-resend) | Transactional mail |
+| [DNS and Cloudflare](/kb/omniai/dns-cloudflare) | Every hostname |
+| [Access and secrets](/kb/omniai/access-secrets) | Token names, SSH |
+| [Super Admin flags](/kb/omniai/super-admin-features) | Create-account 500 |
+| [Staging](/kb/omniai/staging) | Droplet exists, app not up |
+| [Product and repo](/kb/omniai/product-repo) | Custom fork map |
+
+## If you only remember four facts
+
+1. Live = Droplet `188.166.84.105` behind Cloudflare. Not ECS.
+2. Small fix = copy files into the container \+ **restart**. Never recreate.
+3. Secrets stay in `/opt/omniai/.env` and Cursor Cloud secrets.
+4. Staging hostname already points at `164.92.220.232` but the staging app is not up (502).

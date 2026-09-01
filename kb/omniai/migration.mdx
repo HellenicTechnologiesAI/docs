@@ -1,0 +1,28 @@
+---
+title: "OmniAI migration off AWS"
+sidebarTitle: "Migration"
+description: "How production moved, what was copied, and what was left running."
+icon: "arrows-rotate"
+---
+
+Production moved from AWS `eu-central-1` (Frankfurt) to DigitalOcean AMS3 (Amsterdam). Goal: one Droplet for Rails plus Sidekiq, managed Postgres, managed Valkey, and Spaces. Skip a DigitalOcean load balancer. Cloudflare already does DNS and TLS.
+
+<Warning>
+  Do not brief outside devops that the destination is DigitalOcean. Do not commit the DigitalOcean token.
+</Warning>
+
+Custom paid code that lived only on `dev` was merged into `omniai` (PR 121, commit `0d6504edc`) so the Droplet did not lose product work. Database rows were never missing (example: Hellenic Technologies account 26).
+
+## What was copied
+
+1. Dedicated AMS3 VPC plus firewall. Do not put OmniAI on `default-ams3` next to `hellenicAI-Platform`.
+2. Managed Postgres 17 (2 GB / 30 GB) and managed Valkey 1 GB.
+3. Spaces bucket `omniai-prod-ams3`. rclone copied `omniai-s3bucket-v1` (2386 objects, about 278 MiB).
+4. `pg_dump` / restore of the RDS database (about 1.7 GB). Extensions enabled: `vector`, `pg_trgm`, `pgcrypto`.
+5. Droplet `omniai-prod-ams3` with Docker, Caddy, 4G swap, image `chatwoot:production`.
+6. Env switch: `ACTIVE_STORAGE_SERVICE=s3_compatible`, Spaces endpoint, private Postgres and Valkey hosts. `FRONTEND_URL` stayed `https://app.omniaichatbot.com`.
+7. Cloudflare `app` and `hc` A records to `188.166.84.105`, proxied.
+
+AWS prod ECS / ALB / RDS / ElastiCache were **left up** as rollback. They still cost money until someone who owns that account stops them.
+
+GitHub Actions still target ECS. Live must be patched on the Droplet. See [Ship fixes](/kb/omniai/deploy-hotfixes).
