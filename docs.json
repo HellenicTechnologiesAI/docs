@@ -27,9 +27,6 @@
       "dark": "/images/page-background-dark.svg"
     }
   },
-  "icons": {
-    "library": "lucide"
-  },
   "styling": {
     "latex": false,
     "codeblocks": "system"
@@ -82,7 +79,7 @@
           },
           {
             "group": "OmniAI",
-            "icon": "messages-square",
+            "icon": "comments",
             "pages": [
               "kb/omniai/start-here",
               "kb/omniai/current-architecture",
