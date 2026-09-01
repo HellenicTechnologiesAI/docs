@@ -5,4 +5,36 @@ description: "Staging Droplet exists and DNS is flipped. App containers are not 
 icon: "flask"
 ---
 
-Stub. Full staging notes land in the next edit.
+Status on **1 September 2026**: the staging Droplet exists and Cloudflare already points `staging.omniaichatbot.com` at it. The app is **not running**. Public check through Cloudflare returns **502**.
+
+<Warning>
+  Do not change Cloudflare `app` or `hc` while finishing staging. Do not point staging at the live managed Postgres or Valkey.
+</Warning>
+
+| Field | Value |
+| --- | --- |
+| Name | `omniai-staging-ams3` |
+| Public IP | `164.92.220.232` |
+| Private IP | `10.50.0.5` |
+| Droplet ID | `596861262` |
+| Size | same as live: 8 GB / 4 vCPU / 160 GB, AMS3 |
+| SSH | `ssh -i ~/.ssh/omniai_do root@164.92.220.232` |
+| Cost | about 48 USD / month extra. Live managed DB bill stays unchanged |
+
+Already done: Droplet created, assigned to the OmniAI project, 4G swap, Docker installed, Caddy installed and listening on 80/443, Caddyfile has `staging.omniaichatbot.com` reverse-proxy to `127.0.0.1:3000`, Cloudflare A record proxied to `164.92.220.232`.
+
+## Not done yet
+
+`/opt/omniai` on staging is an empty directory. No Docker image is loaded. No Postgres or Redis on the box. No containers.
+
+Finish in this order:
+
+1. Install Postgres 17 and Redis 7 **on the staging Droplet** (no second managed-DB bill).
+2. One-time **read-only** dump from live managed Postgres into `chatwoot_staging`. Never point staging env at live `POSTGRES_HOST` or live `REDIS_URL`.
+3. Copy `/opt/omniai` from live (exclude live `.env`). `docker save` / `docker load` image `chatwoot:production` so you do not compile.
+4. Staging `.env` only changes URLs (`https://staging.omniaichatbot.com`), a new `SECRET_KEY_BASE`, and local database / Redis URLs.
+5. Start Rails and Sidekiq. Prove `https://staging.omniaichatbot.com` returns 200.
+6. Re-copy hotfix files into staging containers if the baked image is older than `omniai` (feature flag overflow fix).
+7. Later: build images **on staging**, then copy the image to live. Never compile on live.
+
+Plan file on the last agent VM (do not edit): `/opt/cursor/artifacts/plans/do_staging_sync_7a800493.plan.md`.
