@@ -1,0 +1,106 @@
+---
+title: "Client platform IDs"
+sidebarTitle: "Client platform IDs"
+description: "Look up every HT client’s web GTM, GA4, Meta Ads, and Google Ads IDs. Snapshot of the Account Mapping sheet for fast agent search."
+icon: "table"
+boost: 3
+keywords:
+  - clients
+  - platform IDs
+  - GTM
+  - GA4
+  - Google Ads
+  - Meta Ads
+  - account mapping
+---
+
+<Note>
+  Search this page for the client name. Copy the IDs. Do not copy one client’s IDs onto another. Tokens stay out of this KB — see [platform access](/kb/web-analytics/cursor-ga4-meta-access).
+</Note>
+
+Source of truth: [Account Mapping | GTM and more](https://docs.google.com/spreadsheets/d/1ZDcH_Zp141uR516Fb3xfxoaOS4iwNgL47NXxBVhG9os/edit). This page is a snapshot of that sheet (last sheet edit **22 Sep 2025**, 50 rows). Blank cells mean the sheet has no value. The **TikTok** and **website url** columns are empty for every row.
+
+Live URL: [https://ht-intra.mintlify.site/kb/clients-platform-ids](https://ht-intra.mintlify.site/kb/clients-platform-ids).
+
+Related: [Platform access](/kb/web-analytics/cursor-ga4-meta-access) · [SST playbook](/kb/web-analytics/server-side-tracking) · [Customer GitHub repo](/kb/customer-github-repo).
+
+## How to look up a client
+
+1. Search this page or the KB for the client name (also try the GTM ID).
+2. Use **Web GTM**, **GA4 ID**, **Meta Ads**, and **Google Ads** from the matching row.
+3. If the cell is blank, open the [live sheet](https://docs.google.com/spreadsheets/d/1ZDcH_Zp141uR516Fb3xfxoaOS4iwNgL47NXxBVhG9os/edit) or list accounts via [platform access](/kb/web-analytics/cursor-ga4-meta-access).
+4. If you add or correct a client, update the sheet first, then this page.
+
+**GA4 ID** in the sheet is a numeric property ID, not a `G-` measurement ID. **Meta Ads** is the ad-account number (no `act_` prefix). **Google Ads** is the CID with dashes.
+
+## Shared sGTM
+
+Four rows fill **sGTM ID** in the sheet: Avance, Camelot GR, GrecoStrom, and Gatsoulis. That value is the public ID of the HT multi-tenant server container (same one as the [SST playbook](/kb/web-analytics/server-side-tracking)). Add a domain on that container. Do **not** create a second Stape or sGTM container. Other rows leave sGTM blank in the sheet.
+
+## Clients (A–Z)
+
+| Client | Web GTM | GA4 ID | Meta Ads | Google Ads |
+| --- | --- | --- | --- | --- |
+| 1926 Collections | `GTM-5747H979` | — | `812877157378233` | `409-975-7874` |
+| A-Office | `GTM-WVCXNSG` | — | — | `873-707-6329` |
+| Aegean Sealines | `GTM-PLKH4M6` | `250918073` | `307749411287391` | `156-960-1166` |
+| Aldemar Olympian Village | `GTM-N556BLP` | — | `333778934075794` | `384-864-0176` |
+| Aperent | `GTM-K5RTH9RK` | — | — | `862-694-6813` |
+| Avance | `GTM-KXCDNCQ` | — | `256946166073022` | `836-488-0676` |
+| Camelot CY | `GTM-TL4F62X` | — | `196324358947452` | `390-113-1366` |
+| Camelot GR | `GTM-TXJ8WFV` | — | `966773983677804` | `773-394-9187` |
+| Coffee Buy | `GTM-PM2SDLF` | — | `247724840151472` | `362-585-6866` |
+| Dama Fashion | `GTM-PBZRWGK` | — | `792833192568575` | `485-944-1658` |
+| Doorway | `GTM-5PFQRLL` | — | `462180156307852` | `373-835-5057` |
+| Drakoulakis | `GTM-TC4M58KM` | — | — | `654-489-7068` |
+| Escaperentals | `GTM-WT6G58S` | `326143052` | `802024411303352` | `608-154-5152` |
+| Eudaimonia Wooden Suites | — | — | — | `750-264-1413` |
+| FactoryShop | `GTM-K82RWNZ` | — | — | `503-529-4903` |
+| Fintech | `GTM-MJKB9D6` | `333146476` | `305107957585360` | `483-339-6710` |
+| Garden Gallery | `GTM-TJ4PN3Z` | — | — | `587-304-0449` |
+| Gatsoulis | `GTM-W25GQR5R` | — | — | `834-759-9254` |
+| GK Mobili | `GTM-WPSMBL6` | — | — | `590-632-2888` |
+| Golden Star Ferries | `GTM-THKV4WF` | — | — | `106-458-9807` |
+| GrecoStrom | `GTM-N7G3WK` | — | — | `298-000-9656` |
+| Gregio | `GTM-N3VDMJQ` | `342364284` | — | `874-603-5566` |
+| Hellenic Store | `GTM-WK6Z72CJ` | `418416571` | `1154839525987580` | `959-041-1200` |
+| Hindimpatoglou | `GTM-THMGDV6` | — | — | `910-476-0462` |
+| Homad | `GTM-T7WKKH8` | `353199573` | — | `642-682-2378` |
+| Kos Rent | `GTM-56JBNFRJ` | — | — | `182-503-0456` |
+| Logistis Mou | `GTM-W8PSRHXP` | — | — | `661-388-1613` |
+| MCI Amsterdam | — | — | — | `871-905-1862` |
+| MCI Tire Emissions | — | — | — | `780-595-5768` |
+| Nolte | `GTM-KV63R6JF` | — | — | `853-248-7449` |
+| Novitron | `GTM-5VWTJZR` | — | — | `476-714-5405` |
+| OSS | `GTM-WJK7SWW` | `375399364` | `10201066475938371` | `808-083-1707` |
+| Paros Rent | `GTM-TTBTTP9C` | — | — | `880-331-1421` |
+| Piperaris | — | — | — | `399-742-7851` |
+| Portopolis | `GTM-WGCFNSS` | — | — | `242-521-1737` |
+| Randstad | — | — | — | `134-065-6363` |
+| RC Master | `GTM-TF83B94` | — | — | `178-355-9970` |
+| Rooted Rent a Car | `GTM-ND6D63NN` | — | — | `348-727-4244` |
+| Rooted Transfers | `GTM-TGZDVSB9` | — | — | `155-499-4386` |
+| Smart rentals | `GTM-PRKWVFQ7` | — | — | `510-100-6243` |
+| Spentzos | `GTM-54HCV48G` | — | — | `516-563-7554` |
+| Tales in Tiles | `GTM-N8XXC2B8` | — | — | `383-826-7472` |
+| Taxipet | `GTM-P5T79DT` | `332604977` | — | `189-267-8282` |
+| TheoCar | `GTM-PFKXKZ8` | — | — | `968-018-5219` |
+| TitanOffice CY | `GTM-P65Z263K` | — | — | `276-543-4711` |
+| TitanOffice GR | `GTM-NTSC6BZ` | — | — | `254-179-9498` |
+| Unbox Greece | `GTM-5X9ZHWQ3` | — | — | `934-496-2854` |
+| Viden | `GTM-P9RVPXT` | `378948580` | — | `306-529-8719` |
+| Watermart | `GTM-NX59CSFX` | `449007344` | `595216980087935` | `274-185-4394` |
+| Κεντρική Αγορά Χρυσού | `GTM-KPJKL4M` | — | — | `548-090-6469` |
+
+## Not in the sheet
+
+These two are documented in this KB and missing from the Sep 2025 snapshot. Do not invent IDs for anyone else.
+
+| Client | Web GTM | Notes |
+| --- | --- | --- |
+| Golden Gastro | `GTM-N8ZFXBTK` | Full record: [Golden Gastro](/kb/web-analytics/customers/golden-gastro). GA4 `G-LNPZX5HKQF` / property `539367952`. Ads `501-480-0688`. Meta pixel `1593994702440618`, ad account `act_2885307635233937`. |
+| Hellenic Technologies (own site) | `GTM-TRPS26L` | Do not copy onto a customer. GA4 account `394561578`. SST GTM account `6202173174`. See the [SST playbook](/kb/web-analytics/server-side-tracking). |
+
+<Warning>
+  Public container, property, pixel, and customer IDs only. Never write CAPI tokens, Stape API keys, OAuth secrets, or a filled `.env` here.
+</Warning>
