@@ -85,7 +85,9 @@
           {
             "group": "n8n",
             "icon": "diagram-project",
-            "pages": []
+            "pages": [
+              "kb/n8n/start-here"
+            ]
           }
         ]
       }

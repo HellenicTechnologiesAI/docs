@@ -1,0 +1,74 @@
+---
+title: "n8n — start here (agent pickup)"
+sidebarTitle: "Start here"
+description: "Read this first. Public URL, DigitalOcean live host, AWS rollback, and the pages another agent needs."
+icon: "flag"
+---
+
+n8n is Hellenic Technologies workflow host. Public URL is `https://n8n.hellenictechnologies.com`. Same IP also answers the typo hostname `n88n.hellenictechnologies.com`.
+
+The editor, webhooks, **parts-api**, and **crawl-proxy** share one box and one Caddy vhost. They are **not** OmniAI Chatwoot. Do not install this stack on `omniai-prod-ams3` or `omniai-staging-ams3`.
+
+<Warning>
+  Internal Hellenic Technologies only. Do not brief outside devops that this host sits on DigitalOcean unless they already operate this box. Never write passwords, encryption keys, SSH keys, or a filled env file into this KB or Git.
+</Warning>
+
+Staff URL: [https://intra.hellenictechnologies.com/kb/n8n/start-here](https://intra.hellenictechnologies.com/kb/n8n/start-here). Sign in with Mintlify. Same site as `ht-intra.mintlify.site`.
+
+Facts below were verified on 4 September 2026 after the DNS flip.
+
+## What is live today
+
+| Question | Answer |
+| --- | --- |
+| Public hostname | `n8n.hellenictechnologies.com` (grey-cloud A — Caddy does TLS) |
+| Typo hostname | `n88n.hellenictechnologies.com` (same A target) |
+| What serves customers | Droplet `n8n-ams3` at `167.172.39.204` |
+| AWS Ireland rollback | EC2 `i-02b985625556f7bd6` at `34.249.195.203`. n8n container is **stopped**. Box still up for a day. |
+| OmniAI Chatwoot | Separate droplets. Do not mix. |
+
+## Hard rules
+
+1. Do not put n8n, parts-api, or crawl-proxy on the OmniAI Chatwoot droplets.
+2. Do not point this stack at OmniAI managed Postgres or Valkey. n8n keeps its own Docker Postgres 16 and Redis 7.
+3. Do not orange-cloud `n8n` or `n88n`. Grey-cloud only. Caddy on the box owns HTTPS.
+4. Do not pull `n8nio/n8n:latest` on this host. Image is pinned to **`n8nio/n8n:2.14.2`**.
+5. Do not start n8n on the AWS box while DigitalOcean n8n is running. Same crons would fire twice.
+6. Do not mention DigitalOcean or this cutover to outside devops unless they already operate this box.
+7. Do not commit `/opt/n8n/.env`, `/opt/n8n/parts-api.env`, `/opt/ai-lens/.env`, `N8N_ENCRYPTION_KEY`, or API keys.
+8. Do not print those values in chat. Names of keys are fine. Values are not.
+9. Keep `N8N_ENCRYPTION_KEY` unchanged or saved credentials will not decrypt.
+
+## First 10 minutes on a new agent
+
+<Steps>
+  <Step title="Use the Cloud environment that already has the SSH key">
+    Launch on the personal Cursor Cloud environment **hellenictechnologies/omniai**: [environment e/9847f7d0-a526-11f1-a7d1-d6b4613131ce](https://cursor.com/dashboard/cloud-agents/environments/e/9847f7d0-a526-11f1-a7d1-d6b4613131ce).
+
+    Confirm live: `test -f ~/.ssh/omniai_do && ssh -i ~/.ssh/omniai_do -o BatchMode=yes -o ConnectTimeout=8 root@167.172.39.204 hostname`
+
+    Expected print: `n8n-ams3`. Details: [Access and secrets](/kb/n8n/access-secrets).
+  </Step>
+  <Step title="Read the two architecture pages">
+    [Current architecture](/kb/n8n/current-architecture) is what serves the hostname. [AWS architecture](/kb/n8n/aws-architecture) is Ireland rollback.
+  </Step>
+  <Step title="Do not touch OmniAI Chatwoot">
+    OmniAI live is `188.166.84.105`. Staging is `164.92.220.232`. Those pages are under [OmniAI](/kb/omniai/start-here).
+  </Step>
+</Steps>
+
+## Child pages
+
+| Page | Use when |
+| --- | --- |
+| [Current architecture](/kb/n8n/current-architecture) | DigitalOcean AMS3 live host |
+| [AWS architecture](/kb/n8n/aws-architecture) | Ireland EC2 left as rollback |
+| [Migration](/kb/n8n/migration) | How the copy and DNS flip were done |
+| [Access and secrets](/kb/n8n/access-secrets) | SSH, token names, where values live |
+
+## If you only remember four facts
+
+1. Public n8n is `https://n8n.hellenictechnologies.com` on droplet `167.172.39.204`. Grey-cloud. Caddy on the box.
+2. parts-api and crawl-proxy live on the **same** host.
+3. n8n version is **2.14.2**. Do not pull `latest`.
+4. Secrets stay on the box in `/opt/n8n/.env` and `/opt/n8n/parts-api.env`. Never in Git.
