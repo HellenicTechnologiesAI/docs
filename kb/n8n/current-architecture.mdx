@@ -28,7 +28,7 @@ Region **AMS3**. Project ID `f66b1882-ccdd-440e-a68f-30f079059938`. VPC `omniai-
 n8n is a **third droplet** in this project. It does not use `omniai-prod-pg`, `omniai-prod-valkey`, or the Spaces bucket. Those stay Chatwoot-only.
 
 | Console name | Kind | Size | Who uses it |
-| --- | --- | --- |
+| --- | --- | --- | --- |
 | `n8n-ams3` | Droplet, tags `n8n` + `production`, `167.172.39.204` | 8 GB / 2 vCPU / 100 GB (`s-2vcpu-8gb-amd`) | n8n + parts-api + crawl-proxy |
 | `omniai-prod-ams3` | Droplet | 8 GB / 4 vCPU / 160 GB | OmniAI live — do not install n8n here |
 | `omniai-staging-ams3` | Droplet | 8 GB / 4 vCPU / 160 GB | OmniAI staging — do not install n8n here |

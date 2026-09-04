@@ -4,3 +4,44 @@ sidebarTitle: "Migration"
 description: "How n8n, parts-api, and crawl-proxy moved from Ireland EC2 to DigitalOcean AMS3."
 icon: "arrows-rotate"
 ---
+
+Moved one Ireland `t3a.large` (about 66 USD / month) to one AMS3 droplet `s-2vcpu-8gb-amd` (42 USD / month). Same hostname. Same Caddy routes. Docker Postgres and Redis came along. No managed database.
+
+DNS flipped on **4 September 2026**. A records `n8n` and `n88n` now point at `167.172.39.204`, grey-cloud. Let's Encrypt issued on the new box. AWS n8n container is stopped. The EC2 instance stays up for a day as rollback.
+
+<Warning>
+  Do not brief outside devops that the destination is DigitalOcean. Do not start n8n on AWS while DigitalOcean n8n is running. Do not put this stack on the OmniAI Chatwoot droplets.
+</Warning>
+
+## What was copied
+
+| Item | Why |
+| --- | --- |
+| `/opt/n8n` | compose, Caddyfile, `.env`, `parts-api.env` |
+| `/opt/ai-lens` | parts-api source and its `.env` |
+| Volume `n8n_n8n_data` | workflows and credential blobs |
+| `pg_dump` of Docker Postgres | 68 workflows |
+| Image `crawl-proxy` | local |
+| Image `ai-lens-parts-api` | running parts-api image, also tagged `ai-lens` |
+| Image `n8nio/n8n` from AWS | pinned as `n8nio/n8n:2.14.2` — do not pull Hub `latest` |
+
+## Order that was used
+
+1. Created droplet `n8n-ams3` `597520995` at `167.172.39.204`.
+2. Copied `/opt/n8n` and `/opt/ai-lens` without printing env files.
+3. Restored `pg_dump`, loaded local images, pinned compose to 2.14.2.
+4. Started n8n long enough to confirm `/healthz` and 68 workflows, then stopped it so crons did not double.
+5. Started n8n + Caddy, flipped grey A records, stopped AWS n8n.
+
+## DNS record IDs (zone `f503eb58a9864a62e079dd313b0c4472`)
+
+| Name | Record ID | New content |
+| --- | --- | --- |
+| `n8n.hellenictechnologies.com` | `a7933d0374209b452017bc1668dcf14f` | `167.172.39.204` |
+| `n88n.hellenictechnologies.com` | `546a7bc40aa0e77565d38866a1e80f47` | `167.172.39.204` |
+
+Token name: `CLOUDFLARE_API_TOKEN`. Value stays in the Cloud environment.
+
+## After a healthy day
+
+Stop `i-02b985625556f7bd6` and release Elastic IP `34.249.195.203`. Do not delete Frankfurt OmniAI leftovers as part of this step.
