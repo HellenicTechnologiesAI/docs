@@ -57,6 +57,6 @@ These used to CNAME the old AWS load balancer `lb-omni-ai-592724678.eu-central-1
 
 Caddy on the live droplet also serves those two names. Do not point them back at AWS.
 
-`chat.avance.gr` is the same leftover CNAME on the **Avance** Cloudflare zone (`lola.ns` / `max.ns`). We cannot edit that zone. Change `chat` from the dead ALB to `chat.hellenictechnologies.com` (or A `188.166.84.105`), then add `chat.avance.gr` to the live Caddyfile. `chat.avance.com` has no DNS record (avance.com is Webflow / Moonhill).
+`chat.avance.gr` and `chat.watermart.gr` had the same leftover CNAME. They now A-record `188.166.84.105` (grey-cloud) on the client Cloudflare zones. Token name for those zones: `cloudflare_api_clients`. A scan of 127 client zones found no other `lb-omni-ai` leftovers. `chat.avance.com` has no DNS record.
 
-Token name for API edits: `CLOUDFLARE_API_TOKEN` in Cloud Agent secrets. Zone ID `fc5ee7d2fa250054a67bf692b257b676`.
+Token name for the OmniAI / HT zones: `CLOUDFLARE_API_TOKEN`. Zone ID `fc5ee7d2fa250054a67bf692b257b676`.
