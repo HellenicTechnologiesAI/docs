@@ -21,7 +21,7 @@ Customer handbook repo: private `ht-goldengastro`. Full markdown twin: `docs/05-
 
 | Piece | Live |
 | --- | --- |
-| Web `GTM-N8ZFXBTK` | **v16** `GG same-origin /metrics`. `C - Server container URL` = `location.origin + '/metrics'` on `goldengastro.de`, else `https://sgtm.goldengastro.de`. Official facebookarchive Facebook Pixel template (v15). Web Ads **paused**. |
+| Web `GTM-N8ZFXBTK` | **v17** `GG purchase thank-you scrape` (purchase retries on PayPal thank-you extra). **Loader IIFE is currently invalid JS** (`try%7B` and a missing OR between `I` and `f`) — GTM does not load until web-dev surgical REPLACE. Official Facebook Pixel template. Web Ads **paused**. |
 | sGTM | **v220** `GG match HT Ads linker + Meta page_view`. Conversion Linker on all GA4 for this hostname. Meta CAPI PageView on `page_view` \+ `ht_consent_ready`. |
 | Cloudflare | Worker `gg-sgtm-metrics` → origin `sgtm.goldengastro.de`. Routes `goldengastro.de/metrics*` \+ `www`. SSL Full. `X-From-Cdn: cf-stape`. Cache bypass for `/metrics`. |
 | Loader | Stape Generate: Cookie Keeper **ON**, Same Origin Path `/metrics`, Stape User ID. Live HTML has the CK wrapper with `o="https://goldengastro.de/metrics"`. Normal filename and Safari `kp` rewrite both **200**. Noscript is still `https://sgtm.goldengastro.de/ns.html?id=GTM-N8ZFXBTK`. |
@@ -60,7 +60,7 @@ Copy **triggers / consent / templates** from HT. Do not copy HT container IDs, H
 - Do **not** unpause web `GG | Google tag Ads` / `GG | Ads *` awct.
 - Do **not** start GTM “Measure purchases in Google Ads” wizard.
 - Do **not** use HT env `META_PIXEL_ID` / `META_CAPI_ACCESS_TOKEN` (those are the HT website).
-- Do **not** generate Cookie Keeper again. Do **not** replace the live snippet.
+- Do **not** generate Cookie Keeper again. Do **not** replace the live snippet with a new Generate. **Exception 4 Sep 2026:** the pasted IIFE does not parse (`try%7B`, mangled OR). Web-dev must surgical-fix those two tokens in the existing snippet, then purge Flying Press + Cloudflare.
 
 ## Public IDs
 
@@ -295,10 +295,11 @@ Custom conversions filter: URL contains `goldengastro.de` AND the event. Audienc
 | --- | --- |
 | Re-run Stape scan after **Alle akzeptieren** (cannot re-run same day; last score 52/100 was before v15/v16 \+ `/metrics`) | PM |
 | Ads UI: uncheck Included in Conversions on 3 observe actions | Human in Ads |
-| Real Purchase \+ Meta EMQ / Test Events | Live order or lead with email/phone |
+| **Cookie Keeper IIFE is syntactically dead** (`try%7B` must become `try{`; `d=d&&(!!If)` must become `d=d&&(!!I or f)` with a JS OR). GTM never loads. Surgical REPLACE in the existing head snippet, then purge Flying Press + Cloudflare. Do **not** regenerate. Do **not** add a second loader. | Web-dev |
+| Real Purchase + Meta EMQ / Test Events (after loader parse-ok + Alle akzeptieren). Web GTM **v17** already retries purchase on PayPal `orderId`/`orderTotal` when the Woodmart thank-you has no order table. | Live order or thank-you 163915 |
 | Merge privacy paragraph in WP editor | Web-dev / PM |
 | Lookalikes | After audience size is real |
 
 <Check>
-  Tags, same-origin Worker, and the Cookie Keeper \+ `/metrics` loader are live. Do not rebuild. Do not paste another loader.
+  Same-origin Worker and `/metrics` loader **file** are live. Web GTM **v17** purchase scrape is published. The **head IIFE currently does not parse**, so GTM/iubenda/pixels do not run until the two-character paste fix. Do not rebuild. Do not paste a second loader.
 </Check>
