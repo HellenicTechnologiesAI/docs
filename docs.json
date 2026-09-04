@@ -81,6 +81,17 @@
               "kb/omniai/product-repo",
               "kb/omniai/keep-custom-work"
             ]
+          },
+          {
+            "group": "n8n",
+            "icon": "diagram-project",
+            "pages": [
+              "kb/n8n/start-here",
+              "kb/n8n/current-architecture",
+              "kb/n8n/aws-architecture",
+              "kb/n8n/migration",
+              "kb/n8n/access-secrets"
+            ]
           }
         ]
       }
@@ -155,6 +166,11 @@
     {
       "source": "/sops/new-client-workflow",
       "destination": "/introduction",
+      "permanent": true
+    },
+    {
+      "source": "/kb/n8n",
+      "destination": "/kb/n8n/start-here",
       "permanent": true
     }
   ]
