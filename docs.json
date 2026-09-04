@@ -86,7 +86,10 @@
             "group": "n8n",
             "icon": "diagram-project",
             "pages": [
-              "kb/n8n/start-here"
+              "kb/n8n/start-here",
+              "kb/n8n/current-architecture",
+              "kb/n8n/aws-architecture",
+              "kb/n8n/migration"
             ]
           }
         ]
