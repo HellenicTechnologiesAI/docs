@@ -18,13 +18,7 @@ Some resolvers still cache the old Route53 plus CloudFront answers. Query `1.1.1
 
 ## Records that matter for the app
 
-| Type | Name | Content | Proxied |
-| --- | --- | --- | --- |
-| A | `app.omniaichatbot.com` | `188.166.84.105` | yes |
-| A | `hc.omniaichatbot.com` | `188.166.84.105` | yes |
-| A | `staging.omniaichatbot.com` | `164.92.220.232` | yes |
-| A | apex `omniaichatbot.com` | Framer `31.43.160.6` and `31.43.161.6` | no |
-| CNAME | `www` | `sites.framer.app` | no |
+| Type | Name | Content | Proxied | | --- | --- | --- | --- | --- | | A | `app.omniaichatbot.com` | `188.166.84.105` | yes | | A | `hc.omniaichatbot.com` | `188.166.84.105` | yes | | A | `staging.omniaichatbot.com` | `164.92.220.232` | yes | | A | apex `omniaichatbot.com` | Framer `31.43.160.6` and `31.43.161.6` | no | | CNAME | `www` | `sites.framer.app` | no |
 
 Do not change `app` or `hc` when working on staging. Do not orange-cloud the Framer records.
 
@@ -54,5 +48,15 @@ The `omniaichatbot.com` zone is **DNS plus orange-cloud proxy** for `app`, `hc`,
 There is **no** OmniAI Cloudflare Worker, no WAF custom rules we rely on, and no Cloudflare R2. TLS for `app` / `hc` is Cloudflare at the edge plus Caddy on the Droplet (`FORCE_SSL=false` in the app because Caddy already terminates TLS).
 
 Marketing apex and `www` stay on Framer (grey cloud).
+
+## Custom chat hosts on `hellenictechnologies.com`
+
+These used to CNAME the old AWS load balancer `lb-omni-ai-592724678.eu-central-1.elb.amazonaws.com`. That ALB is gone. They now A-record the live OmniAI droplet, orange-cloud.
+
+| Type | Name | Content | Proxied | | --- | --- | --- | | A | `chat.hellenictechnologies.com` | `188.166.84.105` | yes | | A | `hc.hellenictechnologies.com` | `188.166.84.105` | yes |
+
+Caddy on the live droplet also serves those two names. Do not point them back at AWS.
+
+`chat.avance.gr` is the same leftover CNAME on the **Avance** Cloudflare zone (`lola.ns` / `max.ns`). We cannot edit that zone. Change `chat` from the dead ALB to `chat.hellenictechnologies.com` (or A `188.166.84.105`), then add `chat.avance.gr` to the live Caddyfile. `chat.avance.com` has no DNS record (avance.com is Webflow / Moonhill).
 
 Token name for API edits: `CLOUDFLARE_API_TOKEN` in Cloud Agent secrets. Zone ID `fc5ee7d2fa250054a67bf692b257b676`.
