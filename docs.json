@@ -81,6 +81,11 @@
               "kb/omniai/product-repo",
               "kb/omniai/keep-custom-work"
             ]
+          },
+          {
+            "group": "n8n",
+            "icon": "diagram-project",
+            "pages": []
           }
         ]
       }
