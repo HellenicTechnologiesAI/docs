@@ -1,0 +1,147 @@
+---
+title: "GrecoStrom"
+sidebarTitle: "GrecoStrom"
+description: "Scenario A SST for grecostrom.gr: existing Stape + GTM-N7G3WK. Inventory, housekeeping, then patch. Do not rebuild containers."
+icon: "bed"
+---
+
+<Warning>
+  Multi-tenant domain. Do **not** create a new Stape or sGTM container. Do **not** publish a stale Default workspace. Hostname-scope every sGTM change so other tenants are untouched. Do **not** copy Golden Gastro `/metrics` unless Cloudflare zone access on `grecostrom.gr` is confirmed. Do **not** orange-cloud `sgtm.grecostrom.gr`.
+</Warning>
+
+Scenario A record for [grecostrom.gr](https://grecostrom.gr/) (started 8 Sep 2026). Playbooks: [Server Side Tracking](/kb/web-analytics/server-side-tracking), [Cursor: existing Stape](/kb/web-analytics/cursor-prompt-existing-stape), [Customer GitHub repo](/kb/customer-github-repo).
+
+Customer handbook repo: private `ht-grecostrom`. Never commit CAPI, Stape API keys, Cloudflare tokens, or Measurement Protocol secrets.
+
+<Note>
+  Live host is `ht-intra.mintlify.site`. `ht-intra.mintlify.io` and `.app` 404. Stape identifier and sGTM container ID are the Multi-tenant values on the [SST playbook](/kb/web-analytics/server-side-tracking) — do not create a second container.
+</Note>
+
+## Current state (8 Sep 2026 — page created)
+
+| Piece | Status |
+| --- | --- |
+| Site | WooCommerce [grecostrom.gr](https://grecostrom.gr) + leftover [shop.grecostrom.gr](https://shop.grecostrom.gr) |
+| Web `GTM-N7G3WK` | Live. Inventory in progress. |
+| sGTM | Shared Multi-tenant. [sgtm.grecostrom.gr/healthy](https://sgtm.grecostrom.gr/healthy) returns `ok`. |
+| GA4 | Property `268233070`. Measurement ID (`G-…`) TBD in inventory. |
+| Google Ads | CID `298-000-9656` |
+| Meta Ads | Ad account `821006281968800`. Pixel TBD. |
+| DV360 | Advertiser `8345751972` on Ringier `8218041317`. Do not use `6887178127`. |
+| TikTok | Keep (future campaign). Pixel TBD. |
+| CMP | Cookiebot **and** Iubenda observed historically. Target: Iubenda in web GTM only. |
+
+## Hard locks
+
+- Do **not** create a new Stape or sGTM container.
+- Stape: existing **Multi-tenant** container (same identifier as the [SST playbook](/kb/web-analytics/server-side-tracking)), EU Center (Germany).
+- sGTM: same shared server container. Fork **live**, never a stale Default workspace.
+- Web GTM: keep `GTM-N7G3WK`. No second web container.
+- Custom domain: `sgtm.grecostrom.gr` — DNS-only (not proxied).
+- Same-origin `/metrics` **only** if Cloudflare zone access is confirmed. Filling `/metrics` without a Worker breaks the loader.
+- Cookie Keeper is a **second** Generate after the first loader + tags work. User identifier = Stape User ID.
+- Do **not** copy HT or Golden Gastro IDs onto this hostname.
+- Keep TikTok. Do not delete it.
+- One Ads e-shop primary: **Purchase**. Papafi store-visit stays a separate goal.
+
+## Public IDs
+
+| System | Value |
+| --- | --- |
+| Site | [https://grecostrom.gr/](https://grecostrom.gr/) |
+| Legacy shop | [https://shop.grecostrom.gr/](https://shop.grecostrom.gr/) |
+| Web GTM | `GTM-N7G3WK` |
+| sGTM host | `https://sgtm.grecostrom.gr` |
+| GA4 property | `268233070` (measurement ID TBD) |
+| Google Ads | CID `298-000-9656` |
+| Meta ad account | `821006281968800` |
+| Meta Pixel | TBD |
+| DV360 advertiser | `8345751972` (Ringier partner `8218041317`) |
+| TikTok pixel | TBD |
+
+## Timeline — start to finish
+
+<Steps>
+  <Step title="Phase 0 — Mintlify customer page (8 Sep 2026)">
+    Created this page under Web Analytics → Customers. Stub IDs and work log. Editor: `admin-mcp/grecostrom-customer`.
+  </Step>
+  <Step title="Phase 1 — Inventory">
+    Pending. Export live web/server GTM, GA4, Ads, Meta, DV360, TikTok, site tags. Write keep/need/drop here. No deletions yet.
+  </Step>
+  <Step title="Phase 2 — Housekeeping">
+    Pending. Delete unused GrecoStrom-owned conversions/pixels/CMP after the keep/drop table exists. Hostname-scope other-tenant leftover tags. Keep TikTok.
+  </Step>
+  <Step title="Phase 3 — SST patch">
+    Pending. Close Stape checker gaps (ITP, Custom Loader, GA4 server-only, Ads server conversions, Meta CAPI + EMQ, TikTok Events API). Cookie Keeper second Generate.
+  </Step>
+  <Step title="Phase 4 — Audiences">
+    Pending. After events are live.
+  </Step>
+  <Step title="Phase 5 — Verify">
+    Pending. Re-scan Stape checker vs before-PDF. Document EMQ and leftover blockers.
+  </Step>
+</Steps>
+
+## Stape — every setting used
+
+<AccordionGroup>
+  <Accordion title="Container (do not clone)">
+    - Name: Multi-tenant
+    - Identifier and sGTM ID: same values as the [SST playbook](/kb/web-analytics/server-side-tracking)
+    - Region: EU Center (Germany)
+    - Job: use existing custom domain `sgtm.grecostrom.gr` — do not open a second container
+  </Accordion>
+  <Accordion title="Custom domain">
+    - Host: `sgtm.grecostrom.gr`
+    - Health: `/healthy` returns `ok`
+    - DNS: must stay DNS-only (not proxied)
+    - Same Origin Path: empty unless a Cloudflare Worker is confirmed live
+  </Accordion>
+  <Accordion title="Loader">
+    Inventory will record the live `j.src`. First Generate Cookie Keeper **off** if the loader must be replaced. Cookie Keeper Generate is a second REPLACE after tags work.
+  </Accordion>
+</AccordionGroup>
+
+## Web GTM — inventory pending
+
+Container `GTM-N7G3WK`. Published version, tags, consent, and `server_container_url` will be filled after the live export.
+
+## sGTM — inventory pending
+
+Shared Multi-tenant. Hostname-scope GrecoStrom. Do not delete other-tenant folders.
+
+## Meta custom conversions and audiences
+
+Pending inventory (pixel ID, EMQ, custom conversions, website audiences).
+
+## Auth notes (no tokens in git or this KB)
+
+- GA4/GTM: OAuth as `digital@hellenictechnologies.com`.
+- Ads: `google-ads-api` gRPC only. Never REST `googleads.googleapis.com`.
+- Meta: HT-SysAdmin Graph token. CAPI token only in sGTM lookup tables.
+- Never commit credentials.
+
+## Keep / need / drop
+
+Pending inventory. Do not delete until this table is filled.
+
+## Work log
+
+| Date | Phase | What |
+| --- | --- | --- |
+| 8 Sep 2026 | Page created | GrecoStrom customer page stubbed under Web Analytics → Customers. IDs from repo + sheet + media PR. |
+
+## Still open
+
+| Item | Owner |
+| --- | --- |
+| Live tag inventory | Agent |
+| Keep/need/drop table | Agent |
+| Housekeeping | Agent after keep/drop |
+| SST patch | Agent after housekeeping |
+| Audiences | Agent after SST |
+| Stape re-scan vs before-PDF | Agent |
+
+<Check>
+  Page created. Next: inventory only — no GTM deletes until keep/drop is on this page.
+</Check>
