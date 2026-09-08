@@ -1,7 +1,7 @@
 ---
 title: "GrecoStrom"
 sidebarTitle: "GrecoStrom"
-description: "Scenario A SST for grecostrom.gr: web v106, sGTM v223, /metrics Worker live. Custom Loader generated, not pasted."
+description: "Scenario A SST for grecostrom.gr: web v106, sGTM v223, /metrics + Custom Loader Workers live. Stape v2 PDF is the Aug 7 scan (score 40), not a new crawl."
 icon: "bed"
 ---
 
@@ -22,7 +22,7 @@ Customer handbook repo: private `ht-grecostrom`. Never commit CAPI, Stape API ke
 | Piece | Live |
 | --- | --- |
 | Site | WooCommerce + WPML + GTM4WP 1.22.5 + Flying Press + **Cloudflare** (apex proxied). [shop.grecostrom.gr](https://shop.grecostrom.gr) still injects the same GTM. |
-| Loader | Still official GTM4WP `googletagmanager.com/gtm.js?id=GTM-N7G3WKL` (URL-encoded). Noscript `data-lazy-src` (broken). Custom Loader **generated**, **not pasted**. |
+| Loader | **Live.** Worker **`gs-html-gtm-loader`** on `grecostrom.gr/*` rewrites GTM4WP official GTM to Stape Generate (Cookie Keeper **off**, `/metrics`). Noscript → `https://sgtm.grecostrom.gr/ns.html?id=GTM-N7G3WKL`. Header `x-gs-gtm-loader: stape-custom`. Origin GTM4WP injection still on. |
 | Web `GTM-N7G3WKL` | Account `6000107638`, container `30113322`, live **v106** `GS housekeeping Floodlight gone + ht_consent_ready pixels + EMQ keys` (33 tags). |
 | sGTM | Shared Multi-tenant, live **v223** `GS SST Meta EMQ hostname-scope + TikTok Events API LT` (124 tags). Default WS **224** is not live — never publish it. |
 | Same-origin | Worker **`gs-sgtm-metrics`**. Routes `grecostrom.gr/metrics*` + `www`. Cache bypass first. `X-From-Cdn: cf-stape`. |
@@ -41,7 +41,7 @@ Customer handbook repo: private `ht-grecostrom`. Never commit CAPI, Stape API ke
 - Do **not** create a new Stape or sGTM container.
 - sGTM: fork **live v223+**, never Default 224.
 - Web: keep `GTM-N7G3WKL` only.
-- `sgtm.` stays grey-cloud. Same-origin path `/metrics` via Worker `gs-sgtm-metrics`. Do **not** add a second Worker. Do **not** modify `gg-sgtm-metrics`.
+- `sgtm.` stays grey-cloud. Same-origin path `/metrics` via Worker `gs-sgtm-metrics`. HTML rewrite is Worker **`gs-html-gtm-loader`** only (do not add a third Worker). Do **not** modify `gg-sgtm-metrics`. `/metrics*` routes stay more specific than `/*`.
 - Cookie Keeper **off** in the snippet (same-origin). Do not Generate-with-Cookie-Keeper for this site.
 - Keep TikTok. Do not delete DILIUSA / Px GD8386 pixels on the same Meta ad account (other brands).
 - One Ads e-shop primary: **Purchase** `AW-594535532/vEpACO6xhfUBEOzIv5sC`. Store visits / Papafi local actions stay a **separate** goal.
@@ -88,11 +88,11 @@ Customer handbook repo: private `ht-grecostrom`. Never commit CAPI, Stape API ke
 
 **Need** (still open after SST patch)
 
-- Web-dev **REPLACE** GTM4WP official snippet with Stape Generate (Cookie Keeper **off**, Same Origin Path `/metrics`). Turn GTM4WP container injection **off**. Purge Flying Press + Cloudflare HTML. Noscript `https://sgtm.grecostrom.gr/ns.html?id=GTM-N7G3WKL`.
+- Web-dev should still turn GTM4WP container injection **off** and paste Generate at origin so `gs-html-gtm-loader` can be removed later. Keep GTM4WP dataLayer. Edge rewrite is already live.
 - Human Ads UI: uncheck Included in Conversions on leftover UA HIDDEN goals. `EmploymentFormSucess - HT` is still include+primary (API cannot clear it).
 - Human: `grecostrom.gr` row on `LT - Tiktok Access Token` with a **pixel-specific** token for `C8B3LAFVFBF9K2CMOS6G`. Do **not** reuse the HT token. Events API tags are already live.
 - Human Meta: VC/ATC/IC/Purchase/Lead **180d** WCAs on pixel `660914304818146` (Graph cannot create ads). Do not attach to live spend until membership looks real.
-- Stape re-scan after loader paste. EMQ Excellent 8–10 after real orders with email/phone.
+- Stape **new** scan (v2 PDF is the Aug 7 score-40 export). EMQ Excellent 8–10 after real orders with email/phone.
 
 **Drop** (GrecoStrom-owned; done unless noted)
 
@@ -124,23 +124,28 @@ Customer handbook repo: private `ht-grecostrom`. Never commit CAPI, Stape API ke
   <Step title="Phase 4 — Audiences (8 Sep 2026)">
     GA4 `GS | *` lists created (ads export on): purchasers 7/180, ATC/checkout/view_item no purchase, leads 90d. Meta 180d WCAs **not** created (Graph ads permission). Existing Meta visitors/cart/purchasers/1% Purchase LAL kept. Not attached to live spend.
   </Step>
-  <Step title="Phase 5 — Verify">
-    `/metrics` healthy 200. Live versions v106 / v223. Homepage still official GTM4WP — Stape checker will not leave Improve until the loader paste. EMQ / Test Events after a real consented purchase.
+  <Step title="Phase 5 — Verify + edge loader (8 Sep 2026)">
+    `/metrics` healthy 200. Live versions v106 / v223. Stape v2 PDF was the old Aug 7 scan (score 40). Worker `gs-html-gtm-loader` serves Generate on HTML. BACS test order **#37890** (€19.80 pillowcase) — dataLayer `view_item` → `add_to_cart` → `begin_checkout` → `purchase`. Meta / TikTok / GA4 / Ads remarketing fired after iubenda **full** grant. **Cancel #37890.**
   </Step>
 </Steps>
 
 ## Stape checker (before vs now)
 
-Source: [stape_report_before.pdf](https://drive.google.com/file/d/1S6CY5fmukdWUgqxwvzrcno7LYhnADF1X/view).
+Sources: [stape_report_before.pdf](https://drive.google.com/file/d/1S6CY5fmukdWUgqxwvzrcno7LYhnADF1X/view) and `stape_report_before(v2).pdf` (8 Sep 2026 export).
 
-| Category | Before | Now (8 Sep 2026) |
+**v2 PDF is not a new crawl.** The checker URL `019fda3f-1e7e-7877-a601-c2d2a52c7950` is still the **2026-08-07 03:30 UTC** scan (score **40/100**: Ads 9, Cookie lifetime 6, Analytics 74, Page speed 60). Footer 08/09/2026 is print time. Re-exporting that URL cannot improve the score. Run a **new** Website Tracking Checker scan.
+
+| Category | Aug 7 scan (v2 PDF) | Live HTML now (8 Sep 2026, after edge loader) |
 | --- | --- | --- |
-| Cookies / ITP | Third-party `googletagmanager.com`. No `/metrics`. | Worker + `/metrics` **live**. Site snippet **still** official GTM. Cookie Keeper **off** (correct with same-origin). |
-| Advertising + Analytics | GTM from Google; GA4 placeholder `G-XXXXXXXXXX`. | GA4 id + transport `/metrics` in GTM. Library still loads from Google until Custom Loader paste. |
-| Advertising | Web awct Purchase + sGTM Ads. Client Floodlight. TikTok web-only. | Web Ads **paused**. Floodlight **server-only**. TikTok Events API tags live, token row **missing**. |
-| Pagespeed | Official GTM + Floodlight gtag + TikTok events.js. | Client Floodlight gtag **gone**. Official GTM + TikTok pixel remain until loader paste. |
+| Cookies / ITP (+19) | Official `googletagmanager.com`. No `/metrics`. | Custom Loader + `/metrics` **in HTML** (Worker `gs-html-gtm-loader`). Cookie Keeper **off** (correct with same-origin). |
+| Ad blockers / official GTM (+12) | Official GTM4WP IIFE. | Official IIFE rewritten to Generate on homepage, `/en/`, product, cart, checkout, shop. |
+| Meta hybrid / CAPI (+8) | Client pixel. | Hybrid + hostname-scoped CAPI already in sGTM v223. Checker needs a new scan + consented hit. |
+| Google Ads server-side (+6) | Client awct. | Web Purchase awct **paused**. sGTM Ads live. Web remarketing tag 16 may still look client-side. |
+| TikTok server-side (+6) | Web-only. | Events API tags live; **`LT - Tiktok Access Token` row missing** — new scan will still flag this. |
+| Floodlight server-side (+3) | Client gtag. | Client Floodlight **deleted** (v106). Server-only `15192785`. |
+| Page speed (+4) | Official GTM + Floodlight + TikTok. | Official GTM gone from HTML. TikTok web pixel remains. |
 
-Re-run the checker **after** web-dev pastes Generate and purges HTML cache. Do not invent a new loader filename if Stape still shows Custom Loader +4 after a byte-identical paste.
+Do not invent a new loader filename if a new scan still shows Custom Loader +4 after this byte-identical Generate.
 
 ## Custom Loader — web-dev paste (Cookie Keeper off)
 
@@ -148,7 +153,7 @@ Generate (8 Sep 2026): Domain `sgtm.grecostrom.gr`, Web GTM `GTM-N7G3WKL`, Enhan
 
 The loader **filename is shared** on this Multi-tenant Stape container. The **query** selects GrecoStrom. Do **not** invent a different file. Do **not** copy the HT query. Bare file without query = 404.
 
-**REPLACE** the GTM4WP head IIFE. Turn GTM4WP **container** injection off. Keep GTM4WP dataLayer / Woo ecommerce JS. Paste from Stape Generate (byte-identical, including official HTML comments). Confirmed 200 via `/metrics/{file}.js?{query}` (~624KB).
+Edge Worker `gs-html-gtm-loader` already injects this Generate IIFE on HTML (Cookie Keeper **off**). Still turn GTM4WP **container** injection off at origin so the Worker can be removed later. Keep GTM4WP dataLayer / Woo ecommerce JS. Confirmed 200 via `/metrics/{file}.js?{query}` (~624KB).
 
 Noscript (not same-origin):
 
@@ -238,21 +243,25 @@ Purchase HT `513890542` kept INCLUDE+PRIMARY. ENABLED webpage junk demoted where
 | 8 Sep 2026 | Inventory | Live HTML + GTM web v103 + sGTM v222 + GA4 `G-ZTF0MGDMMH` + Ads + Meta pixel `660914304818146` + TikTok + Floodlight `15192785`. Keep/need/drop filled. |
 | 8 Sep 2026 | Housekeeping | Web v104/v106 deletions (Cookiebot, leftover awct, client Floodlight, junk). GA4 key events cleaned. Ads API demote where writable. |
 | 8 Sep 2026 | SST | Worker `/metrics`. Web v105/v106 consent + EMQ keys. sGTM v223 GS Meta + TikTok LT/tags. Custom Loader generated, not on site. |
-| 8 Sep 2026 | Audiences | Eight GA4 \`GS | \*\` lists. Meta 180d WCAs blocked on permission. |
+| 8 Sep 2026 | Audiences | Eight GA4 `GS \| *` lists. Meta 180d WCAs blocked on permission. |
+| 8 Sep 2026 | Stape v2 + loader | v2 PDF = Aug 7 score 40. Deployed `gs-html-gtm-loader`. Custom Loader + sGTM noscript on live HTML. |
+| 8 Sep 2026 | Live purchase | BACS order **#37890** €19.80. Funnel events + Meta/TikTok/GA4 network hits after `consentGiven()`. Visible iubenda button does **not** grant measurement. **Cancel the order.** |
 
 ## Still open
 
 | Item | Owner |
 | --- | --- |
-| Paste Custom Loader + noscript; GTM4WP container off; purge caches | Web-dev |
+| **Cancel test order #37890** (BACS, €19.80, `digital@hellenictechnologies.com`) | Human / store |
+| iubenda: visible «Αποθήκευση και συνέχεια» leaves analytics/ad **denied**; «Αποδοχή όλων» missing from DOM | Web-dev / CMP |
+| Turn GTM4WP container injection off at origin (edge rewrite already live) | Web-dev |
 | Ads UI: uncheck Included in Conversions on UA leftovers; EmploymentFormSucess include | Human in Ads |
 | `LT - Tiktok Access Token` row for `grecostrom.gr` (pixel-specific) | Human / Stape UI |
 | Meta 180d VC/ATC/IC/Purchase/Lead WCAs | Human in Ads Manager |
-| Stape re-scan vs before-PDF | After loader paste |
+| Stape **new** scan (do not re-export Aug 7 report `019fda3f-…`) | After this loader |
 | Meta EMQ Excellent + Test Events (do not publish Test ID) | After real order |
 | Rotate CAPI if inventory leaked `LT - fb api token` | Human in Events Manager |
 | Category-split view_item audiences (mattresses/beds/baby) | After volume check |
 
 <Check>
-  Housekeeping and the GTM/sGTM SST patch are live (web v106 / sGTM v223 / `/metrics` Worker). The site still loads official GTM until web-dev pastes Generate. Do not rebuild containers. Do not publish Default 224. Do not enable Cookie Keeper on this same-origin snippet.
+  Housekeeping, SST, and the edge Custom Loader are live (web v106 / sGTM v223 / `gs-sgtm-metrics` + `gs-html-gtm-loader`). Test purchase **#37890** fired the funnel after a full iubenda grant. Cancel that order. Origin GTM4WP injection is still on. Do not rebuild containers. Do not publish Default 224. Do not enable Cookie Keeper on this same-origin snippet.
 </Check>
