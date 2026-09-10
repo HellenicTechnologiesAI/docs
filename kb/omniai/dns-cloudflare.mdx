@@ -53,9 +53,13 @@ Marketing apex and `www` stay on Framer (grey cloud).
 
 These used to CNAME the old AWS load balancer `lb-omni-ai-592724678.eu-central-1.elb.amazonaws.com`. That ALB is gone. They now A-record the live OmniAI droplet, orange-cloud.
 
-| Type | Name | Content | Proxied | | --- | --- | --- | | A | `chat.hellenictechnologies.com` | `188.166.84.105` | yes | | A | `hc.hellenictechnologies.com` | `188.166.84.105` | yes |
+| Type | Name | Content | Proxied |
+| --- | --- | --- | --- |
+| A | `chat.hellenictechnologies.com` | `188.166.84.105` | yes |
 
-Caddy on the live droplet also serves those two names. Do not point them back at AWS.
+`hc.hellenictechnologies.com` was **removed on 10 September 2026**. Do not recreate it. Keep `hc.omniaichatbot.com`.
+
+Caddy on the live droplet still serves `chat.hellenictechnologies.com`. Do not point it back at AWS.
 
 `chat.avance.gr` and `chat.watermart.gr` had the same leftover CNAME. They now A-record `188.166.84.105` (grey-cloud) on the client Cloudflare zones. Token name for those zones: `cloudflare_api_clients`. A scan of 127 client zones found no other `lb-omni-ai` leftovers. `chat.avance.com` has no DNS record.
 
