@@ -33,7 +33,7 @@ Facts below were verified on 4 September 2026 after the DNS flip.
 2. Do not point this stack at OmniAI managed Postgres or Valkey. n8n keeps its own Docker Postgres 16 and Redis 7.
 3. Do not orange-cloud `n8n` or `n88n`. Grey-cloud only. Caddy on the box owns HTTPS.
 4. Do not pull `n8nio/n8n:latest` on this host. Image is pinned to **`n8nio/n8n:2.14.2`**.
-5. Do not start n8n on the AWS box while DigitalOcean n8n is running. Same crons would fire twice.
+5. There is no AWS n8n box anymore. Do not recreate one.
 6. Do not mention DigitalOcean or this cutover to outside devops unless they already operate this box.
 7. Do not commit `/opt/n8n/.env`, `/opt/n8n/parts-api.env`, `/opt/ai-lens/.env`, `N8N_ENCRYPTION_KEY`, or API keys.
 8. Do not print those values in chat. Names of keys are fine. Values are not.
@@ -62,7 +62,7 @@ Facts below were verified on 4 September 2026 after the DNS flip.
 | Page | Use when |
 | --- | --- |
 | [Current architecture](/kb/n8n/current-architecture) | DigitalOcean AMS3 live host |
-| [AWS architecture](/kb/n8n/aws-architecture) | Ireland EC2 left as rollback |
+| [AWS architecture](/kb/n8n/aws-architecture) | What Ireland looked like before delete |
 | [Migration](/kb/n8n/migration) | How the copy and DNS flip were done |
 | [Access and secrets](/kb/n8n/access-secrets) | SSH, token names, where values live |
 

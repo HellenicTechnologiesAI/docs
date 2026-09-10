@@ -53,6 +53,4 @@ Cloudflare `staging` no longer points at AWS. Public `staging.omniaichatbot.com`
 
 ## GitHub Actions trap
 
-`.github/workflows/build_and_push_aws.yml` runs on push to `omniai`. Secrets used: `AWS_SECRET_ID` / `AWS_ACCESS_KEY` (the names that last succeeded against account `338428745150`). Older secret names `AWS_ACCESS_KEY_ID` / `AWS_SECRET_ACCESS_KEY` pointed at dead account `142083259984` and cannot push to ECR.
-
-A green ECS deploy still does **not** update live customers.
+`.github/workflows/build_and_push_aws.yml` is **manual-only**. Do not run it. Live customers are not on ECS. After this cut, GitHub secrets `AWS_SECRET_ID` / `AWS_ACCESS_KEY` can be removed.
