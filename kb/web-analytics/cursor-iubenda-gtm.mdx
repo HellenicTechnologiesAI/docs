@@ -1,0 +1,216 @@
+---
+title: "Cursor: iubenda + GTM consent"
+sidebarTitle: "Cursor: iubenda + GTM"
+description: "How the team uses iubenda MCP and the Cursor skill to set up, audit, and fix cookie banners in web GTM with Consent Mode Advanced v2."
+icon: "cookie"
+keywords:
+  - "iubenda"
+  - "GTM"
+  - "consent"
+  - "Consent Mode"
+  - "ht_consent_ready"
+  - "cookie banner"
+  - "CMP"
+---
+
+<Note>
+  Consent slice only. Full SST still uses [Server Side Tracking](/kb/web-analytics/server-side-tracking) plus [Scenario A](/kb/web-analytics/cursor-prompt-existing-stape) or [Scenario B](/kb/web-analytics/cursor-prompt-new-customer). Live host is `ht-intra.mintlify.site` — `.io` and `.app` 404.
+</Note>
+
+<Warning>
+  Customer iubenda is **always** the GTM Community Gallery template. Never theme, WP plugin, Shopify app, or React head. The hellenictechnologies.com **head** CMP is HT-only — do not copy it. Do not copy HT GTM IDs, loader filenames, or pixel IDs onto a customer.
+</Warning>
+
+Use this page when you need a cookie banner, a consent audit, or a consent-only fix. Do **not** paste the full SST prompt if you only need iubenda in GTM.
+
+## What this is
+
+Cursor can talk to iubenda over MCP (`https://mcp-server.iubenda.com/mcp`) and drive the web GTM container in the browser. The personal skill `iubenda-gtm` loads when you mention iubenda, cookie banner, CMP, Consent Mode, or `ht_consent_ready`.
+
+It does **not** provision Stape, a Cloudflare Worker, or CAPI. That is Scenario A/B.
+
+Playbook still wins over this page, GTM defaults, Stape UI, and plugins.
+
+## One-time Cursor setup (each teammate)
+
+Do this once per person. Then Connect iubenda with **your** iubenda login.
+
+1. Open `~/.cursor/mcp.json` and add:
+
+```json
+"iubenda": {
+  "url": "https://mcp-server.iubenda.com/mcp"
+}
+```
+
+2. **Cursor Settings → MCP → iubenda → Connect**. Sign in to iubenda and click **Allow access**.
+3. In a new chat, ask: `List my iubenda sites.` If that fails, disconnect and Connect again.
+4. **Skill (optional but faster):** copy `skills/iubenda-gtm/` (the `SKILL.md` + `ht-gtm-consent.md` from a machine that already has it) into your user Agent Store. If you skip this, paste a prompt from this page instead — the playbook still applies.
+
+<Note>
+  The skill lives in the user Agent Store (`skills/iubenda-gtm/`), not in `ht-<customer>` repos. Each teammate installs MCP + OAuth themselves. Do not commit iubenda tokens.
+</Note>
+
+## When to use which prompt
+
+| Job | Prompt | Do not use |
+| --- | --- | --- |
+| New banner + policy on a customer web GTM | Setup | Full Scenario B unless they also need Stape |
+| Theme / plugin CMP must move into GTM | Fix | Rebuilding the GTM container |
+| Check before an SST job or a client call | Audit | Any GTM publish |
+| Meta / TikTok / LinkedIn fire on All Pages | Fix | Adding more pixels |
+| Reject still sends CAPI / Ads | Fix | Pausing the web pixel to go server-only |
+| Customer already has Stape and you need the whole stack | [Scenario A](/kb/web-analytics/cursor-prompt-existing-stape) | This page alone |
+| No Stape yet and you need sGTM | [Scenario B](/kb/web-analytics/cursor-prompt-new-customer) | This page alone |
+
+## Team split
+
+- **PM / Cursor:** iubenda MCP (site, policy, banner), GTM template, `ht_consent_ready`, pixel triggers, sGTM consent checks.
+- **Web-dev, one-time:** remove theme/plugin CMP and extra `gtm.js` / plugin pixels. Paste Stape Custom Loader only if that ticket already exists. They do **not** paste iubenda.
+- Never ask developers for pixels, conversion tags, or iubenda snippets.
+
+## Worked shape
+
+**Good first message**
+
+```text
+Consent-only. Customer Acme, https://acme.gr, web GTM-XXXXXXX.
+iubenda is in the WordPress theme today. Markets GR/EU.
+Audit first, then spec. Do not publish. Cloudflare: no.
+```
+
+**Bad first message**
+
+```text
+Do the full SST playbook, new Stape container, copy hellenictechnologies.com
+head iubenda, and fire Meta on All Pages.
+```
+
+## Prompt — setup (greenfield consent)
+
+Copy into a **new** Cursor chat. Fill every `{{placeholder}}`. UNKNOWN is allowed. Wait for the spec before GTM publish or iubenda owner finalize.
+
+```text
+You are the tracking engineer for Hellenic Technologies.
+
+This job is CONSENT-ONLY: iubenda cookie banner in the customer web GTM with
+Google Consent Mode Advanced v2 and ht_consent_ready.
+Do not provision Stape, a Cloudflare Worker, or CAPI unless I explicitly ask.
+
+Read first (this wins):
+https://ht-intra.mintlify.site/kb/web-analytics/server-side-tracking
+https://ht-intra.mintlify.site/kb/web-analytics/cursor-iubenda-gtm
+
+HARD RULES
+1) Customer iubenda is ALWAYS the GTM Community Gallery template. Never theme,
+   WP plugin, Shopify app, or React head. hellenictechnologies.com head CMP is HT-only.
+2) Do not copy HT IDs (GTM-TRPS26L, dw0iesespmfwe.js, iubenda site 3941073, pixels).
+3) One Custom Loader only. No googletagmanager.com/gtm.js. iubenda is a tag inside
+   the web GTM, not a second snippet.
+4) Audit first. Spec. Wait for my approval. Then implement.
+5) Confirm before iubenda owner finalize, deletes, or GTM publish.
+6) Named GTM workspace. Never publish a stale Default.
+7) Purpose map: 2 functionality, 3 experience, 4 measurement, 5 marketing (ads trio).
+8) EEA defaults: ads trio + analytics_storage denied; functionality_storage +
+   security_storage granted; personalization_storage denied until purpose 3;
+   url_passthrough on; ads_data_redaction on until ads granted; wait_for_update 2000.
+9) When purpose 5 / ads trio granted: one ht_consent_ready + gtmconsentupdate per page,
+   new event_id, built in GTM from iubenda_gtm_consent_event.
+10) Meta / TikTok / LinkedIn BASE pixels on ht_consent_ready only. Never All Pages.
+11) sGTM CAPI/Ads require adStorageConsent. No server bypass. No match cookies before purpose 5.
+12) Work in GitHub ht-{{customer_slug}}. Never commit credentials.
+
+INTAKE
+Customer: {{customer_name}}
+Website: {{website_url}}
+Web GTM: {{gtm_web_id}}
+Markets: {{markets}}
+Cloudflare access: {{yes | no | unknown}}
+CMP today: {{none | theme | plugin | gtm | unknown}}
+iubenda IDs: {{ids_or_todo}}
+Platform: {{cms}}
+Stape / sGTM today: {{none | ids}}
+Business model: {{ecommerce | leadgen | hybrid}}
+
+ORDER
+1. Confirm iubenda MCP (list_sites). If disconnected, tell me to Connect in Cursor Settings.
+2. Phase 0 audit of the live site + published web GTM. No edits.
+3. Spec: iubenda site/policy/banner via MCP, GTM template on Consent Initialization,
+   ht_consent_ready, theme CMP removal ticket if needed.
+4. Wait.
+5. After I approve: MCP create/update, GTM tag, named publish, QA gates below.
+```
+
+## Prompt — audit / check
+
+No GTM edits. No iubenda writes except `list_*` / `get_*`.
+
+```text
+You are the tracking engineer for Hellenic Technologies.
+
+This job is AUDIT ONLY for iubenda + Consent Mode Advanced v2 on {{website_url}}.
+Do not edit GTM, iubenda, Stape, DNS, or the website.
+
+Read first:
+https://ht-intra.mintlify.site/kb/web-analytics/server-side-tracking
+https://ht-intra.mintlify.site/kb/web-analytics/cursor-iubenda-gtm
+
+Check and report:
+- Where the CMP lives (GTM template vs theme vs plugin vs none vs second CMP).
+- What fires before accept (gtm.js, fbq, ttq, lintrk, gtag G-/AW-, CAPI).
+- Consent Initialization tag present? emitGtmEvents? defaults denied?
+- purpose 5 / ads trio → one ht_consent_ready with event_id? Or pixels on All Pages?
+- sGTM adStorageConsent required? Any marketing hit on G100?
+- Match cookies (_ht_vid, _fbp, _fbc) before purpose 5?
+- Second web GTM or googletagmanager.com/gtm.js beside Custom Loader?
+
+Web GTM: {{gtm_web_id_or_unknown}}
+sGTM / sgtm host: {{id_or_unknown}}
+
+OUTPUT
+1) Where CMP lives
+2) What fires before accept
+3) Severity list (critical / major / minor) with the specific fix
+4) Whether this is consent-only or needs Scenario A/B
+Stop. Do not spec implementation unless I ask.
+```
+
+## Prompt — fix
+
+Patch only. Do not rebuild SST.
+
+```text
+You are the tracking engineer for Hellenic Technologies.
+
+This job is a CONSENT FIX on {{website_url}} / web {{gtm_web_id}}.
+Inventory and patch. Do not rebuild containers. Do not create Stape.
+
+Read first:
+https://ht-intra.mintlify.site/kb/web-analytics/server-side-tracking
+https://ht-intra.mintlify.site/kb/web-analytics/cursor-iubenda-gtm
+
+Symptoms: {{theme_cmp | pixels_on_all_pages | capi_on_denied | no_ht_consent_ready | other}}
+
+HARD RULES
+- iubenda in GTM Community Gallery, Consent Initialization – All Pages.
+- Move theme/plugin CMP out via one web-dev ticket after GTM iubenda is ready.
+- Move Meta / TikTok / LinkedIn base pixels onto ht_consent_ready.
+- Stop match cookies before purpose 5.
+- sGTM marketing tags: adStorageConsent required.
+- Named publish only after I approve the patch list.
+- ht-{{customer_slug}} repo. No credentials in git.
+
+ORDER: audit → patch list → wait → patch → named GTM publish → QA gates.
+```
+
+## QA gates
+
+| State | Expect |
+| --- | --- |
+| Fresh reject | Ads + analytics denied. No Meta PageView / TikTok / Insight. No marketing CAPI. |
+| Analytics only | GA4 yes. Ads/Meta no. |
+| Ads accept | One `ht_consent_ready`. Base pixels on **that** landing URL (UTMs / click IDs still there). |
+| Refresh after accept | Banner does not flash. |
+| Loader | iubenda from GTM, not theme. No second CMP. No second `gtm.js`. |
+
+GTM Preview on the published version. Do not leave work only in Default.

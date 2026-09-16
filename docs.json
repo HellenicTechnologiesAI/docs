@@ -53,6 +53,7 @@
               "kb/web-analytics/server-side-tracking",
               "kb/web-analytics/cursor-prompt-existing-stape",
               "kb/web-analytics/cursor-prompt-new-customer",
+              "kb/web-analytics/cursor-iubenda-gtm",
               "kb/web-analytics/cursor-ga4-meta-access",
               "kb/customer-github-repo",
               {
