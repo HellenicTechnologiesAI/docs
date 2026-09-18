@@ -130,6 +130,9 @@ ChatGPT Ads has no native GA4 linking. The site already sends the same canonical
 | Check | Result |
 | --- | --- |
 | Homepage HTML has no `oaiq` / `oaiq.min.js` / Pixel ID | **Pass.** `oaiq` count 0. Pixel ID count 0. `GTM-TRPS26L` + Custom Loader `dw0iesespmfwe` present. `bzrcdn.openai.com` / `bzr.openai.com` appear only on the iubenda unblock list (count 4 each). |
+| Live Custom Loader JS (`/metrics/dw0iesespmfwe.js?…`) | **Pass.** Contains `oaiq.min.js`, `bzrcdn.openai.com`, pixel `FBhTiRnwDWGpwYa5vcgKyt`, Stape template `__cvt_6516135_536`, and `page_viewed` / `contents_viewed` / `lead_created` / `appointment_scheduled`. |
+| Reject marketing | **Pass.** Fresh reject: 0 of 204 network requests matched `bzr` / `bzrcdn.openai.com`. |
+| Accept marketing in an automated browser | **Inconclusive.** iubenda banner click did not set `_iub.cs.api.isConsentGiven()`; Meta `fbq` and TikTok `ttq` also stayed undefined, so this is not a ChatGPT-only miss. Use GTM Preview as a human after a real purpose-5 accept. |
 | `/metrics/healthy` | **200** `ok` |
 | GTM live versions | Web **v414**, SST **v230**. Default workspaces not published. |
 | No `purchase` / `order_created` | Web ChatGPT tags have none. Ads Manager has no `order_created` conversion. |
@@ -150,9 +153,9 @@ GTM Preview (accept vs reject, SPA `page_view`, `/services/{slug}`, contact, Cal
 
 | Item | Owner |
 | --- | --- |
-| GTM Preview on production after iubenda accept: pixel loads once; reject does not measure | Human / next agent |
+| GTM Preview on production after a real iubenda purpose-5 accept: pixel loads once; reject does not measure | Human — automated banner click did not register consent (Meta/TikTok also stayed unloaded) |
 | Ads Manager test/debug events show live `page_viewed`, `contents_viewed`, `lead_created`, `appointment_scheduled` | After consented traffic |
-| Copy §7.12g live versions into `patrickabedin/ht-agency-website` `docs/STYLE_GUIDE.md` if that repo is reachable | Website repo access |
+| Copy §7.12g live versions into `patrickabedin/ht-agency-website` `docs/STYLE_GUIDE.md` if that repo is reachable | Website repo 404 from this agent; stub is in `ht-hellenictechnologies` |
 
 <Check>
   Hybrid ChatGPT measurement is live in GTM (web v414 / SST v230). Pixel is not in Next.js. Shared `event_id`. No purchase. Other SST tenants untouched.
