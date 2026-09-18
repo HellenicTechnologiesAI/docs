@@ -43,7 +43,7 @@ Team Cursor prompts (audit first, then spec, then wait for approval):
     6. **Do not fire base Meta / TikTok / LinkedIn pixels on All Pages.** Fire them on `ht_consent_ready` so UTMs and click IDs are still on the landing URL.
     7. **Do not unpause web Google Ads conversion tags if sGTM already sends them.**
     8. **Do not fire `purchase` on a B2B lead site.** HT does not.
-    9. **Do not publish stale GTM workspaces.** HT: never publish web 416 or SST 208. Live is web v412 and SST v214.
+    9. **Do not publish stale GTM workspaces.** HT: never publish web 416 or SST 208. Live is web v414 (`HT ChatGPT Ads hybrid pixel`) and SST v230 (`HT ChatGPT Ads hybrid CAPI`).
     10. **Do not delete folders in a multi-tenant SST container.** Only edit `HT | SST *` tags. Hostname-exception leftover tags.
     11. **Do not reuse another tenant's FB or TikTok token rows.** Use `LT - fb *` / `LT - Tiktok ID` for that hostname.
     12. **Do not write match cookies before iubenda purpose 5.**
@@ -228,7 +228,7 @@ Customer triggers: consent defaults in the page (CMP), CE - ht\_consent\_ready o
 
 ## Server GTM (Stape)
 
-HT live: `GTM-WKJ6FDLB` v214 (HT Meta EMQ match keys). Never publish Default Workspace 208. Multi-tenant: yes. Other clients live here. Only edit HT | SST \* tags. Never delete Aldemar / Gatsoulis / car-rental / OHE folders. Leftover Purchase / Lead / Calendly tags must keep a hostname exception so they do not fire on hellenictechnologies.com.
+HT live: `GTM-WKJ6FDLB` **v230** (`HT ChatGPT Ads hybrid CAPI`). Never publish Default Workspace 208 or 233. Multi-tenant: yes. Other clients live here. Only edit HT | SST \* tags. Never delete Aldemar / Gatsoulis / car-rental / OHE folders. Leftover Purchase / Lead / Calendly tags must keep a hostname exception so they do not fire on hellenictechnologies.com.
 
 Clients that must exist: GA4 client so /g/collect works on the same-origin path. Facebook / Data Client only from the hostname-scoped LT - fb \* row. TikTok Events API client using this domain's token row.
 
@@ -359,7 +359,7 @@ Use this when the customer already has Stape.
   </Step>
 </Steps>
 
-HT-specific landmines on hellenictechnologies.com: live web v412 and SST v214; never publish 416 / 208; multi-tenant folders stay; LT - fb \* and LT - Tiktok ID rows for hellenictechnologies.com only; iubenda is the CMP; production deploy is npx vercel deploy --prod after push.
+HT-specific landmines on hellenictechnologies.com: live web v414 and SST v230; never publish 416 / 208 (or Default 433 / 233); multi-tenant folders stay; LT - fb \* and LT - Tiktok ID rows for hellenictechnologies.com only; iubenda is the CMP; production deploy is npx vercel deploy --prod after push.
 
 ## Scenario B — Greenfield SST
 
