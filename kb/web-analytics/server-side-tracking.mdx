@@ -216,9 +216,9 @@ Stape first-touch: the landing hit must see the pixels on that same page after c
 
 ## Web GTM
 
-HT live: `GTM-TRPS26L` v412 (HT first-touch consent only). Never publish Default Workspace 416. server\_container\_url is [https://hellenictechnologies.com/metrics](https://hellenictechnologies.com/metrics). Constants: GA4 ID, Server container URL, Meta pixel ID, LinkedIn partner ID, DLV - event\_id.
+HT live: `GTM-TRPS26L` **v414** (`HT ChatGPT Ads hybrid pixel`). Never publish Default Workspace 416 or 433. server_container_url is [https://hellenictechnologies.com/metrics](https://hellenictechnologies.com/metrics). Constants: GA4 ID, Server container URL, Meta pixel ID, LinkedIn partner ID, ChatGPT pixel ID `FBhTiRnwDWGpwYa5vcgKyt`, DLV - event_id.
 
-Keep live: Conversion Linker (auto-link hellenictechnologies.com, www, hta.gr only — no Vercel preview hosts). HT Google tag GA4 G-GYMSRM45JV via same-origin /metrics/gtag/js. ClickCease and deferred Clarity if already present. Web Meta / TikTok / LinkedIn base tags on ht\_consent\_ready only. Web conversion tags on the ads consent trio. HT GA4 events from the event table.
+Keep live: Conversion Linker (auto-link hellenictechnologies.com, www, hta.gr only — no Vercel preview hosts). HT Google tag GA4 G-GYMSRM45JV via same-origin /metrics/gtag/js. ClickCease and deferred Clarity if already present. Web Meta / TikTok / LinkedIn base tags on ht_consent_ready only. Web ChatGPT Pixel tags (Stape OpenAI Ads Pixel) with ads-trio consent. Web conversion tags on the ads consent trio. HT GA4 events from the event table. Customer record: [Hellenic Technologies](/kb/web-analytics/customers/hellenic-technologies).
 
 Stay paused: HT Google tag Ads (tag 517) and web awct Contact / Calendly / Chat. Ads conversions fire sGTM only.
 
@@ -277,21 +277,33 @@ HT pixel CV3IRQ3C77U0G6IA7NV0. Web HT | TikTok Pixel on ht\_consent\_ready. HTML
 
 Insight partner 47021. CAPI rules: Contact 30351433, Calendly booked 30351441. Web Insight Tag base on ht\_consent\_ready. Persist li\_fat\_id. Server HT | SST LinkedIn PageView stores li\_fat\_id on hostname-scoped page\_view. Contact / Calendly on triggers 280 / 281 with the same event\_id as Insight. adStorageConsent required. Token lives only as GTM constant LinkedIn CAPI token. Do not reuse Typeform / Callpage leftover Insight conversions.
 
+## ChatGPT Ads
+
+Hybrid Client & Server. Pixel and Conversions API live in GTM only — never in Next.js head. Official pixel docs: [Measurement Pixel](https://developers.openai.com/ads/measurement-pixel). CAPI: [Conversions API](https://developers.openai.com/ads/conversions-api). Events: [Supported events](https://developers.openai.com/ads/supported-events). Stape web: [OpenAI Ads Pixel](https://stape.io/helpdesk/documentation/openai-ads-pixel-tag). Stape server: [OpenAI Ads Events API](https://stape.io/helpdesk/documentation/openai-ads-events-api-tag).
+
+HT pixel `FBhTiRnwDWGpwYa5vcgKyt` (Ads Manager source `cds_6aacf94fbb088195a50d8261853f63f5`, name HT - Pixel). CAPI `POST https://bzr.openai.com/v1/events?pid=FBhTiRnwDWGpwYa5vcgKyt`. Token only as SST constant `ChatGPT CAPI token`. Web template OpenAI Ads Pixel by Stape. SST template OpenAI Ads Conversions API by Stape. Same `event_id` on both sides (`DLV - event_id` / `ED - event_id`). Do not add Stape Unique Event ID.
+
+Web tags `HT | ChatGPT Pixel — *` require the ads trio. Page View fires on `page_view` + `ht_consent_ready` so inherit cannot send custom `ht_consent_ready`. SST tags `HT | SST ChatGPT *` use `adStorageConsent` required, action source Web, `__oppref` cookie on, `autoGenerateEventId` off. Inherit is OK for `page_view` / `view_item` / `generate_lead`. Override `schedule` → `appointment_scheduled` and `chat_lead` → `lead_created`. No `purchase` / `order_created`.
+
+iubenda already unblocks `bzrcdn.openai.com` and `bzr.openai.com`. Ads Manager conversions: `page_viewed`, `contents_viewed`, `lead_created`, `appointment_scheduled`, custom `book_start`, custom `newsletter_subscribe`. Full record: [Hellenic Technologies](/kb/web-analytics/customers/hellenic-technologies).
+
+GA4 has no native ChatGPT link. Keep sending the same canonical events to `G-GYMSRM45JV`; that is how `event_id` reaches sGTM.
+
 ## Event catalog (copy this, then rename values)
 
 Canonical helper on HT: src/lib/analytics/data-layer.ts (track plus event\_id). Do not add a second helper.
 
-| Event | When | GA4 | Google Ads | Meta | TikTok | LinkedIn | EUR (HT) |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| ht\_consent\_ready | CMP grants ads, once/page | - | - | Pixel \+ CAPI PageView | Pixel | Insight | - |
-| page\_view | SPA / App Router path change | yes | - | CAPI PageView same event\_id | Pageview web\+sGTM | store li\_fat\_id | - |
-| view\_item | Service / product page | yes | remarketing if planned | ViewContent | if planned | - | - |
-| book\_start | Booking popup opens | observe | - | custom / audience | - | - | - |
-| schedule | Booking confirmed | key event | primary sGTM | Schedule | if planned | CAPI \+ Insight 30351441 | 150 |
-| generate\_lead | Contact form 200 | key event | primary sGTM | Lead | if planned | CAPI \+ Insight 30351433 | 50 |
-| chat\_lead | Chat CRM lead | key event | secondary sGTM only | Lead | - | - | 50 |
-| newsletter\_subscribe | Footer subscribe | observe | - | - | - | - | - |
-| purchase | Not on HT B2B | ecommerce only | only if real purchase | only if real | only if real | - | - |
+| Event | When | GA4 | Google Ads | Meta | TikTok | LinkedIn | ChatGPT | EUR (HT) |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| ht_consent_ready | CMP grants ads, once/page | - | - | Pixel + CAPI PageView | Pixel | Insight | Pixel + CAPI `page_viewed` | - |
+| page_view | SPA / App Router path change | yes | - | CAPI PageView same event_id | Pageview web+sGTM | store li_fat_id | `page_viewed` web+sGTM | - |
+| view_item | Service / product page | yes | remarketing if planned | ViewContent | if planned | - | `contents_viewed` | - |
+| book_start | Booking popup opens | observe | - | custom / audience | - | - | custom `book_start` (web observe) | - |
+| schedule | Booking confirmed | key event | primary sGTM | Schedule | if planned | CAPI + Insight 30351441 | `appointment_scheduled` | 150 |
+| generate_lead | Contact form 200 | key event | primary sGTM | Lead | if planned | CAPI + Insight 30351433 | `lead_created` | 50 |
+| chat_lead | Chat CRM lead | key event | secondary sGTM only | Lead | - | - | `lead_created` (override, do not inherit) | 50 |
+| newsletter_subscribe | Footer subscribe | observe | - | - | - | - | custom `newsletter_subscribe` (web observe) | - |
+| purchase | Not on HT B2B | ecommerce only | only if real purchase | only if real | only if real | - | **forbidden** (`order_created` off) | - |
 
 Every conversion carries event\_id. Chat tools return event\_id so the rail and CAPI can dedup (src/lib/analytics/chat-conversions.ts).
 
@@ -434,6 +446,7 @@ HT live diagnostic UI: [https://hellenictechnologies.com/same-origin](https://he
 | STAPE\_ACCOUNT\_API\_KEY | Cloud Agent | X-AUTH-TOKEN on api.app.stape.io. Rotate if pasted in chat. |
 | META\_PIXEL\_ID / META\_CAPI\_ACCESS\_TOKEN | Vercel \+ GTM LT - fb \* | Hostname-scoped |
 | LinkedIn CAPI token | GTM constant only |  |
+| ChatGPT CAPI token | SST GTM constant only | Advertiser setup uses Cloud secret `openai_chatgpt_ads_api_key`. Never commit either. |
 | TikTok Events API token | GTM LT - Tiktok ID | Hostname-scoped |
 | GOOGLE\_OAUTH\_CLIENT\_ID / SECRET / REFRESH\_TOKEN | Cloud Agent | `digital@` — GA4, GTM, Sheets. Do **not** invite a service account. |
 | GOOGLE\_ADS\_\* \+ LOGIN\_CUSTOMER\_ID | Cloud Agent | MCC `3568564840`. gRPC only (`google-ads-api`). |
