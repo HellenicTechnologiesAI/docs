@@ -1,0 +1,20 @@
+---
+title: "AI spend"
+sidebarTitle: "AI spend"
+description: "One Vercel project and AI Gateway API key per customer. DeepSeek Flash primary."
+---
+
+Dashboard app is one Vercel project: `ht-reporting`. Each **customer** also gets `ht-reporting-ai-{slug}` plus an AI Gateway key (`purpose: ai-gateway`, `projectId` of that project).
+
+<Note>
+  Vercel **project budgets** only meter OIDC from that project's deployments. `/api/chat` runs on the reports app, so we meter with per-customer API keys (and key budgets). The extra project is a spend folder, not a second website.
+</Note>
+
+- Primary: `deepseek/deepseek-v4.1-flash`
+- Fallback: `openai/gpt-4.1-nano` via Gateway `models`
+- Never OpenRouter. Ignore `OPENROUTER_API_KEY`.
+- Missing `customer_ai_gateways` row → chat disabled for that tenant. Do not fall back to another customer's key.
+- Staff talking on a customer scorecard bills **that** customer's key.
+- Requests set Gateway `user` = signed-in user id and tags `customer:{id}`, `tenant:{slug}`.
+
+Phase-1 seed: `ht-reporting-ai-gregio` + key `reporting-gregio`. Do not share Gregio's key with a future customer.

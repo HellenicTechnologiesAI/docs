@@ -1,0 +1,19 @@
+---
+title: "Ingest"
+sidebarTitle: "Ingest"
+description: "Git-owned Google Ads v22, Meta campaign Insights, and GA4 Data API sync."
+---
+
+Workers: `workers/ingest/` on the ClickHouse droplet. Not Vercel cron for backfill.
+
+- Google Ads REST **v22** GAQL, one date per request, child `8746035566` only. Nightly re-pulls last 14 days.
+- Meta campaign Insights, `time_increment=1`, no breakdowns, async job + poll.
+- GA4 Data API `runReport` with interval **1 day** (Standard sampling).
+
+Commands on the box (after compose is up):
+
+```bash
+ssh -o BatchMode=yes hp-clickhouse 'cd /opt/hp && docker compose -f infra/docker-compose.yml run --rm ingest node --import tsx src/index.ts nightly'
+```
+
+Daemon mode runs ~02:00 Europe/Athens.

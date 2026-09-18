@@ -98,7 +98,44 @@
         ]
       },
       {
-        "tab": "Reporting"
+        "tab": "Reporting",
+        "groups": [
+          {
+            "group": "Getting started",
+            "icon": "flag",
+            "pages": [
+              "reporting/overview",
+              "reporting/architecture",
+              "reporting/phase-1-plan"
+            ]
+          },
+          {
+            "group": "Schema and ingest",
+            "icon": "database",
+            "pages": [
+              "reporting/clickhouse-schema",
+              "reporting/ingest",
+              "reporting/metrics"
+            ]
+          },
+          {
+            "group": "Tenancy and AI",
+            "icon": "shield",
+            "pages": [
+              "reporting/tenancy",
+              "reporting/ai-spend",
+              "reporting/cursor-agents"
+            ]
+          },
+          {
+            "group": "Runbooks",
+            "icon": "book",
+            "pages": [
+              "reporting/runbooks/ssh-grant",
+              "reporting/runbooks/droplet"
+            ]
+          }
+        ]
       }
     ]
   },
