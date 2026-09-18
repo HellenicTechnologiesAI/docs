@@ -132,7 +132,8 @@
             "icon": "book",
             "pages": [
               "reporting/runbooks/ssh-grant",
-              "reporting/runbooks/droplet"
+              "reporting/runbooks/droplet",
+              "reporting/runbooks/sync"
             ]
           }
         ]
