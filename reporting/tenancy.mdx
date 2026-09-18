@@ -1,0 +1,15 @@
+---
+title: "Tenancy"
+sidebarTitle: "Tenancy"
+description: "app_metadata roles, RLS, and the server allow-list used by scorecard and chat."
+---
+
+Role lives in `auth.users.raw_app_meta_data` (`admin` | `agency` | `customer`). Never `user_metadata`.
+
+- **admin** — all customers, CRUD
+- **agency** — read all (none seeded in phase 1)
+- **customer** — rows via `customer_users` only
+
+Scorecard and `POST /api/chat` share `lib/tenancy/allow-list.ts`. Chat tools never accept a raw account id from the model without intersecting that list. Empty allow-list returns empty results, not an unfiltered query.
+
+No `service_role` in the browser. `customer_ai_gateways` has no authenticated RLS policies — server service role only.

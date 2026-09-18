@@ -1,0 +1,14 @@
+---
+title: "Metrics"
+sidebarTitle: "Metrics"
+description: "Certified ads and web KPIs for Gregio ecommerce EUR."
+---
+
+Source of truth: `clickhouse/METRICS.md` in the reporting repo.
+
+Gregio is ecommerce. Money is **EUR, native, no FX**.
+
+- Ads conversions: Google `metrics.conversions`; Meta `purchase` / `omni_purchase` / `offsite_conversion.fb_pixel_purchase`
+- CPA = ads spend / ads conversions (null if conversions = 0)
+- ROAS = ads revenue / ads spend (null if spend = 0)
+- Do **not** mix GA4 `purchaseRevenue` into ads ROAS. Different attribution. Label it site revenue / MER only if shown separately.

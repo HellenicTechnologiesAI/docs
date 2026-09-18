@@ -1,0 +1,22 @@
+---
+title: "ClickHouse schema"
+sidebarTitle: "ClickHouse schema"
+description: "Raw per-source ReplacingMergeTree tables and certified FINAL views."
+---
+
+SQL lives in the reporting repo under `clickhouse/`.
+
+Raw engines are `ReplacingMergeTree(_inserted_at)`. The version column is **not** in `ORDER BY`. Certified views select `FINAL`.
+
+| Database | Table | ORDER BY |
+| --- | --- | --- |
+| `raw_google_ads` | `campaign_performance_daily` | `(customer_id, campaign_id, date)` |
+| `raw_meta_ads` | `ads_insights_campaign` | `(account_id, campaign_id, date)` |
+| `raw_ga4` | `ga4_daily` | `(property_id, date, channel)` |
+
+Certified:
+
+- `analytics.ads_performance_daily` — date, platform, account_id, campaign, spend, impressions, clicks, conversions, revenue
+- `analytics.web_performance_daily` — date, property_id, channel, sessions, users, purchases, revenue
+
+App/worker user: `async_insert = 0`. Meta `actions` / `action_values` stay JSON strings; purchase is parsed in the view.
