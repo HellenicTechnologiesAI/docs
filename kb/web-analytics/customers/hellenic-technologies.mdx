@@ -1,0 +1,168 @@
+---
+title: "Hellenic Technologies"
+sidebarTitle: "Hellenic Technologies"
+description: "ChatGPT Ads hybrid pixel + CAPI for hellenictechnologies.com. Web GTM-TRPS26L v416 (first-touch ht_consent_ready), SST v230. Pixel lives in GTM, not Next.js head."
+icon: "building"
+---
+
+<Warning>
+  Own-site measurement. Do **not** copy HT IDs onto a customer. Do **not** put `oaiq` / `bzrcdn.openai.com/sdk/oaiq.min.js` back into Next.js. Do **not** publish web Default Workspace **416** / **433** or SST Default **208** / **233**. Do **not** enable Cookie Keeper or Own CDN. Same-origin `/metrics` is already live. Never commit the ChatGPT CAPI key.
+</Warning>
+
+Record for [hellenictechnologies.com](https://hellenictechnologies.com/) ChatGPT Ads hybrid measurement (19 Sep 2026). Playbooks: [Server Side Tracking](/kb/web-analytics/server-side-tracking), [Cursor: existing Stape](/kb/web-analytics/cursor-prompt-existing-stape), [Customer GitHub repo](/kb/customer-github-repo).
+
+Site repo: `patrickabedin/ht-agency-website` (`docs/STYLE_GUIDE.md` §7.12g). Handbook stub: private `ht-hellenictechnologies`. Never commit CAPI, Stape API keys, or Ads API keys.
+
+<Note>
+  Live page: [ht-intra.mintlify.site/kb/web-analytics/customers/hellenic-technologies](https://ht-intra.mintlify.site/kb/web-analytics/customers/hellenic-technologies). Editor: [app.mintlify.com/hellenictechnologies/ht-intra](https://app.mintlify.com/hellenictechnologies/ht-intra).
+</Note>
+
+## Current state (19 Sep 2026)
+
+| Piece | Live |
+| --- | --- |
+| Site | Next.js App Router. Canonical `dataLayer` in `src/lib/analytics/data-layer.ts`. No second helper. No `oaiq` in first-party head. |
+| Web `GTM-TRPS26L` | Account `1226191120`, container `6516135`. Live **v416** `HT ChatGPT first-touch replay v2` (31 tags). Published from named workspace **HT ChatGPT first-touch** (`436`), not Default. Prior: v415 emitter, v414 hybrid pixel. |
+| sGTM `GTM-WKJ6FDLB` | Shared Multi-tenant account `6202173174`, container `169217628`. Live **v230** `HT ChatGPT Ads hybrid CAPI` (145 tags). Published from named workspace **HT ChatGPT Ads hybrid** (`234`), not Default. |
+| First-party transport | `https://hellenictechnologies.com/metrics` → Cloudflare Worker → `sgtm.hellenictechnologies.com`. `/metrics/healthy` → `ok`. |
+| ChatGPT Ads | Account `Hellenic Technologies` `adacct_6a9689e48a8c819593d444c9b7515b08`, EUR, brand **approved**. Pixel **HT - Pixel** `FBhTiRnwDWGpwYa5vcgKyt` (`cds_6aacf94fbb088195a50d8261853f63f5`). |
+| CAPI endpoint | `POST https://bzr.openai.com/v1/events?pid=FBhTiRnwDWGpwYa5vcgKyt`. Token only as SST constant `ChatGPT CAPI token`. |
+| GA4 | Existing `G-GYMSRM45JV` already receives the same `dataLayer` events + `event_id`. No native ChatGPT↔GA4 link exists; do not invent one. |
+| CMP | iubenda site `3941073`, Consent Mode v2 Advanced. Ads start denied. Purpose 5 → ads trio. `bzrcdn.openai.com` and `bzr.openai.com` already on the unblock list. |
+
+## Hard locks
+
+- Do **not** put the OpenAI setup script into `src/components/iubenda-consent.tsx` or any Next.js layout.
+- Do **not** load a second web container.
+- Do **not** add Stape Unique Event ID. Use existing `DLV - event_id` / `ED - event_id` so OpenAI, Meta, LinkedIn, and Next.js CAPI dedup on the same id.
+- Do **not** fire `purchase` / `order_created` on this B2B site.
+- Do **not** publish stale Default workspaces. Live is web **v416** and SST **v230**.
+- SST is multi-tenant. Only add `HT \| SST *` tags. Never delete Aldemar / Gatsoulis / car-rental / OHE folders. Leftover Purchase / Lead / Calendly tags keep `HT \| Block hellenictechnologies.com` (trigger **285**).
+- Cookie Keeper / Own CDN stay **off**. Same-origin `/metrics` is already live.
+- Extra sGTM hits for contact form / hellenicAI chat lead / chat booking are fine: Next.js already sends hashed CAPI with the same `event_id`; OpenAI keeps the first and drops the duplicate.
+
+## Public IDs
+
+| System | Value |
+| --- | --- |
+| Site | [https://hellenictechnologies.com/](https://hellenictechnologies.com/) (also `www`; `hta.gr` linker only) |
+| Web GTM | `GTM-TRPS26L` — live **v416** |
+| sGTM | `GTM-WKJ6FDLB` — live **v230** |
+| Stape | Multi-tenant identifier `sespmfwe`, Custom Loader `dw0iesespmfwe` |
+| GA4 | `G-GYMSRM45JV` |
+| ChatGPT Pixel | `FBhTiRnwDWGpwYa5vcgKyt` |
+| Pixel source id | `cds_6aacf94fbb088195a50d8261853f63f5` |
+| ChatGPT ad account | `adacct_6a9689e48a8c819593d444c9b7515b08` |
+| iubenda | Site `3941073` |
+
+## Ads Manager conversions
+
+All attached to pixel source `cds_6aacf94fbb088195a50d8261853f63f5`. Attribution window **30** days. No `order_created`.
+
+| Conversion | Event |
+| --- | --- |
+| Page View - 30 Days | `page_viewed` |
+| HT \| Service viewed | `contents_viewed` |
+| HT \| Lead created | `lead_created` |
+| HT \| Appointment scheduled | `appointment_scheduled` |
+| HT \| Book start | custom `book_start` |
+| HT \| Newsletter subscribe | custom `newsletter_subscribe` |
+
+Optimize **Lead created** on lead campaigns and **Appointment scheduled** on booking campaigns. Observe page / contents / custom events. Do not add Purchase.
+
+## Event map
+
+Canonical pushes from `src/lib/analytics/data-layer.ts`. Every push includes `event_id`.
+
+| `dataLayer.event` | When | ChatGPT name | EUR |
+| --- | --- | --- | --- |
+| `page_view` | App Router path change | `page_viewed` | — |
+| `ht_consent_ready` | Purpose 5 granted, once/page | `page_viewed` (web + SST Page View tags also fire here so the SDK inits after accept) | — |
+| `view_item` | `/services/{slug}` | `contents_viewed` | — |
+| `book_start` | Calendly popup opens | custom `book_start` | — |
+| `schedule` | Calendly booked or chat booking | `appointment_scheduled` | 150 |
+| `generate_lead` | Contact form 200 | `lead_created` | 50 |
+| `chat_lead` | hellenicAI CRM lead | `lead_created` | 50 |
+| `newsletter_subscribe` | Footer subscribe | custom `newsletter_subscribe` | — |
+
+Amounts: dataLayer `value` is EUR regular units (50 / 150). Stape auto-map converts to minor units (5000 / 15000). Currency EUR. `view_item` contents `content_type = service`. `page_view` contents `content_type = page`.
+
+## Web GTM — live v416
+
+Template: **OpenAI Ads Pixel by Stape** (`stape-io/openai-pixel-tag`), not a raw Custom HTML of the OpenAI snippet.
+
+Constant `ChatGPT pixel ID` = `FBhTiRnwDWGpwYa5vcgKyt`.
+
+First-touch: Custom HTML `HT | emit ht_consent_ready` (tag **554**, Consent folder, Initialization + All Pages, consent **notSet**). The site head CMP updates `gtag` but never pushes `ht_consent_ready`. First-layer banner is Reject All + Save and continue (Accept All is only in Customize). US-IP iubenda writes `_iub_cs-*-uspr` `adv:true` (sometimes before a denied window is visible). The tag emits one `ht_consent_ready` + `gtmconsentupdate` with a new shared `event_id` on a denied→granted transition, and also if `page_view` already ran while `oaiq` is still down (~2s). Skip once `oaiq` is up so returning visitors do not double `page_viewed`.
+
+| Tag | ChatGPT event | Trigger |
+| --- | --- | --- |
+| `HT \| emit ht_consent_ready` | — | Initialization + All Pages |
+| `HT \| ChatGPT Pixel — Page View` | override `page_viewed` | `HT \| page_view` + `CE - ht_consent_ready` |
+| `HT \| ChatGPT Pixel — View Item` | override `contents_viewed` | `HT \| view_item` |
+| `HT \| ChatGPT Pixel — Contact` | override `lead_created` | `HT \| generate_lead` |
+| `HT \| ChatGPT Pixel — Chat` | override `lead_created` | `HT \| chat_lead` |
+| `HT \| ChatGPT Pixel — Calendly` | override `appointment_scheduled` | `HT \| schedule` |
+| `HT \| ChatGPT Pixel — Book Start` | custom `book_start` | `HT \| book_start` |
+| `HT \| ChatGPT Pixel — Newsletter` | custom `newsletter_subscribe` | `HT \| newsletter_subscribe` |
+
+Every tag: Pixel ID `{{ChatGPT pixel ID}}`, Event ID `{{DLV - event_id}}`, GTM consent **needed** ads trio (`ad_storage`, `ad_user_data`, `ad_personalization`), Stape **Enable Google Consent Mode support** on, automatic dataLayer mapping on. One Pixel ID. Existing HT hostname-scoped custom-event triggers only — no leftover WordPress / Typeform / CallMe triggers, no Vercel preview hosts.
+
+## sGTM — live v230
+
+Template: **OpenAI Ads Conversions API by Stape** (`stape-io/openai-capi-tag`).
+
+Constants: `ChatGPT pixel ID`, `ChatGPT CAPI token` (secret). Action source **Web**. `setClickIdCookie` on (`__oppref`). `autoGenerateEventId` **off**. Event ID `{{ED - event_id}}`. `adStorageConsent` **required**. `validate_only` off. IP / UA / email / phone hashes from event data + `GEO-Ipaddress`.
+
+| Tag | Event name | Trigger |
+| --- | --- | --- |
+| `HT \| SST ChatGPT PageView` | inherit (`page_view` / `ht_consent_ready` → `page_viewed`) | `HT \| SST page_view` + `HT \| SST ht_consent_ready` |
+| `HT \| SST ChatGPT ViewContent` | inherit (`view_item` → `contents_viewed`) | `HT \| SST view_item` |
+| `HT \| SST ChatGPT Contact` | inherit (`generate_lead` → `lead_created`) | `HT \| SST generate_lead` |
+| `HT \| SST ChatGPT Chat` | **standard** `lead_created` (do not inherit `chat_lead`) | `HT \| SST chat_lead` |
+| `HT \| SST ChatGPT Calendly` | **standard** `appointment_scheduled` (do not inherit `schedule`) | `HT \| SST schedule` |
+
+Hostname condition is already on those HT SST triggers (`hellenictechnologies.com` only).
+
+## Why GA4 stays as-is
+
+ChatGPT Ads has no native GA4 linking. The site already sends the same canonical events to GA4 through `HT \| GA4 *` and `HT \| SST GA4`. That is the reason to keep GA4: first-party reporting plus the GA4 client that carries `event_id` into sGTM for Meta / LinkedIn / ChatGPT CAPI. Do not add a ChatGPT-specific GA4 event name. Do not mark `purchase` as a GA4 key event.
+
+## QA (19 Sep 2026)
+
+| Check | Result |
+| --- | --- |
+| Homepage HTML has no `oaiq` / `oaiq.min.js` / Pixel ID | **Pass.** `oaiq` count 0. Pixel ID count 0. |
+| Reject All | **Pass.** Purpose 5 false. `oaiq` / `fbq` / `lintrk` undefined. 0 `bzr` / `oaiq.min.js` posts. No `ht_consent_ready`. |
+| Same-page Accept All (US customize Αποδοχή όλων) | **Pass (v416).** One `ht_consent_ready`. `oaiq` / `fbq` / `lintrk` / TikTok load. `POST bzr.openai.com/v1/sdk/events` 202 `page_viewed` uses the `ht_consent_ready` `event_id`. |
+| Conversion overrides after accept | **Pass.** Pushed `view_item` / `book_start` / `schedule` / `generate_lead` / `chat_lead` / `newsletter_subscribe` with `dbg_*` ids. Browser pixel posted `contents_viewed`, custom `book_start`, `appointment_scheduled`, two `lead_created`, custom `newsletter_subscribe` with those same ids. |
+| Reload after accept | **Pass.** No second `ht_consent_ready`. `oaiq` still a function. New `page_viewed` uses the site `page_view` `event_id`. |
+| `/metrics/healthy` | **200** `ok` |
+| GTM live versions | Web **v416**, SST **v230**. Default workspaces not published. |
+| No `purchase` / `order_created` | Web ChatGPT tags have none. Ads Manager has no `order_created` conversion. |
+| Leftover SST tenants | Aldemar / `FB - Purchase` / `G-ADS - Purchase` still present and still blocked by trigger **285**. |
+| CAPI `validate_only` POST to `bzr.openai.com/v1/events?pid=FBhTiRnwDWGpwYa5vcgKyt` | **200** `accepted_events: 1` |
+| Ads Manager conversions | Six settings live (page / contents / lead / appointment / book_start / newsletter). |
+
+Tag Assistant query params on `/` do **not** reliably preview the Custom Loader (`/metrics`). Debug this container on live after a named publish, or inject `gtm_auth` into the loader. Human EU-IP Preview is still useful because this VM is US-IP (US privacy cookie, not EEA purposes[5]).
+
+v415 transition-only emit missed US first-touch: iubenda writes `adv:true` before a denied window is visible. v416 also replays if `page_view` already ran and `oaiq` is still down.
+
+## Auth notes (no tokens)
+
+- GTM: OAuth `digital@hellenictechnologies.com`. Publish from named workspaces only.
+- ChatGPT Advertiser API: Cloud secret `openai_chatgpt_ads_api_key` for `api.ads.openai.com` (pixels / event settings).
+- ChatGPT CAPI: SST constant `ChatGPT CAPI token` only. Also used by Next.js hashed CAPI if `CHATGPT_CAPI_ACCESS_TOKEN` / `OPENAI_CONVERSIONS_API_KEY` is already on Vercel — leave it.
+- Do not paste either key into git, PRs, Mintlify, or chat.
+
+## Still open
+
+| Item | Owner |
+| --- | --- |
+| Human EU-IP GTM Preview after purpose-5 accept (this VM is US-IP / `adv:true`) | Optional — automated US Accept All now fires first-touch |
+| Ads Manager test/debug UI shows the live `dbg_*` / production events | After consented traffic |
+| Copy §7.12g live versions into `patrickabedin/ht-agency-website` `docs/STYLE_GUIDE.md` if that repo is reachable | Website repo 404 from this agent; stub is in `ht-hellenictechnologies` |
+
+<Check>
+  Hybrid ChatGPT measurement is live in GTM (web v416 / SST v230). First-touch `ht_consent_ready` after Accept All. Pixel is not in Next.js. Shared `event_id`. No purchase. Other SST tenants untouched.
+</Check>
