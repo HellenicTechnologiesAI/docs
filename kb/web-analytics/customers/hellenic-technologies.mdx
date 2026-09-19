@@ -1,7 +1,7 @@
 ---
 title: "Hellenic Technologies"
 sidebarTitle: "Hellenic Technologies"
-description: "ChatGPT Ads hybrid pixel + CAPI for hellenictechnologies.com. Web GTM-TRPS26L v414, SST GTM-WKJ6FDLB v230. Pixel lives in GTM, not Next.js head."
+description: "ChatGPT Ads hybrid pixel + CAPI for hellenictechnologies.com. Web GTM-TRPS26L v416 (first-touch ht_consent_ready), SST v230. Pixel lives in GTM, not Next.js head."
 icon: "building"
 ---
 
@@ -9,7 +9,7 @@ icon: "building"
   Own-site measurement. Do **not** copy HT IDs onto a customer. Do **not** put `oaiq` / `bzrcdn.openai.com/sdk/oaiq.min.js` back into Next.js. Do **not** publish web Default Workspace **416** / **433** or SST Default **208** / **233**. Do **not** enable Cookie Keeper or Own CDN. Same-origin `/metrics` is already live. Never commit the ChatGPT CAPI key.
 </Warning>
 
-Record for [hellenictechnologies.com](https://hellenictechnologies.com/) ChatGPT Ads hybrid measurement (18 Sep 2026). Playbooks: [Server Side Tracking](/kb/web-analytics/server-side-tracking), [Cursor: existing Stape](/kb/web-analytics/cursor-prompt-existing-stape), [Customer GitHub repo](/kb/customer-github-repo).
+Record for [hellenictechnologies.com](https://hellenictechnologies.com/) ChatGPT Ads hybrid measurement (19 Sep 2026). Playbooks: [Server Side Tracking](/kb/web-analytics/server-side-tracking), [Cursor: existing Stape](/kb/web-analytics/cursor-prompt-existing-stape), [Customer GitHub repo](/kb/customer-github-repo).
 
 Site repo: `patrickabedin/ht-agency-website` (`docs/STYLE_GUIDE.md` §7.12g). Handbook stub: private `ht-hellenictechnologies`. Never commit CAPI, Stape API keys, or Ads API keys.
 
@@ -17,12 +17,12 @@ Site repo: `patrickabedin/ht-agency-website` (`docs/STYLE_GUIDE.md` §7.12g). Ha
   Live page: [ht-intra.mintlify.site/kb/web-analytics/customers/hellenic-technologies](https://ht-intra.mintlify.site/kb/web-analytics/customers/hellenic-technologies). Editor: [app.mintlify.com/hellenictechnologies/ht-intra](https://app.mintlify.com/hellenictechnologies/ht-intra).
 </Note>
 
-## Current state (18 Sep 2026)
+## Current state (19 Sep 2026)
 
 | Piece | Live |
 | --- | --- |
 | Site | Next.js App Router. Canonical `dataLayer` in `src/lib/analytics/data-layer.ts`. No second helper. No `oaiq` in first-party head. |
-| Web `GTM-TRPS26L` | Account `1226191120`, container `6516135`. Live **v414** `HT ChatGPT Ads hybrid pixel` (30 tags). Published from named workspace **HT ChatGPT Ads hybrid** (`434`), not Default. |
+| Web `GTM-TRPS26L` | Account `1226191120`, container `6516135`. Live **v416** `HT ChatGPT first-touch replay v2` (31 tags). Published from named workspace **HT ChatGPT first-touch** (`436`), not Default. Prior: v415 emitter, v414 hybrid pixel. |
 | sGTM `GTM-WKJ6FDLB` | Shared Multi-tenant account `6202173174`, container `169217628`. Live **v230** `HT ChatGPT Ads hybrid CAPI` (145 tags). Published from named workspace **HT ChatGPT Ads hybrid** (`234`), not Default. |
 | First-party transport | `https://hellenictechnologies.com/metrics` → Cloudflare Worker → `sgtm.hellenictechnologies.com`. `/metrics/healthy` → `ok`. |
 | ChatGPT Ads | Account `Hellenic Technologies` `adacct_6a9689e48a8c819593d444c9b7515b08`, EUR, brand **approved**. Pixel **HT - Pixel** `FBhTiRnwDWGpwYa5vcgKyt` (`cds_6aacf94fbb088195a50d8261853f63f5`). |
