@@ -36,7 +36,7 @@ Site repo: `patrickabedin/ht-agency-website` (`docs/STYLE_GUIDE.md` §7.12g). Ha
 - Do **not** load a second web container.
 - Do **not** add Stape Unique Event ID. Use existing `DLV - event_id` / `ED - event_id` so OpenAI, Meta, LinkedIn, and Next.js CAPI dedup on the same id.
 - Do **not** fire `purchase` / `order_created` on this B2B site.
-- Do **not** publish stale Default workspaces. Live is web **v414** and SST **v230**.
+- Do **not** publish stale Default workspaces. Live is web **v416** and SST **v230**.
 - SST is multi-tenant. Only add `HT \| SST *` tags. Never delete Aldemar / Gatsoulis / car-rental / OHE folders. Leftover Purchase / Lead / Calendly tags keep `HT \| Block hellenictechnologies.com` (trigger **285**).
 - Cookie Keeper / Own CDN stay **off**. Same-origin `/metrics` is already live.
 - Extra sGTM hits for contact form / hellenicAI chat lead / chat booking are fine: Next.js already sends hashed CAPI with the same `event_id`; OpenAI keeps the first and drops the duplicate.
@@ -46,7 +46,7 @@ Site repo: `patrickabedin/ht-agency-website` (`docs/STYLE_GUIDE.md` §7.12g). Ha
 | System | Value |
 | --- | --- |
 | Site | [https://hellenictechnologies.com/](https://hellenictechnologies.com/) (also `www`; `hta.gr` linker only) |
-| Web GTM | `GTM-TRPS26L` — live **v414** |
+| Web GTM | `GTM-TRPS26L` — live **v416** |
 | sGTM | `GTM-WKJ6FDLB` — live **v230** |
 | Stape | Multi-tenant identifier `sespmfwe`, Custom Loader `dw0iesespmfwe` |
 | GA4 | `G-GYMSRM45JV` |
@@ -87,14 +87,17 @@ Canonical pushes from `src/lib/analytics/data-layer.ts`. Every push includes `ev
 
 Amounts: dataLayer `value` is EUR regular units (50 / 150). Stape auto-map converts to minor units (5000 / 15000). Currency EUR. `view_item` contents `content_type = service`. `page_view` contents `content_type = page`.
 
-## Web GTM — live v414
+## Web GTM — live v416
 
 Template: **OpenAI Ads Pixel by Stape** (`stape-io/openai-pixel-tag`), not a raw Custom HTML of the OpenAI snippet.
 
 Constant `ChatGPT pixel ID` = `FBhTiRnwDWGpwYa5vcgKyt`.
 
+First-touch: Custom HTML `HT | emit ht_consent_ready` (tag **554**, Consent folder, Initialization + All Pages, consent **notSet**). The site head CMP updates `gtag` but never pushes `ht_consent_ready`. First-layer banner is Reject All + Save and continue (Accept All is only in Customize). US-IP iubenda writes `_iub_cs-*-uspr` `adv:true` (sometimes before a denied window is visible). The tag emits one `ht_consent_ready` + `gtmconsentupdate` with a new shared `event_id` on a denied→granted transition, and also if `page_view` already ran while `oaiq` is still down (~2s). Skip once `oaiq` is up so returning visitors do not double `page_viewed`.
+
 | Tag | ChatGPT event | Trigger |
 | --- | --- | --- |
+| `HT \| emit ht_consent_ready` | — | Initialization + All Pages |
 | `HT \| ChatGPT Pixel — Page View` | override `page_viewed` | `HT \| page_view` + `CE - ht_consent_ready` |
 | `HT \| ChatGPT Pixel — View Item` | override `contents_viewed` | `HT \| view_item` |
 | `HT \| ChatGPT Pixel — Contact` | override `lead_created` | `HT \| generate_lead` |
@@ -125,22 +128,25 @@ Hostname condition is already on those HT SST triggers (`hellenictechnologies.co
 
 ChatGPT Ads has no native GA4 linking. The site already sends the same canonical events to GA4 through `HT \| GA4 *` and `HT \| SST GA4`. That is the reason to keep GA4: first-party reporting plus the GA4 client that carries `event_id` into sGTM for Meta / LinkedIn / ChatGPT CAPI. Do not add a ChatGPT-specific GA4 event name. Do not mark `purchase` as a GA4 key event.
 
-## QA (18 Sep 2026)
+## QA (19 Sep 2026)
 
 | Check | Result |
 | --- | --- |
-| Homepage HTML has no `oaiq` / `oaiq.min.js` / Pixel ID | **Pass.** `oaiq` count 0. Pixel ID count 0. `GTM-TRPS26L` + Custom Loader `dw0iesespmfwe` present. `bzrcdn.openai.com` / `bzr.openai.com` appear only on the iubenda unblock list (count 4 each). |
-| Live Custom Loader JS (`/metrics/dw0iesespmfwe.js?…`) | **Pass.** Contains `oaiq.min.js`, `bzrcdn.openai.com`, pixel `FBhTiRnwDWGpwYa5vcgKyt`, Stape template `__cvt_6516135_536`, and `page_viewed` / `contents_viewed` / `lead_created` / `appointment_scheduled`. |
-| Reject marketing | **Pass.** Fresh reject: 0 of 204 network requests matched `bzr` / `bzrcdn.openai.com`. |
-| Accept marketing in an automated browser | **Inconclusive.** iubenda banner click did not set `_iub.cs.api.isConsentGiven()`; Meta `fbq` and TikTok `ttq` also stayed undefined, so this is not a ChatGPT-only miss. Use GTM Preview as a human after a real purpose-5 accept. |
+| Homepage HTML has no `oaiq` / `oaiq.min.js` / Pixel ID | **Pass.** `oaiq` count 0. Pixel ID count 0. |
+| Reject All | **Pass.** Purpose 5 false. `oaiq` / `fbq` / `lintrk` undefined. 0 `bzr` / `oaiq.min.js` posts. No `ht_consent_ready`. |
+| Same-page Accept All (US customize Αποδοχή όλων) | **Pass (v416).** One `ht_consent_ready`. `oaiq` / `fbq` / `lintrk` / TikTok load. `POST bzr.openai.com/v1/sdk/events` 202 `page_viewed` uses the `ht_consent_ready` `event_id`. |
+| Conversion overrides after accept | **Pass.** Pushed `view_item` / `book_start` / `schedule` / `generate_lead` / `chat_lead` / `newsletter_subscribe` with `dbg_*` ids. Browser pixel posted `contents_viewed`, custom `book_start`, `appointment_scheduled`, two `lead_created`, custom `newsletter_subscribe` with those same ids. |
+| Reload after accept | **Pass.** No second `ht_consent_ready`. `oaiq` still a function. New `page_viewed` uses the site `page_view` `event_id`. |
 | `/metrics/healthy` | **200** `ok` |
-| GTM live versions | Web **v414**, SST **v230**. Default workspaces not published. |
+| GTM live versions | Web **v416**, SST **v230**. Default workspaces not published. |
 | No `purchase` / `order_created` | Web ChatGPT tags have none. Ads Manager has no `order_created` conversion. |
 | Leftover SST tenants | Aldemar / `FB - Purchase` / `G-ADS - Purchase` still present and still blocked by trigger **285**. |
 | CAPI `validate_only` POST to `bzr.openai.com/v1/events?pid=FBhTiRnwDWGpwYa5vcgKyt` | **200** `accepted_events: 1` |
 | Ads Manager conversions | Six settings live (page / contents / lead / appointment / book_start / newsletter). |
 
-GTM Preview (accept vs reject, SPA `page_view`, `/services/{slug}`, contact, Calendly, chat lead, same `event_id` web+server) still needs a consented browser session after cache. Pixel SDK is injected by GTM **after** purpose 5 — it will not be in first-party HTML.
+Tag Assistant query params on `/` do **not** reliably preview the Custom Loader (`/metrics`). Debug this container on live after a named publish, or inject `gtm_auth` into the loader. Human EU-IP Preview is still useful because this VM is US-IP (US privacy cookie, not EEA purposes[5]).
+
+v415 transition-only emit missed US first-touch: iubenda writes `adv:true` before a denied window is visible. v416 also replays if `page_view` already ran and `oaiq` is still down.
 
 ## Auth notes (no tokens)
 
@@ -153,10 +159,10 @@ GTM Preview (accept vs reject, SPA `page_view`, `/services/{slug}`, contact, Cal
 
 | Item | Owner |
 | --- | --- |
-| GTM Preview on production after a real iubenda purpose-5 accept: pixel loads once; reject does not measure | Human — automated banner click did not register consent (Meta/TikTok also stayed unloaded) |
-| Ads Manager test/debug events show live `page_viewed`, `contents_viewed`, `lead_created`, `appointment_scheduled` | After consented traffic |
+| Human EU-IP GTM Preview after purpose-5 accept (this VM is US-IP / `adv:true`) | Optional — automated US Accept All now fires first-touch |
+| Ads Manager test/debug UI shows the live `dbg_*` / production events | After consented traffic |
 | Copy §7.12g live versions into `patrickabedin/ht-agency-website` `docs/STYLE_GUIDE.md` if that repo is reachable | Website repo 404 from this agent; stub is in `ht-hellenictechnologies` |
 
 <Check>
-  Hybrid ChatGPT measurement is live in GTM (web v414 / SST v230). Pixel is not in Next.js. Shared `event_id`. No purchase. Other SST tenants untouched.
+  Hybrid ChatGPT measurement is live in GTM (web v416 / SST v230). First-touch `ht_consent_ready` after Accept All. Pixel is not in Next.js. Shared `event_id`. No purchase. Other SST tenants untouched.
 </Check>
