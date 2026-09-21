@@ -1,0 +1,123 @@
+---
+title: "FactoryShop"
+sidebarTitle: "FactoryShop"
+description: "Scenario A SST for factoryshop.com.gr: web v61, sGTM v230, no Cloudflare same-origin. Prompt slug camelot — not camelot.gr water."
+icon: "couch"
+keywords: ["factoryshop", "camelot", "sst", "stape", "gtm"]
+---
+
+<Warning>
+  Prompt name for this KB page is **camelot**. The live site is **[factoryshop.com.gr](https://factoryshop.com.gr/)** (Hindimpatoglou / Volos furniture). **Do not mix with camelot.gr / camelotwater.com** (`CW \| SST *`, GTM `GTM-TXJ8WFV`). Multi-tenant sGTM: do **not** create a new Stape container. Do **not** publish sGTM Default Workspace **233**. No `/metrics` — HT Cloudflare token cannot edit this zone.
+</Warning>
+
+Scenario A record for [factoryshop.com.gr](https://factoryshop.com.gr/) (21 Sep 2026). Playbooks: [Server Side Tracking](/kb/web-analytics/server-side-tracking), [Cursor: existing Stape](/kb/web-analytics/cursor-prompt-existing-stape), [Customer GitHub repo](/kb/customer-github-repo).
+
+Customer handbook: private `ht-factoryshop`. Never commit CAPI, Stape keys, or Measurement Protocol secrets.
+
+## Current state (21 Sep 2026 — audit complete, patch in progress)
+
+| Piece | Live |
+| --- | --- |
+| Site | OpenCart 3 + Journal3 + Devman GMT + **theme iubenda** + Moosend. Origin access-point.gr. Cloudflare orange-cloud (zone **not** in HT account). |
+| Loader | Official-pattern IIFE **×3** on `sgtm.factoryshop.com.gr/{file}.js?id=`. **Not** Stape Generate. Dual noscript (sgtm **and** googletagmanager.com). |
+| Web `GTM-K82RWNZ` | Account `6002551054`, container `35244384`, live **v61**. |
+| sGTM | Shared Multi-tenant, live **v230**. Workspace **235** matches. Default **233** is stale (140 vs 145 tags). |
+| Same-origin | **No.** `https://sgtm.factoryshop.com.gr/healthy` → `ok`. |
+| GA4 | Property `377447236`, `G-JFNCHGMJWW`. |
+| Google Ads | CID `503-529-4903`, `AW-630734053`. Purchase `r9dcCKizreoBEOX54KwC`. |
+| Meta | Ad account `136090761163392`. Pixel **`2957743177673438`**. |
+| TikTok | `D1AISU3C77U8IVAAGSQG` (LT ID + access-token row present). |
+| CMP | Theme iubenda site `3543443`. GTM template **246 paused**. |
+| Stape scan | **57/100** (21 Sep 2026 12:38 UTC). |
+
+## Hard locks
+
+- Do **not** create a new Stape or sGTM container.
+- sGTM: fork **live v230+** / workspace **235**. Never Default **233**.
+- Web: keep `GTM-K82RWNZ` only.
+- `sgtm.` stays DNS-only to Stape. **No** `/metrics` Worker.
+- First Custom Loader: Cookie Keeper **off**. Second Generate (after QA): Cookie Keeper **on**, Stape User ID.
+- One Ads e-shop primary: **Purchase \| HT**. Store visits / calls stay a **separate** goal.
+- Web Ads conversion tags must not fire in parallel with sGTM Ads.
+- Do not copy HT / GG / GS / Camelot water IDs.
+- CAPI token stays in sGTM `LT - fb api token` only.
+
+## Public IDs
+
+| System | Value |
+| --- | --- |
+| Site | [https://factoryshop.com.gr/](https://factoryshop.com.gr/) |
+| Web GTM | `GTM-K82RWNZ` (account `6002551054`, live **v61**) |
+| sGTM | Shared Multi-tenant account `6202173174`, live **v230** |
+| sGTM host | `https://sgtm.factoryshop.com.gr` |
+| GA4 | `G-JFNCHGMJWW`, property `377447236` |
+| Google Ads | CID `503-529-4903`, `AW-630734053` |
+| Ads Purchase | `r9dcCKizreoBEOX54KwC` (action `491477416`) |
+| Ads Add to cart | `xtnlCKWuv-oBEOX54KwC` (observe) |
+| Ads Checkout | `HN-LCPqjoOoBEOX54KwC` (observe) |
+| Meta ad account | `136090761163392` |
+| Meta Pixel | `2957743177673438` |
+| TikTok | `D1AISU3C77U8IVAAGSQG` |
+| iubenda | Site `3543443` (CS policy `28843811`) |
+| Skroutz | `SA-14035-3443` |
+
+## Keep / need / drop
+
+**Keep**
+
+- Funnel dataLayer: `view_item`, `add_to_cart`, `begin_checkout`, `purchase`.
+- Google Ads **Purchase \| HT** as the only e-shop primary.
+- Meta Pixel hybrid + CAPI. TikTok web + Events API.
+- Skroutz + Clickcease.
+- sGTM LT rows already present for `factoryshop.com.gr`.
+
+**Need** (open after audit)
+
+- Stape **Generate** Custom Loader (API 1010 from agent VM — do in Stape UI). Cookie Keeper off first.
+- iubenda into GTM; web-dev removes theme CMP.
+- `ht_consent_ready`; Meta/TikTok PageView off All Pages [MKT].
+- Pause web `awct` + `GT - Google Ads`.
+- `FS \| SST Meta *` + block shared `FB - *` on this hostname. EMQ keys on DT.
+- GA4 drop `ua_10_page_visitors`. Add `FS \| *` audiences.
+- Meta 180d WCAs. Human Ads UI on UA HIDDEN includes.
+
+**Drop**
+
+- VK Pixel (paused).
+- Paused old GA4 EE tags / GMT consent tags.
+- Dual googletagmanager noscript / extra GTM IIFEs.
+- Do **not** delete other-tenant sGTM tags. Do **not** delete `CW \| *`.
+
+## Stape checker (21 Sep 2026)
+
+Source: [Drive PDF](https://drive.google.com/file/d/1nlslkP9cLimzOGHIp-m_HzsGAFDqM9IT/view). Scan `01a0c3f8-96f4-74db-82f6-f8f49e5d7e1e` **same day** as this job (not a stale reprint).
+
+| Category | Scan | Plan |
+| --- | --- | --- |
+| ITP / cookies +19 | No Cookie Keeper / same-origin | No Worker. CK **second** Generate after tags. |
+| Consent Mode +10 | GCM format missing | GTM iubenda; kill consent `location.reload`. |
+| Ads server-side +6 | Client awct **and** server | Pause web Ads tags. |
+| Custom Loader +4 | Outdated official-pattern on sgtm | Generate + REPLACE. |
+| Page speed +5 | Extra GTM + Ads gtag | One loader. |
+
+## Work log
+
+| Date | Phase | What |
+| --- | --- | --- |
+| 21 Sep 2026 | Page created | Mintlify slug **camelot** under Web Analytics → Customers. |
+| 21 Sep 2026 | Inventory | Live HTML + web v61 + sGTM v230 + GA4 `G-JFNCHGMJWW` + Ads `503-529-4903` + Meta pixel `2957743177673438` + TikTok + Stape 57/100. Keep/need/drop filled. |
+
+## Still open
+
+| Item | Owner |
+| --- | --- |
+| Generate Custom Loader in Stape UI (CK off) + web-dev REPLACE | PM / web-dev |
+| Remove theme iubenda | Web-dev |
+| Web + sGTM named publishes | This job |
+| Ads UI: uncheck Included in Conversions on UA leftovers | Human in Ads |
+| Meta 180d WCAs + EMQ after real order | This job / Events Manager |
+| Cookie Keeper REPLACE (second ticket) | After QA |
+
+<Check>
+  Audit is on disk in `ht-factoryshop`. Do not rebuild containers. Do not publish sGTM Default 233. Do not apply `/metrics` without a Worker on this zone.
+</Check>
