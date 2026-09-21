@@ -1,0 +1,38 @@
+---
+title: "hellenicBI current architecture"
+sidebarTitle: "Current architecture"
+description: "What serves reports.hellenictechnologies.com: Next app, Supabase tenancy, ClickHouse facts, ingest."
+icon: "server"
+---
+
+Parent: [Start here](/kb/hellenicai-bi/start-here).
+
+## App
+
+Next.js 16 App Router on Vercel (`ht-reporting`). Auth is Supabase (`ht-reporting`). `proxy.ts` (Next 16, no `middleware.ts`) sends unauthenticated `/`, channel pages, `/api/report`, and `/api/chat` to `/login`.
+
+The customer UI is the vendored hellenicAI BI shell (Mobiscroll, container-query grids, every card has info + sparkles). Warehouse `spend` maps to report `cost`. `provider` is `"clickhouse"` when facts exist.
+
+Empty channel (no rows): one Panel — “No data source connected for this channel”. Not zeroed cards. Same for GA4 breakdowns this warehouse does not carry (funnel, products, landing pages, age/geo/keywords/creatives/video).
+
+## Data
+
+| Layer | Role |
+| --- | --- |
+| Supabase | Users, roles (`admin` / `agency` / `customer`), customers, businesses, ad accounts, GA4 properties |
+| ClickHouse | Certified facts. Ads: `analytics.ads_performance_daily`. Web: `analytics.web_performance_daily`. |
+| Ingest worker | Google Ads, Meta Ads, GA4 → ClickHouse. Still **writes**. That is not the old dashboard. |
+
+Gregio (first tenant): customer slug `gregio`, business `gregio-eshop`. Google Ads `8746035566`, Meta `1405833119731509`, GA4 `342364284`. Money is EUR, native, no FX.
+
+`getAllowedClients(session)` → that tenant’s businesses (customers: their own; admin/agency: all). Header client switcher only if the list length is greater than one.
+
+Chat (`POST /api/chat`) uses the same allow-list. A prompt cannot widen tenancy.
+
+## Admin
+
+`/admin` is the shell control plane (customers, ingest, AI spend, revenue, plans, audit, team). Wired to live Supabase tenancy — not the v0 mock catalog. Customers cannot open it.
+
+## Old scorecard
+
+Deleted. `/app` is a redirect only. It never imports ClickHouse. If a human still sees Scorecard / Consent / “Hellenic reporting”, production is a stale Vercel deployment, not current `main`.
