@@ -1,9 +1,14 @@
 ---
 title: "FactoryShop"
 sidebarTitle: "FactoryShop"
-description: "Scenario A SST for factoryshop.com.gr: web v61, sGTM v230, no Cloudflare same-origin. Prompt slug camelot — not camelot.gr water."
+description: "Scenario A SST for factoryshop.com.gr: web v63, sGTM v231, no Cloudflare same-origin. Prompt slug camelot — not camelot.gr water."
 icon: "couch"
-keywords: ["factoryshop", "camelot", "sst", "stape", "gtm"]
+keywords:
+  - "factoryshop"
+  - "camelot"
+  - "sst"
+  - "stape"
+  - "gtm"
 ---
 
 <Warning>
@@ -14,21 +19,20 @@ Scenario A record for [factoryshop.com.gr](https://factoryshop.com.gr/) (21 Sep 
 
 Customer handbook: private `ht-factoryshop`. Never commit CAPI, Stape keys, or Measurement Protocol secrets.
 
-## Current state (21 Sep 2026 — audit complete, patch in progress)
+## Current state (21 Sep 2026 — web v63 / sGTM v231 published)
 
 | Piece | Live |
 | --- | --- |
-| Site | OpenCart 3 + Journal3 + Devman GMT + **theme iubenda** + Moosend. Origin access-point.gr. Cloudflare orange-cloud (zone **not** in HT account). |
-| Loader | Official-pattern IIFE **×3** on `sgtm.factoryshop.com.gr/{file}.js?id=`. **Not** Stape Generate. Dual noscript (sgtm **and** googletagmanager.com). |
-| Web `GTM-K82RWNZ` | Account `6002551054`, container `35244384`, live **v61**. |
-| sGTM | Shared Multi-tenant, live **v230**. Workspace **235** matches. Default **233** is stale (140 vs 145 tags). |
-| Same-origin | **No.** `https://sgtm.factoryshop.com.gr/healthy` → `ok`. |
-| GA4 | Property `377447236`, `G-JFNCHGMJWW`. |
-| Google Ads | CID `503-529-4903`, `AW-630734053`. Purchase `r9dcCKizreoBEOX54KwC`. |
-| Meta | Ad account `136090761163392`. Pixel **`2957743177673438`**. |
-| TikTok | `D1AISU3C77U8IVAAGSQG` (LT ID + access-token row present). |
-| CMP | Theme iubenda site `3543443`. GTM template **246 paused**. |
-| Stape scan | **57/100** (21 Sep 2026 12:38 UTC). |
+| Site | OpenCart 3 + Journal3 + Devman GMT + **theme iubenda still in HTML** until web-dev ticket 1. |
+| Loader | Still official-pattern IIFE ×3 (web-dev ticket). sGTM host healthy. |
+| Web `GTM-K82RWNZ` | Live **v63** `FS EMQ user_data + delete paused EE/GMT junk`. Edit Default workspace **65**. |
+| sGTM | Live **v231** `FS SST Meta EMQ hostname-scope + block shared FB`. Never Default **233**. |
+| GA4 | `G-JFNCHGMJWW`. Key events: purchase, add_to_cart, begin_checkout. `FS \| *` audiences created. |
+| Google Ads | Purchase \| HT primary. Web awct **paused**. Conversion lists `FS \| Ads *` created. |
+| Meta | Pixel `2957743177673438`. Dedicated `FS \| SST Meta *` CAPI. EMQ keys on DT + pixel AM. Graph cannot create WCAs (no Advertiser write). |
+| TikTok | `D1AISU3C77U8IVAAGSQG` PageView on `ht_consent_ready`. Website audiences need Ads Manager (token has no advertiser grant). |
+| CMP | GTM iubenda **on**. Theme iubenda still injects until web-dev removes it. |
+| Stape scan | **57/100** (pre-loader paste). |
 
 ## Hard locks
 
@@ -47,8 +51,8 @@ Customer handbook: private `ht-factoryshop`. Never commit CAPI, Stape keys, or M
 | System | Value |
 | --- | --- |
 | Site | [https://factoryshop.com.gr/](https://factoryshop.com.gr/) |
-| Web GTM | `GTM-K82RWNZ` (account `6002551054`, live **v61**) |
-| sGTM | Shared Multi-tenant account `6202173174`, live **v230** |
+| Web GTM | `GTM-K82RWNZ` (account `6002551054`, live **v63**, edit workspace **65**) |
+| sGTM | Shared Multi-tenant account `6202173174`, live **v231** |
 | sGTM host | `https://sgtm.factoryshop.com.gr` |
 | GA4 | `G-JFNCHGMJWW`, property `377447236` |
 | Google Ads | CID `503-529-4903`, `AW-630734053` |
@@ -71,15 +75,22 @@ Customer handbook: private `ht-factoryshop`. Never commit CAPI, Stape keys, or M
 - Skroutz + Clickcease.
 - sGTM LT rows already present for `factoryshop.com.gr`.
 
-**Need** (open after audit)
+**Need** (open after this job)
 
 - Stape **Generate** Custom Loader (API 1010 from agent VM — do in Stape UI). Cookie Keeper off first.
-- iubenda into GTM; web-dev removes theme CMP.
-- `ht_consent_ready`; Meta/TikTok PageView off All Pages [MKT].
+- Web-dev removes theme CMP (GTM iubenda already live).
+- Meta 180d WCAs — human with Advertiser role. Existing visitor/ATC/lookalike lists stay.
+- Human Ads UI on UA HIDDEN includes.
+- TikTok website audiences in Ads Manager.
+- Cookie Keeper second Generate after QA.
+- Consented purchase QA; Events Manager EMQ score (keys are wired; do not invent a number).
+
+**Need** (done)
+
+- iubenda into GTM; `ht_consent_ready`; Meta/TikTok PageView off All Pages.
 - Pause web `awct` + `GT - Google Ads`.
-- `FS \| SST Meta *` + block shared `FB - *` on this hostname. EMQ keys on DT.
-- GA4 drop `ua_10_page_visitors`. Add `FS \| *` audiences.
-- Meta 180d WCAs. Human Ads UI on UA HIDDEN includes.
+- `FS \| SST Meta *` + block shared `FB - *`. EMQ keys on DT + pixel AM.
+- GA4 drop `ua_10_page_visitors`. `FS \| *` audiences. Ads `FS \| Ads *` conversion lists.
 
 **Drop**
 
@@ -105,7 +116,8 @@ Source: [Drive PDF](https://drive.google.com/file/d/1nlslkP9cLimzOGHIp-m_HzsGAFD
 | Date | Phase | What |
 | --- | --- | --- |
 | 21 Sep 2026 | Page created | Mintlify slug **camelot** under Web Analytics → Customers. |
-| 21 Sep 2026 | Inventory | Live HTML + web v61 + sGTM v230 + GA4 `G-JFNCHGMJWW` + Ads `503-529-4903` + Meta pixel `2957743177673438` + TikTok + Stape 57/100. Keep/need/drop filled. |
+| 21 Sep 2026 | Housekeeping + SST | Web **v62**: paused awct + Ads gtag; iubenda GTM on; `ht_consent_ready`; Meta/TikTok PageView retargeted. sGTM **v231**: `FS \| SST Meta *` + block shared FB. GA4 junk key event deleted; `FS \| *` audiences. Meta WCAs blocked on Graph ads write. |
+| 21 Sep 2026 | EMQ + cleanup | Web **v63**: DT user_data (name/email/phone/city/zip/country/`user_id`/fbp/fbc + consent); Meta AM + ct/zp/country/`external_id`; deleted paused EE GA4 / GMT consent / old ATC HTML. Ads conversion lists `FS \| Ads Purchasers 7D/180D`, ATC 30D, Checkout 30D. TikTok website audiences blocked (no advertiser grant). |
 
 ## Still open
 
@@ -113,9 +125,9 @@ Source: [Drive PDF](https://drive.google.com/file/d/1nlslkP9cLimzOGHIp-m_HzsGAFD
 | --- | --- |
 | Generate Custom Loader in Stape UI (CK off) + web-dev REPLACE | PM / web-dev |
 | Remove theme iubenda | Web-dev |
-| Web + sGTM named publishes | This job |
 | Ads UI: uncheck Included in Conversions on UA leftovers | Human in Ads |
-| Meta 180d WCAs + EMQ after real order | This job / Events Manager |
+| Meta 180d WCAs (Advertiser role) + EMQ after real order | Human / Events Manager |
+| TikTok website audiences | Ads Manager |
 | Cookie Keeper REPLACE (second ticket) | After QA |
 
 <Check>
