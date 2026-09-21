@@ -1,0 +1,46 @@
+---
+title: "hellenicBI access"
+sidebarTitle: "Access"
+description: "Where the live product, git, Vercel, and warehouse live. Token names only. No secret values."
+icon: "key"
+---
+
+Parent: [Start here](/kb/hellenicai-bi/start-here).
+
+<Warning>
+  Never paste PATs, Cloudflare tokens, ClickHouse passwords, or a filled `.env` into this page, Git, or chat. If a secret was pasted in chat, rotate it.
+</Warning>
+
+## GitHub
+
+| Resource | Account / name |
+| --- | --- |
+| Live product | `patrickabedin/HellenicPerformance-Dashboards` (`main`) |
+| Shell template | `HellenicTechnologiesAI/hellenicai-bi-shell` (read-only unless asked to update the template) |
+
+Cursor Cloud Agent environment for Dashboards historically listed only `HellenicPerformance-Dashboards`. Adding the shell repo to that environment is required before agents can clone the template. Until then, re-vendor from a `git archive` of the SHA in `VENDORED.md`.
+
+A `digital-hellenic-technologies` GitHub token is **not** the same as access to `HellenicTechnologiesAI/hellenicai-bi-shell`. Collaborator invites do not grant the Cloud Agent GitHub App token.
+
+## Vercel
+
+| Resource | Value |
+| --- | --- |
+| Team | Patrick Abedin HT (`patrickabedin`) |
+| Project | `ht-reporting` (`prj_HQ3yutTE3r358ahIggdGpLk2kXNf`) |
+| Production branch | `main` |
+| Domain | `reports.hellenictechnologies.com` |
+
+Needed env (names only): `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, ClickHouse URL/user/password, AI Gateway key if the project has no AI Gateway integration.
+
+## Cloudflare
+
+Zone `hellenictechnologies.com`. `reports` is a CNAME to the ht-reporting `vercel-dns-016` target, **DNS only** (grey cloud). Do not orange-cloud this hostname.
+
+## Warehouse
+
+ClickHouse host used by the app: `ch.hellenictechnologies.com`, user `app`. Values live in Vercel project env, not in Git.
+
+## Login (staff testing)
+
+Customer usernames are provisioned in Supabase. Do not publish passwords in this KB. First live customer username is `gregio`.

@@ -1,0 +1,105 @@
+---
+title: "hellenicBI — start here (agent pickup)"
+sidebarTitle: "Start here"
+description: "Read this first. Live reporting product, GitHub repo, Vercel project, and the rules another agent needs."
+icon: "flag"
+---
+
+hellenicBI is the shared reporting product for every Hellenic customer. Live URL is [https://reports.hellenictechnologies.com](https://reports.hellenictechnologies.com). Product name in the UI is **hellenicBI** (lowercase hellenic).
+
+Gregio is the first live tenant, not the product. The old Gregio `/app` scorecard is gone. It must not read ClickHouse.
+
+<Warning>
+  Internal Hellenic Technologies only. Never write passwords, PATs, Cloudflare tokens, ClickHouse passwords, or a filled env file into this KB or Git. Land finished work on `main`. Do not open pull requests.
+</Warning>
+
+Staff URL: [https://intra.hellenictechnologies.com/kb/hellenicai-bi/start-here](https://intra.hellenictechnologies.com/kb/hellenicai-bi/start-here).
+
+Facts below were verified on 21 September 2026.
+
+## Live today
+
+| Thing | Value |
+| --- | --- |
+| Public URL | [https://reports.hellenictechnologies.com](https://reports.hellenictechnologies.com) |
+| Login | Username (example customer: `gregio`). Not `?client=` |
+| After login | Overview `/`. Admins go to `/admin`. |
+| Vercel project | [ht-reporting](https://vercel.com/patrickabedin/ht-reporting) on team **Patrick Abedin HT** |
+| Production git | GitHub **`patrickabedin`** / **`HellenicPerformance-Dashboards`** / branch **`main`** |
+| DNS | Cloudflare `reports` CNAME → `cfdbb6e3bf6c4bfb.vercel-dns-016.com`, DNS-only (not proxied) |
+
+Preview aliases: `https://ht-reporting-patrickabedin.vercel.app` and `https://ht-reporting-eight.vercel.app`. Same project.
+
+## Two repos — do not mix them
+
+| Repo | Role |
+| --- | --- |
+| [patrickabedin/HellenicPerformance-Dashboards](https://github.com/patrickabedin/HellenicPerformance-Dashboards) | **The live product.** Vercel deploys this `main` to reports.hellenictechnologies.com. |
+| [HellenicTechnologiesAI/hellenicai-bi-shell](https://github.com/HellenicTechnologiesAI/hellenicai-bi-shell) | Reusable v0 template for other projects. Preview: [hellenicai-bi-shell.vercel.app](https://hellenicai-bi-shell.vercel.app). Do not commit or push here unless a human asked to update the template. Re-vendor into Dashboards using the SHA in `VENDORED.md`. |
+
+Customer sites still use `ht-<slug>` for tracking/SST jobs. This product is **not** `ht-gregio`. See [Customer GitHub repo](/kb/customer-github-repo).
+
+## Hard rules
+
+1. Always land on **`main`**. Never open or leave a pull request.
+2. Production deploys from Dashboards `main` automatically (Vercel ht-reporting). Confirm the deploy is READY before telling a human it is live.
+3. Do not invent dashboard UI. Vendor the shell wholesale, then wire tenancy and ClickHouse.
+4. Do not restore `/app` or the old scorecard chrome. `/app` and `/app/*` redirect to `/` (`/app/web` → `/ga4`).
+5. Session allow-list is tenancy. Ignore browser `clientId` for who the tenant is. APIs 403 any client id not in the session list.
+6. Do not copy demo shell accounts (`aegean-retail`, `ionian-travel`, `attica-fashion`) into live tenancy.
+7. No new ingest unless asked. TikTok and DV360 stay on the empty panel until ingest exists.
+8. Do not restyle `/admin` as a one-off. Admin lives in the shell design system; re-vendor from the shell SHA.
+9. Do not commit secrets. Token names belong in [Access](/kb/hellenicai-bi/access). Values stay in Vercel / Cloud Agent secrets.
+
+## Product routes
+
+| Path | Who |
+| --- | --- |
+| `/login` | All. Split-screen **Sign in to hellenicBI**. |
+| `/` | Overview (paid + site). First screen after customer login. |
+| `/google-ads`, `/meta-ads` | Channel reports. Real campaign-daily KPIs when connected. |
+| `/tiktok-ads`, `/dv360` | Empty panel until ingest exists. |
+| `/ga4` | Site analytics from `analytics.web_performance_daily`. |
+| `/admin` | Staff only. Customers are bounced. |
+| `/agency` | Redirects to Overview. |
+| `GET /api/report`, `POST /api/chat` | Same-origin. Session allow-list. Unauthenticated → `/login`. |
+
+## Compare in the header
+
+Not previous calendar month.
+
+| Option | Meaning |
+| --- | --- |
+| vs previous N days (dates) | Equal-length window ending the day **before** the selected range starts. Last 30 days 22 Aug–20 Sept → **23 Jul–21 Aug**. |
+| vs same period last year | Same from/to, one year back. |
+| No comparison | Hide deltas. |
+
+Math is `compareRange()` in `lib/bi/dates.ts`. Do not change the meaning without updating this page and the dropdown copy.
+
+## First 10 minutes on a new agent
+
+<Steps>
+  <Step title="Clone the live product, not the template">
+    `patrickabedin/HellenicPerformance-Dashboards` on `main`. Confirm `VENDORED.md` for the shell SHA.
+  </Step>
+  <Step title="Do not treat /app as the product">
+    If you still see Scorecard / Consent / Web analytics, you are on a stale deploy. Check Vercel ht-reporting production SHA vs `origin/main`.
+  </Step>
+  <Step title="Land on main, then wait for ht-reporting">
+    Push to `main`. No PR. Confirm [ht-reporting](https://vercel.com/patrickabedin/ht-reporting) READY, then check [reports.hellenictechnologies.com/login](https://reports.hellenictechnologies.com/login).
+  </Step>
+</Steps>
+
+## Child pages
+
+| Page | Use when |
+| --- | --- |
+| [Current architecture](/kb/hellenicai-bi/current-architecture) | What is live: app, warehouse, tenancy |
+| [Access](/kb/hellenicai-bi/access) | Token names, where values live. No secret values. |
+
+## If you only remember four facts
+
+1. Live = `reports.hellenictechnologies.com` → Vercel **ht-reporting** → GitHub **`patrickabedin/HellenicPerformance-Dashboards` `main`**.
+2. The shell repo is a template. Do not push product fixes only there.
+3. Gregio is the first customer. The product is hellenicBI.
+4. No PRs. Deploy `main`.

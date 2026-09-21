@@ -47,6 +47,15 @@
             ]
           },
           {
+            "group": "hellenicBI",
+            "icon": "chart-simple",
+            "pages": [
+              "kb/hellenicai-bi/start-here",
+              "kb/hellenicai-bi/current-architecture",
+              "kb/hellenicai-bi/access"
+            ]
+          },
+          {
             "group": "Web Analytics",
             "icon": "chart-line",
             "pages": [
