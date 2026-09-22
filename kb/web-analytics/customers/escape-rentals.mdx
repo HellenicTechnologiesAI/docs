@@ -6,7 +6,7 @@ icon: "car"
 ---
 
 <Warning>
-  Multi-tenant domain. Do **not** create a new Stape or sGTM container. Do **not** publish sGTM Default Workspace. Fork **live v231+**. Cloudflare zone **is** available — same-origin `/metrics` Worker `er-sgtm-metrics` is the plan. Do **not** orange-cloud `sgtm.escaperentals.gr`. Cookie Keeper stays **off** while same-origin is on. Do not copy HT / Golden Gastro / GrecoStrom IDs.
+  Multi-tenant domain. Do **not** create a new Stape or sGTM container. Do **not** publish sGTM Default Workspace. Fork **live v231+**. Cloudflare zone **is** available — same-origin `/metrics` Workers `er-sgtm-metrics` + `er-html-gtm-loader` are **live**. Do **not** orange-cloud `sgtm.escaperentals.gr`. Cookie Keeper stays **off** while same-origin is on. Do not copy HT / Golden Gastro / GrecoStrom IDs.
 </Warning>
 
 Scenario A record for [escaperentals.gr](https://escaperentals.gr/) (22 Sep 2026). Playbooks: [Server Side Tracking](/kb/web-analytics/server-side-tracking), [Cursor: existing Stape](/kb/web-analytics/cursor-prompt-existing-stape), [Customer GitHub repo](/kb/customer-github-repo).
@@ -19,14 +19,14 @@ Customer handbook repo: private `ht-escaperentals`. Never commit CAPI, Stape API
 | --- | --- |
 | Site | WooCommerce + GTM4WP (dataLayer on, container injection **off**). PixelYourSite present but **no pixel configured**. |
 | Loader | **Live.** Worker **`er-html-gtm-loader`** on `escaperentals.gr/*` serves Stape Generate (Cookie Keeper **off**, `/metrics`). Header `x-er-gtm-loader: stape-custom`. Noscript → `https://sgtm.escaperentals.gr/ns.html?id=GTM-WT6G58S`. |
-| Web `GTM-WT6G58S` | Account `6053012429`, container `90928158`, live **v61** `ER SST /metrics + ht_consent_ready Meta off All Pages + pause web Ads`. |
-| sGTM | Shared Multi-tenant, live **v231**. Escape LT rows present. Shared `FB - *` already Event Enhancement + `adStorageConsent`. |
+| Web `GTM-WT6G58S` | Account `6053012429`, container `90928158`, live **v61**. |
+| sGTM | Shared Multi-tenant, live **v231**. Escape LT rows present. Shared `FB - *` Event Enhancement + `adStorageConsent`. |
 | Same-origin | Worker **`er-sgtm-metrics`**. Routes `escaperentals.gr/metrics*` + `www`. `X-From-Cdn: cf-stape`. |
 | Proof | [escaperentals.gr/metrics/healthy](https://escaperentals.gr/metrics/healthy) → `ok`. |
 | GA4 | Property `326143052`, stream `G-X9VY4F4WX3`. Key events: `purchase`, `begin_checkout`. |
 | Google Ads | CID `608-154-5152`, `AW-699965654`. Web awct Purchase **paused**. |
-| Meta | Pixel **`672086917699411`**. New ER WCAs created. |
-| TikTok | No hostname LT row / web pixel yet (pixel-specific token pending). |
+| Meta | Pixel **`672086917699411`**. ER WCAs created. |
+| TikTok | **Deferred** — not running TikTok ads. |
 | CMP | iubenda in web GTM + `ht_consent_ready`. |
 | Stape scan | 2026-09-17 score **84/100** (pre-fix). Re-scan after this loader. |
 | Cloudflare zone | `escaperentals.gr` `25fe7d4b5e1d41c9f38f576bd7a3859d`. |
@@ -36,7 +36,7 @@ Customer handbook repo: private `ht-escaperentals`. Never commit CAPI, Stape API
 - Do **not** create a new Stape or sGTM container.
 - sGTM: fork **live v231+**, never Default.
 - Web: keep `GTM-WT6G58S` only.
-- `sgtm.` stays grey-cloud. Same-origin path `/metrics` via Worker `er-sgtm-metrics`.
+- `sgtm.` stays grey-cloud. Same-origin path `/metrics`.
 - Cookie Keeper **off** while same-origin is on.
 - One Ads e-shop primary: **Purchase (2)** `AW-699965654/lmAQCKny2Z8aENbB4s0C` via **sGTM only**.
 - Do not reuse HT TikTok Events API token on this hostname.
@@ -46,9 +46,10 @@ Customer handbook repo: private `ht-escaperentals`. Never commit CAPI, Stape API
 
 | System | Value |
 | --- | --- |
-| Web GTM | `GTM-WT6G58S` (live **v60**) |
+| Web GTM | `GTM-WT6G58S` (live **v61**) |
 | sGTM | Shared Multi-tenant (live **v231**) |
 | sGTM host | `https://sgtm.escaperentals.gr` |
+| Same-origin | `https://escaperentals.gr/metrics` |
 | GA4 | `G-X9VY4F4WX3`, property `326143052` |
 | Google Ads | CID `608-154-5152`, `AW-699965654` |
 | Ads Purchase | `lmAQCKny2Z8aENbB4s0C` |
@@ -58,35 +59,45 @@ Customer handbook repo: private `ht-escaperentals`. Never commit CAPI, Stape API
 
 ## Keep / need / drop
 
-**Keep:** ecommerce funnel events; Ads Purchase (2) sGTM-only; Meta hybrid pixel `672086917699411`; GA4 `G-X9VY4F4WX3`; iubenda in GTM; GTM4WP dataLayer; existing Escape LT rows; `sgtm.` DNS-only.
+**Keep:** ecommerce funnel; Ads Purchase (2) sGTM-only; Meta hybrid `672086917699411`; GA4 `G-X9VY4F4WX3`; iubenda in GTM; GTM4WP dataLayer; Escape LT rows; `sgtm.` DNS-only.
 
-**Need:** `/metrics` Worker + Custom Loader regenerate; `ht_consent_ready`; Meta/TikTok off All Pages; pause web awct Purchase; Meta EMQ keys; TikTok hybrid when token exists; GA4/Ads/Meta audiences; fresh Stape scan.
+**Need (still open):** Ads Diagnostics clear on Purchase (2) after AW tag traffic; fresh Stape scan; Meta EMQ Excellent confirmation after a real booking with email/phone.
 
-**Drop:** web awct Purchase parallel to sGTM; GA4 junk key events (`ads_conversion_Contact_Us_1`, `conversion_event_purchase*`); Ads Android/local actions as e-shop primary; PixelYourSite pixels; second containers; Cookie Keeper on with same-origin; orange-cloud `sgtm.`.
+**Deferred:** TikTok hybrid — not running TikTok ads.
 
-## Stape checker (17 Sep 2026)
+**Drop / done:** web awct Purchase parallel to sGTM (**paused**); GA4 junk key events (**deleted**); Cookie Keeper on with same-origin (**off**); All Pages Meta PageView (**moved** to `ht_consent_ready`).
 
-Score **84/100**. Actions: fix consent, page speed via same-origin loader, update Custom Loader, add TikTok web pixel for hybrid.
+## Stape checker (17 Sep 2026 → now)
+
+Pre-fix score **84/100**. PDF actions mapped: consent → `ht_consent_ready`; outdated loader → Generate `/metrics` + edge rewrite; page speed → Ads Google Tag paused + first-party collect; TikTok hybrid → still pending token.
+
+## Audiences (22 Sep 2026)
+
+**GA4:** `ER | Purchasers 7D/180D`, `ER | ATC no purchase 7D/30D`, `ER | Checkout no purchase 7D/30D`, `ER | View item no purchase 30D`, `ER | Leads 90D`.
+
+**Meta WCAs:** All visitors 180d, ViewContent 30d, AddToCart 30d, InitiateCheckout 14d, Purchasers 180d, Leads 90d. Do not attach to live spend until membership is real.
+
+**TikTok:** none (token missing).
 
 ## Work log
 
 | Date | Phase | What |
 | --- | --- | --- |
 | 22 Sep 2026 | Page created | Under Web Analytics → Customers. |
-| 22 Sep 2026 | Inventory | Live HTML + web v60 + sGTM v231 + GA4 + Ads + Meta + Stape PDF 84. Keep/need/drop filled. |
+| 22 Sep 2026 | Inventory | Live HTML + web v60 + sGTM v231 + GA4 + Ads + Meta + Stape PDF 84. |
+| 22 Sep 2026 | Housekeeping | GA4 key events; Ads demote where writable; Meta + GA4 audiences. |
+| 22 Sep 2026 | SST | `/metrics` Workers + edge loader; web **v61** published. |
 
 ## Still open
 
 | Item | Owner |
 | --- | --- |
-| Deploy `/metrics` + new Custom Loader | Agent |
-| Web awct pause + `ht_consent_ready` | Agent |
-| Ads UI leftover includes | Human |
-| `LT - Tiktok *` (pixel-specific token) | Human |
-| Meta EMQ Excellent after real booking | After SST |
-| New Stape scan | After loader + consent |
-| Rotate CAPI if exposed | Human |
+| Ads UI: Included in Conversions on GA4 purchase import + Smart leftovers | Human |
+| `LT - Tiktok *` + web TikTok pixel (pixel-specific token) | Human |
+| Meta EMQ Excellent after real booking with email/phone | After live order |
+| New Stape scan | After traffic |
+| Rotate CAPI if tooling exposed `LT - fb api token` | Human |
 
 <Check>
-  Phase 0 audit is complete. Same-origin is **not** live yet. Do not rebuild containers. Do not publish sGTM Default. Do not enable Cookie Keeper on the same-origin snippet.
+  Housekeeping and SST are live (web **v61** / sGTM **v231** / `er-sgtm-metrics` + `er-html-gtm-loader`). TikTok hybrid still blocked on a pixel-specific token. Do not rebuild containers. Do not publish sGTM Default. Do not enable Cookie Keeper on this same-origin snippet.
 </Check>
