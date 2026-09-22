@@ -1,7 +1,7 @@
 ---
 title: "Escape Rentals"
 sidebarTitle: "Escape Rentals"
-description: "Scenario A SST for escaperentals.gr: audit score 84, Cloudflare yes, web GTM-WT6G58S v60, shared sGTM v231."
+description: "Scenario A SST for escaperentals.gr: web v61, /metrics Workers live, GA4/Meta audiences created. TikTok hybrid pending pixel token."
 icon: "car"
 ---
 
@@ -13,21 +13,22 @@ Scenario A record for [escaperentals.gr](https://escaperentals.gr/) (22 Sep 2026
 
 Customer handbook repo: private `ht-escaperentals`. Never commit CAPI, Stape API keys, Cloudflare tokens, or Measurement Protocol secrets.
 
-## Current state (22 Sep 2026 — Phase 0 audit done)
+## Current state (22 Sep 2026 — after housekeeping + SST)
 
 | Piece | Live |
 | --- | --- |
-| Site | WooCommerce + GTM4WP (dataLayer on, container injection **off**) + Stape Custom Loader. PixelYourSite present but **no pixel configured**. |
-| Loader | `sgtm.escaperentals.gr` Custom Loader — Cookie Keeper **on** (`stapeUserId`), Same Origin Path **empty**. Stape flags **outdated** loader. |
-| Web `GTM-WT6G58S` | Account `6053012429`, container `90928158`, live **v60**. |
-| sGTM | Shared Multi-tenant, live **v231**. Escape rows on GA4 / Ads / FB pixel / FB token LTs. |
-| Same-origin | **Not live** (`/metrics` 404). Zone access **yes**. |
-| GA4 | Property `326143052`, stream `G-X9VY4F4WX3`. |
-| Google Ads | CID `608-154-5152`, `AW-699965654`. |
-| Meta | Ad account `802024411303352`. Pixel **`672086917699411`**. |
-| TikTok | Server-side seen by Stape. **No** web pixel in GTM. **No** `LT - Tiktok *` row. |
-| CMP | iubenda in web GTM (`_iub_cs-83816287`). Stape: consent **misconfigured**. |
-| Stape scan | 2026-09-17 score **84/100**. |
+| Site | WooCommerce + GTM4WP (dataLayer on, container injection **off**). PixelYourSite present but **no pixel configured**. |
+| Loader | **Live.** Worker **`er-html-gtm-loader`** on `escaperentals.gr/*` serves Stape Generate (Cookie Keeper **off**, `/metrics`). Header `x-er-gtm-loader: stape-custom`. Noscript → `https://sgtm.escaperentals.gr/ns.html?id=GTM-WT6G58S`. |
+| Web `GTM-WT6G58S` | Account `6053012429`, container `90928158`, live **v61** `ER SST /metrics + ht_consent_ready Meta off All Pages + pause web Ads`. |
+| sGTM | Shared Multi-tenant, live **v231**. Escape LT rows present. Shared `FB - *` already Event Enhancement + `adStorageConsent`. |
+| Same-origin | Worker **`er-sgtm-metrics`**. Routes `escaperentals.gr/metrics*` + `www`. `X-From-Cdn: cf-stape`. |
+| Proof | [escaperentals.gr/metrics/healthy](https://escaperentals.gr/metrics/healthy) → `ok`. |
+| GA4 | Property `326143052`, stream `G-X9VY4F4WX3`. Key events: `purchase`, `begin_checkout`. |
+| Google Ads | CID `608-154-5152`, `AW-699965654`. Web awct Purchase **paused**. |
+| Meta | Pixel **`672086917699411`**. New ER WCAs created. |
+| TikTok | No hostname LT row / web pixel yet (pixel-specific token pending). |
+| CMP | iubenda in web GTM + `ht_consent_ready`. |
+| Stape scan | 2026-09-17 score **84/100** (pre-fix). Re-scan after this loader. |
 | Cloudflare zone | `escaperentals.gr` `25fe7d4b5e1d41c9f38f576bd7a3859d`. |
 
 ## Hard locks
