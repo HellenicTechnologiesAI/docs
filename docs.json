@@ -69,6 +69,7 @@
                 "group": "Customers",
                 "icon": "users",
                 "pages": [
+                  "kb/web-analytics/customers/avance",
                   "kb/web-analytics/customers/golden-gastro",
                   "kb/web-analytics/customers/grecostrom"
                 ]

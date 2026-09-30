@@ -1,0 +1,151 @@
+---
+title: "Avance"
+sidebarTitle: "Avance"
+description: "Scenario A SST for avance.gr: web GTM-KXCDNCQ, Multi-tenant sGTM GTM-WKJ6FDLB / sespmfwe, Cloudflare same-origin /metrics. GTM4WP 2.0.3 booking cliff fix — no rollback."
+icon: "car"
+---
+
+<Warning>
+  Multi-tenant domain. Do **not** create a new Stape or sGTM container. Server is shared **`GTM-WKJ6FDLB`** (Stape Multi-tenant / `sespmfwe`, account `6202173174`, container `169217628`). Hostname-scope every sGTM change. Cloudflare zone **is** available — same-origin `/metrics`. Do **not** orange-cloud `sgtm.avance.gr`. Cookie Keeper stays **off** while same-origin is on. Do **not** roll GTM4WP back from 2.0.3 — fix forward.
+</Warning>
+
+Scenario A record for [avance.gr](https://avance.gr/) (started 30 Sep 2026). Playbooks: [Server Side Tracking](/kb/web-analytics/server-side-tracking), [Cursor: existing Stape](/kb/web-analytics/cursor-prompt-existing-stape), [Customer GitHub repo](/kb/customer-github-repo).
+
+Customer handbook repo: private `ht-avance`. Never commit CAPI, Stape API keys, Cloudflare tokens, or Measurement Protocol secrets.
+
+<Note>
+  Live page: [ht-intra.mintlify.site/kb/web-analytics/customers/avance](https://ht-intra.mintlify.site/kb/web-analytics/customers/avance). Stape before PDF scan **2026-09-18** score **54/100** — re-run a **new** crawl after SST; do not re-export that URL.
+</Note>
+
+## Current state (30 Sep 2026 — job start)
+
+| Piece | Live |
+| --- | --- |
+| Site | WooCommerce + GTM4WP **2.0.3** + custom sGTM loader + iubenda (GTM). Booking engine car rental. |
+| Loader | `https://sgtm.avance.gr/…` Custom Loader (pre same-origin). Same-origin `/metrics` **not yet** live. |
+| Web `GTM-KXCDNCQ` | Customer-dedicated. Patch in place; named publish only. |
+| sGTM | Shared Multi-tenant **`GTM-WKJ6FDLB`** / `sespmfwe`. Fork **live** only; never publish stale Default. |
+| Same-origin | Planned Worker `av-sgtm-metrics` → `sgtm.avance.gr` with `X-From-Cdn: cf-stape`. |
+| Tagging URL | [sgtm.avance.gr/healthy](https://sgtm.avance.gr/healthy) → ok (pre-job). |
+| GA4 | Property `274979111`, stream `G-PLZZBD95NB` (+ legacy `G-77Z68G6GWH` — do not use for decisions). |
+| Google Ads | CID `836-488-0676`. `AW-993944351`. Primary **Booking \| HT** `qWF-CM74i74CEJ_G-dkD`. Checkout \| HT secondary. |
+| Meta | Ad account `256946166073022`. Pixel **`553420986746842`**. Hybrid GTM + sGTM CAPI target (PYS Meta off). |
+| TikTok | `D610EIJC77U3UMFCT2MG`. |
+| Floodlight | `DC-17270846` · counter `avanc0` · sales `purch0` (client double page-view to remove). |
+| Outbrain / Adform | Detected on Stape scan — move to S2S in Multi-tenant. |
+| CMP | Iubenda in web GTM. Consent Mode Advanced v2. |
+| Cloudflare zone | `avance.gr` accessible (HT Support account). |
+
+## Hard locks
+
+- Do **not** create a new Stape or sGTM container — stay on **`GTM-WKJ6FDLB` / `sespmfwe`**.
+- sGTM: fork **live**, never stale Default Workspace.
+- Web: keep `GTM-KXCDNCQ` only.
+- `sgtm.` stays grey-cloud. Same-origin path `/metrics` via Worker. Cookie Keeper **off**.
+- One Ads primary: **Booking \| HT**. Checkout observe only. Ads has no dedupe — web awct paused when sGTM sends.
+- Meta hybrid: web pixel + CAPI, same `event_id`. Do not pause web pixel for server-only.
+- GTM4WP: dataLayer **on**, container inject **off**. Fix 2.0.3 — **no rollback** to 1.22.x.
+- Do not copy HT / Golden Gastro / GrecoStrom IDs or tokens onto Avance LT rows.
+- CAPI / Events API tokens only in sGTM LT. Never git / this KB / chat.
+
+## Public IDs
+
+| System | Value |
+| --- | --- |
+| Site | [https://avance.gr/](https://avance.gr/) |
+| Web GTM | `GTM-KXCDNCQ` |
+| sGTM | **`GTM-WKJ6FDLB`** Multi-tenant · account `6202173174` · container `169217628` · Stape `sespmfwe` |
+| sGTM host | `https://sgtm.avance.gr` |
+| Same-origin | `https://avance.gr/metrics` (Worker planned) |
+| GA4 | `G-PLZZBD95NB` · property `274979111` |
+| Google Ads | CID `836-488-0676` · `AW-993944351` |
+| Ads Booking \| HT | `qWF-CM74i74CEJ_G-dkD` (**primary**) |
+| Ads Checkout \| HT | `CAH7CJf5s74CEJ_G-dkD` (secondary / observe) |
+| Meta ad account | `256946166073022` |
+| Meta Pixel | `553420986746842` |
+| TikTok | `D610EIJC77U3UMFCT2MG` |
+| Floodlight | Advertiser `17270846`, counter `avanc0`, sales `purch0` |
+
+## Keep / need / drop
+
+**Keep** (inventory refining — Phase 1)
+
+- Primary KPI: booking / `purchase` → GA4 + Ads Booking \| HT + Meta Purchase.
+- Funnel: `view_item`, `add_to_cart`, `begin_checkout`, `purchase` (repair via GTM4WP 2.0.3).
+- Hybrid Meta pixel `553420986746842`.
+- TikTok pixel `D610EIJC77U3UMFCT2MG`.
+- Floodlight sales `purch0` server-side.
+- iubenda in web GTM. GTM4WP dataLayer (inject off).
+- Multi-tenant LT rows for `avance.gr` once verified.
+
+**Need**
+
+- Same-origin `/metrics` + Custom Loader Generate (Cookie Keeper off).
+- `ht_consent_ready`; base Meta/TikTok off All Pages.
+- Ads Booking + Checkout in **`GTM-WKJ6FDLB`**; pause web awct.
+- Meta CAPI EMQ keys + hostname-scoped `AV \| SST Meta *` (or existing FB LT).
+- TikTok Events API LT row (pixel-specific token).
+- Outbrain + Adform S2S hostname-scoped.
+- Floodlight client double removed.
+- GTM4WP 2.0.3 ecommerce events verified on thank-you.
+- GA4 / Ads / Meta / TikTok audiences.
+- New Stape scan after ship.
+
+**Drop**
+
+- PixelYourSite Meta (if still present) — GTM+sGTM owns Meta.
+- Client Floodlight page-view double.
+- Web Ads conversion tags once sGTM owns them.
+- Legacy GA4 stream `G-77Z68G6GWH` for decisions.
+- Do **not** delete other-tenant sGTM tags/folders.
+
+## Timeline
+
+<Steps>
+  <Step title="Phase 0 — Mintlify + STATUS (30 Sep 2026)">
+    Customer page created. Repo `STATUS.md` started on branch `cursor/avance-sst-cleanup-786f`.
+  </Step>
+  <Step title="Phase 1 — Inventory">
+    In progress: live HTML, web GTM, Multi-tenant sGTM, GA4, Ads, Meta, DV360, TikTok, Outbrain, Adform.
+  </Step>
+  <Step title="Phase 2 — Housekeeping">
+    Pending.
+  </Step>
+  <Step title="Phase 3 — GTM4WP 2.0.3">
+    Pending — fix forward, no rollback.
+  </Step>
+  <Step title="Phase 4 — SST patch">
+    Pending — `/metrics`, consent, Ads/Meta/TikTok/Outbrain/Adform in `GTM-WKJ6FDLB`.
+  </Step>
+  <Step title="Phase 5 — Audiences">
+    Pending.
+  </Step>
+  <Step title="Phase 6 — QA + Stape re-scan">
+    Pending.
+  </Step>
+</Steps>
+
+## Stape checker (before)
+
+Source: Stape Website Tracking Checker scan **2026-09-18 20:43 UTC**, score **54/100** (Ads 35, Cookie lifetime 27, Analytics 76, Page speed 81). Recommendations: bypass ITP (+19), Ads server-side (+7), consent (+7), Outbrain S2S (+5), Adform S2S (+4), Custom Loader (+4). With Cloudflare same-origin, Cookie Keeper stays **off** in the snippet — ITP via first-party `/metrics` + HttpOnly cookies.
+
+## Work log
+
+| Date | Phase | What |
+| --- | --- | --- |
+| 30 Sep 2026 | Page created | Stub under Web Analytics → Customers. Hard locks + IDs. |
+| 30 Sep 2026 | STATUS | `ht-avance` `STATUS.md` on `cursor/avance-sst-cleanup-786f`. |
+
+## Still open
+
+| Item | Owner |
+| --- | --- |
+| Full inventory keep/need/drop | Agent |
+| Housekeeping + SST + audiences + QA | Agent |
+| GTM4WP 2.0.3 settings / thank-you dataLayer | Web-dev + Agent verify |
+| Ads UI Included in Conversions leftovers | Human in Ads |
+| New Stape scan after ship | After Phase 4 |
+
+<Check>
+  Job started. Multi-tenant is **`GTM-WKJ6FDLB`**. Do not rebuild containers. Do not enable Cookie Keeper on same-origin. Do not roll back GTM4WP.
+</Check>
