@@ -1,0 +1,134 @@
+---
+title: "Tigerpack"
+sidebarTitle: "Tigerpack"
+description: "Scenario A SST for tigerpack.gr: web v22 consent + ht_consent_ready, sGTM v235 TP Meta CAPI, Worker /metrics live; Custom Loader pending Stape EU SSL recovery."
+icon: "box"
+---
+
+<Warning>
+  Multi-tenant domain. Do **not** create a new Stape or sGTM container. Do **not** orange-cloud `sgtm.tigerpack.gr`. Cookie Keeper stays **off** on the first Custom Loader paste. Stape EU had a Traefik-default-cert outage on 1 Oct 2026 — Generate/paste only after `/healthy` returns `ok` with a real cert.
+</Warning>
+
+Scenario A record for [tigerpack.gr](https://tigerpack.gr/) (1 Oct 2026). Playbooks: [Server Side Tracking](/kb/web-analytics/server-side-tracking), [Cursor: existing Stape](/kb/web-analytics/cursor-prompt-existing-stape), [Customer GitHub repo](/kb/customer-github-repo).
+
+Customer handbook repo: private `ht-tigerpack`. Never commit CAPI, Stape API keys, Cloudflare tokens, or Measurement Protocol secrets.
+
+## Current state (1 Oct 2026)
+
+| Piece | Live |
+| --- | --- |
+| Site | WooCommerce + Woodmart + GTM4WP + Flying Press + Cloudflare |
+| Loader | Still official `googletagmanager.com/gtm.js` via GTM4WP — **Custom Loader paste pending** (Stape EU SSL outage blocked Generate) |
+| Web `GTM-WCL473M` | Live **v22** `TP Consent Mode + ht_consent_ready + Meta PV` |
+| sGTM | Shared Multi-tenant **v235** `TP SST Meta adStorageConsent required + block leftovers` |
+| Same-origin Worker | **`tp-sgtm-metrics`** live + routes `/metrics*` + cache bypass. Proof blocked while Stape `/healthy` is 404 |
+| Tagging URL | `sgtm.tigerpack.gr` CNAME `eug.stape.io` DNS-only. Re-check SSL after Stape recovers |
+| GA4 | Property `394332995`, stream `G-FGTQ9SX0FT` → transport `https://tigerpack.gr/metrics` |
+| Google Ads | CID `991-255-7849`. Purchase `eltzCMesuNUbEK6UxuUo` primary. Web awct **paused** |
+| Meta | Pixel `807004759055226`. Hybrid web + CAPI (`TP \| SST Meta *`) |
+| TikTok | Not wired — skip |
+| CMP | iubenda cHTML in GTM site `4245155` + Consent Mode defaults + `ht_consent_ready` |
+| Stape checker (before) | **57/100** (2026-09-06): ITP +19, Custom Loader +12, Ads SS +6 |
+
+## Hard locks
+
+- Do **not** create a new Stape or sGTM container.
+- sGTM: fork **live**, never a stale Default without sync.
+- Web: keep `GTM-WCL473M` only.
+- `sgtm.` stays grey-cloud. Same-origin path `/metrics` via Worker `tp-sgtm-metrics`.
+- Cookie Keeper **off** on first Generate. Second REPLACE after tags QA.
+- One Ads e-shop primary: **Purchase** `AW-10950380078/eltzCMesuNUbEK6UxuUo`.
+- Web Ads conversion tags must not fire in parallel with sGTM Ads.
+- Do not copy HT / Golden Gastro / GrecoStrom IDs.
+- CAPI token stays in sGTM `LT - fb api token` only.
+
+## Public IDs
+
+| System | Value |
+| --- | --- |
+| Site | [https://tigerpack.gr/](https://tigerpack.gr/) |
+| Web GTM | `GTM-WCL473M` (live **v22**) |
+| sGTM host | `https://sgtm.tigerpack.gr` |
+| GA4 | `G-FGTQ9SX0FT` / property `394332995` |
+| Google Ads | CID `991-255-7849`, `AW-10950380078` |
+| Ads Purchase | `eltzCMesuNUbEK6UxuUo` (primary) |
+| Ads Begin checkout | `fvX2CPjsxtUbEK6UxuUo` (observe) |
+| Ads Add to cart | `WytzCPvsxtUbEK6UxuUo` (observe) |
+| Ads View item | `XJcmCP7sxtUbEK6UxuUo` (observe) |
+| Meta ad account | `1367600570814886` |
+| Meta Pixel | `807004759055226` |
+| iubenda | Privacy `58992159`, CS site `4245155` |
+| Cloudflare Worker | `tp-sgtm-metrics` |
+
+## Timeline
+
+<Steps>
+  <Step title="Phase 0 — Audit (1 Oct 2026)">
+    Live HTML, Stape PDF 57/100, web v18, sGTM v234, GA4, Ads, Meta inventoried. Keep/need/drop written in `ht-tigerpack`.
+  </Step>
+  <Step title="Phase 1 — Housekeeping">
+    Web v19–v21: dual Ads paused, Measurement ID ZWSP fixed, GA4 transport → `/metrics`. GA4 key events cleaned. Ads demotions where API allows. `TP \| *` GA4 + Ads audiences present.
+  </Step>
+  <Step title="Phase 2 — Consent + Meta SST">
+    Web **v22**: Consent Mode defaults (ads+analytics denied), iubenda `googleConsentMode` + `emitGtmEvents` + no continued-browsing grant, `ht_consent_ready` CE, Meta PageView on `ht_consent_ready`, Data Tags → CON `/metrics`.
+
+    sGTM **v235**: `TP \| SST Meta PageView/ViewContent/AddToCart/InitiateCheckout/Purchase` with `adStorageConsent=required`, EMQ userData + event enhancement. Shared optional FB tags blocked on `tigerpack.gr`.
+  </Step>
+  <Step title="Phase 3 — Custom Loader (blocked on Stape outage)">
+    Cloudflare Worker + routes + cache bypass are live. Stape EU returned Traefik default cert / `/healthy` 404 from ~11:20 UTC 1 Oct across Multi-tenant domains — Generate deferred. Ticket: repo `docs/04-webdev-loader.md`.
+  </Step>
+  <Step title="Phase 4 — Cookie Keeper REPLACE">
+    After named publish + QA of loader only.
+  </Step>
+</Steps>
+
+## Stape Generate (when healthy)
+
+Domain `sgtm.tigerpack.gr`, Web GTM `GTM-WCL473M`, Enhanced adblock **ON**, Same Origin Path **`/metrics`**, Platform **Other**, Cookie Keeper **OFF**. Web-dev: GTM4WP container injection off; paste IIFE + noscript; purge Flying Press + CF.
+
+## Keep / need / drop
+
+**Keep** — Funnel dataLayer + Data Tags with `event_id`; Ads Purchase primary via sGTM; Meta hybrid; GTM4WP dataLayer; iubenda; CF Worker.
+
+**Need** — Custom Loader paste after Stape recovery; Meta longer WCAs (human Advertiser); EMQ Excellent after consented purchase with PII; new Stape scan; optional iubenda Gallery swap.
+
+**Drop** — Dual client+server Ads; junk GA4 key events; TikTok; Cookie Keeper on first paste.
+
+## Audiences
+
+| Platform | Status |
+| --- | --- |
+| GA4 | `TP \| Purchasers 7D/180D`, ATC/Checkout abandon, View item no purchase — live |
+| Google Ads | Matching `TP \| *` remarketing lists + retail/GA4 lists — live |
+| Meta | Visitors 30/60/90d, ATC 7d, Purchase 7/14d — live. Extra `TP \| *` WCAs need Ads Manager (API: no write) |
+| TikTok | N/A |
+
+## iubenda / GDPR
+
+- Policy `58992159` on site. CS `4245155` from GTM.
+- Consent Mode Advanced defaults denied; marketing after purpose 5 / `ht_consent_ready`.
+- Page-reload consent update tag remains **paused**.
+- cHTML pattern matches Golden Gastro (Gallery optional later).
+
+## Auth notes
+
+- GA4/GTM: OAuth `digital@hellenictechnologies.com`.
+- Ads: `google-ads` gRPC v23+, MCC login customer.
+- Meta: `META_ACCESS_TOKEN` as HT-SysAdmin — read OK; custom audience create needs Advertiser write.
+- Cloudflare: zone-capable token for `tigerpack.gr`.
+- Stape Account API works with browser User-Agent; Generate still needs healthy domain SSL.
+
+## Still open
+
+| Item | Owner |
+| --- | --- |
+| Stape EU SSL recovery → Generate + web-dev paste | Agent / web-dev |
+| GTM4WP container injection off after paste | Web-dev |
+| Meta extra WCAs + EMQ Excellent after real consented purchase | Human + traffic |
+| Ads UI leftover Includes | Human |
+| New Stape scan (not the old PDF) | After loader |
+| Cookie Keeper REPLACE | After QA |
+
+<Check>
+  Consent + Meta SST + Worker are in place. Do not rebuild containers. Paste Custom Loader only after Stape `/healthy` is `ok` again.
+</Check>
