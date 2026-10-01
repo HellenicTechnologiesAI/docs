@@ -1,0 +1,228 @@
+---
+title: "Camelot GR"
+sidebarTitle: "Camelot GR"
+description: "Scenario A SST for gr.camelotwater.com: web v57 GCM + purpose-5 ht_consent_ready, sGTM v228, same-origin /metrics. Cookie Keeper off. Stape GR scan 45/100 on 17 Sep."
+icon: "droplet"
+keywords:
+  - "camelot"
+  - "camelotwater"
+  - "GA4"
+  - "GTM"
+  - "Google Ads"
+  - "Meta"
+  - "DV360"
+---
+
+<Warning>
+  Multi-tenant domain. Do **not** create a new Stape or sGTM container. Do **not** publish sGTM Default Workspace (live is **v228**). Do **not** publish web **Default Workspace** (workspace id 57 is not the live named version). Live web is **v57** `CW Stape 45 GCM + purpose5 ht_consent_ready + Meta/TikTok hold`. Hostname-scope every sGTM change. Cloudflare zone **is** available — same-origin `/metrics` Worker `cw-sgtm-metrics` is live. Do **not** orange-cloud `sgtm.camelotwater.com`. Do **not** touch `gs-sgtm-metrics` or `gg-sgtm-metrics`. Cookie Keeper stays **off** while same-origin is on.
+</Warning>
+
+Work record for [gr.camelotwater.com](https://gr.camelotwater.com/) (17 Sep 2026). Playbooks: [Server Side Tracking](/kb/web-analytics/server-side-tracking), [Cursor: existing Stape](/kb/web-analytics/cursor-prompt-existing-stape), [Customer GitHub repo](/kb/customer-github-repo).
+
+Customer handbook repo: private `ht-camelot-gr`. Never commit CAPI, Stape API keys, Cloudflare tokens, or Measurement Protocol secrets.
+
+<Note>
+  Live page (Mintlify sign-in): [ht-intra.mintlify.site/kb/web-analytics/customers/camelot](https://ht-intra.mintlify.site/kb/web-analytics/customers/camelot). Scan hostnames separately. Apex `camelotwater.com` (Cookiebot / `GTM-NKS5D8KN`) is not GR. `sgtm.camelotwater.com` is the tagging host, not the shop. **GR Stape scan** 17 Sep 2026 13:13 UTC `gr.camelotwater.com` score **45/100** (checker `01a0af7e-b4bd-71bc-9e86-e132460f2641`). Aug 7 Drive PDF is the **apex** scan (score 20).
+</Note>
+
+## Current state (17 Sep 2026 — Stape 45 GCM patch)
+
+| Piece | Live |
+| --- | --- |
+| Site | WooCommerce + theme `camelotwater` + TranslatePress + GTM4WP 1.22.5 + Flying Press + **Cloudflare** (`gr.` proxied). |
+| Loader | **Live.** Worker **`cw-html-gtm-loader`** on `gr.camelotwater.com/*` serves same-origin Custom Loader (Cookie Keeper **off**, `/metrics`) plus `gtag('consent','default',…)` in `<head>`. Header `x-cw-gtm-loader: stape-custom`. Noscript → `https://sgtm.camelotwater.com/ns.html?id=GTM-TXJ8WFV`. Official `gtm.js` / `gtag.js` gone. MonsterInsights leftover JS stripped at the edge. |
+| Web `GTM-TXJ8WFV` | Account `4701211474`, container `33467388`, live **v57** `CW Stape 45 GCM + purpose5 ht_consent_ready + Meta/TikTok hold`. |
+| sGTM | Shared Multi-tenant, live **v228** `CW SST Meta EMQ hostname-scope + TikTok ID LT`. Do **not** publish Default. |
+| Same-origin | Worker **`cw-sgtm-metrics`**. Route `gr.camelotwater.com/metrics*`. Cache bypass first. `X-From-Cdn: cf-stape`. `/metrics/gtag/js` → 200. |
+| Proof | [gr.camelotwater.com/metrics/healthy](https://gr.camelotwater.com/metrics/healthy) → `ok`. Loader JS via `/metrics/{file}.js?{query}` → 200. |
+| Tagging URL | [sgtm.camelotwater.com/healthy](https://sgtm.camelotwater.com/healthy) → `ok`. A `34.107.54.19` (DNS-only). |
+| GA4 | Property `249879584`, stream **`G-5F610QDZTF`**. Key events: `purchase`, `add_to_cart`, `begin_checkout`. Leftover MI stream `G-0LC80R71XP` — do not use. |
+| Google Ads | CID `773-394-9187`. `AW-981131784`. Purchase **`c75HCPuWju8BEIjE69MD`** (`Purchase GR \| HT` `501451643`). |
+| Meta | Ad account `966773983677804` Camelot Iraklis. Pixel **`2382379672021615`**. Web template consent **off**. CAPI `CW \| SST Meta *`. Dead 2019 pixel `462051321075183` — do not attach. |
+| DV360 | Advertiser `6510209028`. Web Floodlight `DC-17307679` **paused**. sGTM Floodlight advertiser **`14357133`**. |
+| TikTok | Web pixel **`CEI2FTBC77UD28TRAQT0`** on `ht_consent_ready` with `holdConsent`/`grantConsent`. `LT - Tiktok ID` has `gr.camelotwater.com`. Access-token row **missing**. |
+| Outbrain | Web pixel / purchase / ATC **paused**. No invented S2S postback. |
+| CMP | Iubenda (site `3326076`, el `32191024` / en `66492786`). `googleConsentMode:true`. Autoblocking **off**. `ht_consent_ready` only on purpose 5. Cookiebot **deleted**. |
+| Cloudflare zone | `camelotwater.com` `b8c7ca357252c8b22b730ad7bf0028ce`. |
+
+## Hard locks
+
+- Do **not** create a new Stape or sGTM container.
+- sGTM: fork **live v228+**, never Default.
+- Web: keep `GTM-TXJ8WFV` only. Do **not** publish Default Workspace. Live is named **v57**.
+- `sgtm.` stays grey-cloud. Same-origin `/metrics` via `cw-sgtm-metrics`. HTML rewrite is `cw-html-gtm-loader` only. `/metrics*` stays more specific than `/*`.
+- Cookie Keeper **off** in the snippet (same-origin).
+- One Ads e-shop primary: **Purchase GR | HT**. Store visits / local actions **separate**.
+- Web Ads gtag + client Floodlight must stay **paused** (sGTM sends; Ads has no dedupe).
+- Do not copy HT, GrecoStrom, or Golden Gastro IDs.
+- CAPI token stays in sGTM `LT - fb api token` only.
+- Do **not** reuse HT `TIKTOK_EVENTS_API_TOKEN` on this hostname.
+- Do not attach new audiences to live spend until membership is real.
+- Do not pause live Meta catalog/sales campaigns.
+
+## Public IDs
+
+| System | Value |
+| --- | --- |
+| Site | [https://gr.camelotwater.com/](https://gr.camelotwater.com/) |
+| Web GTM | `GTM-TXJ8WFV` (account `4701211474`, container `33467388`, live **v57**) |
+| Other containers in account | old `GTM-TVGCX9H`, Cyprus `GTM-TL4F62X`, empty Global `GTM-NKS5D8KN` |
+| sGTM | Shared Multi-tenant account `6202173174`, container `169217628`, live **v228** |
+| sGTM host | `https://sgtm.camelotwater.com` |
+| Same-origin | `https://gr.camelotwater.com/metrics` (Worker `cw-sgtm-metrics`) |
+| GA4 | `G-5F610QDZTF`, property `249879584` |
+| Google Ads | CID `773-394-9187`, `AW-981131784` |
+| Ads Purchase | `c75HCPuWju8BEIjE69MD` (primary; keep) |
+| Ads Add to cart | `drLuCMf_7e8BEIjE69MD` (observe) |
+| Ads Checkout | `tpasCOam3-8BEIjE69MD` (observe) |
+| Ads Contact click | `NI5CCKn3nu8BEIjE69MD` (observe) |
+| Meta ad account | `966773983677804` |
+| Meta Pixel | `2382379672021615` |
+| Dead pixel | `462051321075183` (last fired 2019) |
+| DV360 | Advertiser `6510209028` |
+| Floodlight (server LT) | Advertiser `14357133`, group `invmedia` / `sales`, cat `pagev0` / `purch0` |
+| TikTok | `CEI2FTBC77UD28TRAQT0` |
+| iubenda | Site `3326076` |
+
+## Keep / need / drop
+
+**Keep**
+
+- Funnel: `view_item`, `add_to_cart`, `begin_checkout`, `purchase`. Lead: `contact_click` secondary.
+- Ads **Purchase GR | HT** as the only e-shop bidding primary. Store visits separate.
+- Meta pixel `2382379672021615` hybrid + CAPI (`CW \| SST Meta *`).
+- TikTok web pixel `CEI2FTBC77UD28TRAQT0`.
+- iubenda in GTM. GTM4WP dataLayer.
+- sGTM LT rows for `gr.camelotwater.com` (GA4, Ads labels, FB pixel/token, Floodlight).
+- HelpCrunch (chat). Outbrain web pixel **paused** until a DSP postback URL exists.
+- Existing Meta visitor 7/30/60/90/180d lists on the **live** pixel.
+
+**Need** (still open — Camelot only; GrecoStrom was named in the original prompt **by accident** and is out of scope for this job)
+
+- Web-dev: disable MonsterInsights Premium (duplicate `G-0LC80R71XP`). Edge already strips official `gtag/js` and leftover scroll/conversion JS.
+- Human Ads UI (`primary_for_goal` is **not writable** via API, `mutate_error 9`):
+  - Keep ENABLED primary: **Purchase GR | HT** `501451643`.
+  - Demote ENABLED primary: **Android installs (all other apps)** `776445775`.
+  - Uncheck Included in Conversions on **36 HIDDEN** leftover UA webpage goals (old camelot.gr / cy / Smart Goal / product-page visits).
+- Human: `gr.camelotwater.com` row on `LT - Tiktok Access Token` with a **pixel-specific** token for `CEI2FTBC77UD28TRAQT0`. Do **not** reuse the HT token in cloud secrets.
+- Confirm Floodlight advertiser `14357133` vs paused web `DC-17307679` in CM360.
+- Stape **new** scan of `gr.camelotwater.com` **after ads accept**. Do not scan apex or `sgtm.` and call it GR. Cookie Keeper stays **off**.
+- Meta EMQ Excellent after a consented purchase with email/phone (Events Manager). Do not invent scores.
+- Outbrain S2S only if DSP gives a postback URL — web pixel stays paused.
+
+**Drop** (done unless noted)
+
+- Cookiebot CMP — **deleted** (v56).
+- Web `GT - Google Ads`, client Floodlight tags, Clickcease — **paused** (v56).
+- Fake 500ms `cHTML - consentUpdate` — **paused** (v57).
+- Outbrain web pixel / purchase / ATC — **paused** (v57).
+- iubenda autoblocking script — **removed** (Advanced GCM).
+- GA4 junk key events — **deleted**. Keep `purchase`, `add_to_cart`, `begin_checkout`.
+- Meta PageView on DOM Ready / All Pages — moved to `ht_consent_ready`. Template consent **off** (v57).
+- Abandoned-cart Meta lists with `pixel_id` 0 — do **not** attach; do not delete until campaigns are checked.
+- Old-pixel remarketing lists on `462051321075183` — do **not** attach to GR spend.
+
+## Timeline — 17 Sep 2026
+
+<Steps>
+  <Step title="Phase 0 — Mintlify + inventory">
+    Created under Web Analytics → Customers. Live HTML, web v55, sGTM v227, GA4, Ads (78 conversion actions), Meta pixels, DV360 `6510209028`, Stape PDF (apex score 20).
+  </Step>
+  <Step title="Phase 1 — Housekeeping">
+    GA4: deleted junk key events; created eight `CW \| *` audiences (ads export on). Meta: created 180d WCAs on pixel `2382379672021615`. Ads: API cannot demote `primary_for_goal` (human UI). Web **v56**: Cookiebot deleted; Ads gtag + Floodlight + Clickcease paused; purposeBasic granted; `ht_consent_ready`; Conversion Linker; transport `/metrics`; base pixels on `CE - ht_consent_ready`.
+  </Step>
+  <Step title="Phase 2 — SST">
+    Worker `cw-sgtm-metrics` + `/metrics` cache bypass. HTML Worker `cw-html-gtm-loader` (same-origin Generate, Cookie Keeper **off**, MI official gtag stripped). sGTM **v228**: `CW \| SST Meta *` (EMQ keys, Event Enhancement, HttpOnly, `adStorageConsent` required). Shared `FB - *` **blocked** on `gr.camelotwater.com`. `LT - Tiktok ID` + `CW \| SST TikTok *`. Access-token row **not** added.
+  </Step>
+  <Step title="Scope note — GrecoStrom was accidental">
+    The original prompt named `grecostrom.gr` SST after Camelot housekeeping. That hostname was a copy-paste error; SST in this job is **Camelot GR** (`gr.camelotwater.com`). The Drive PDF is the Aug 7 **camelotwater.com** apex scan. A GrecoStrom HTML `/*` loader restore ran before the correction; that Worker was left live (do not revert). No further GrecoStrom work in this job.
+  </Step>
+  <Step title="Phase 3 — Stape 45 leftovers (17 Sep 2026)">
+    GR Stape scan `gr.camelotwater.com` scored **45/100** (ITP, GCM, Meta hybrid, page speed, TikTok SS, Outbrain SS). Web **v57**: `googleConsentMode` + gtag default in iubenda HTML; autoblocking removed; `CW \| Marketing Consent` purpose 5; `ht_consent_ready` on Initialization [MKT] + consent_update [MKT] (also pushes `gtmconsentupdate`); fake 500ms consent_update paused; Meta template consent off; TikTok `holdConsent`/`grantConsent`; Outbrain web tags paused. HTML Worker injects GCM default in `<head>` and strips leftover MonsterInsights JS. Cookie Keeper **still off**. TikTok Events API token and Outbrain postback URL were **not** invented.
+  </Step>
+</Steps>
+
+## Stape checker (PDF vs now)
+
+Apex Drive PDF: [Drive](https://drive.google.com/file/d/1vusZrlfO20rZeKky4DOeO27IZe0XXQGV/view) — **camelotwater.com** 2026-08-07, score **20/100**. That is **not** GR.
+
+GR scan 17 Sep 2026 13:13 UTC `gr.camelotwater.com` score **45/100** (Analytics 82, Ads 19, Cookie lifetime 17, Page speed 26). Checker `01a0af7e-b4bd-71bc-9e86-e132460f2641`. Remaining on that crawl: ITP +19, GCM +10, Meta hybrid +8, page speed +7, TikTok SS +6, Outbrain SS +4.
+
+| Item | GR 45 scan | Live GR after v57 |
+| --- | --- | --- |
+| ITP / cookies +19 | Meta `_fbp` 7d JS; Google FPID/\_ga 365d via `/metrics` | Same-origin `/metrics`. Cookie Keeper **off**. CAPI HttpOnly `_fbp` only after ads grant. Do not chase 400-day JS Meta cookies. |
+| Consent Mode +10 | iubenda HTML missing `googleConsentMode`; fake 500ms `consent_update` | `gtag('consent','default')` in `<head>` + iubenda `googleConsentMode:true`. Autoblocking off. |
+| Meta hybrid +8 | Web pixel without ads grant so CAPI never ran | Web pixel + CAPI same `event_id`. Template consent off. CAPI `adStorageConsent` required. Needs a **consented** rescan. |
+| Page speed +7 | Outbrain + MI leftover | Outbrain paused. MI JS stripped at edge. Disable plugin at WP. |
+| TikTok SS +6 | Web pixel; Events API tags token empty | `holdConsent` on web. Token row **still missing** — do not reuse HT. |
+| Outbrain SS +4 | Client pixel | Web tags paused. S2S needs DSP postback URL. |
+| GA4 server-side | All good | Keep. |
+| Adblockers / Custom Loader | Yes | `/metrics` Custom Loader, Cookie Keeper off. |
+
+## Web GTM — live v57
+
+- iubenda purposeBasic **granted**. `googleConsentMode:true`, `consentOnContinuedBrowsing:false`. Autoblocking script **removed**.
+- `CW \| Marketing Consent` (purpose 5 on `_iub_cs-32191024` / `_iub_cs-66492786`).
+- `CW \| ht_consent_ready` on `Initialization - All Pages [MKT]` + `CE - consent_update [MKT]`. Pushes `ht_consent_ready` + `gtmconsentupdate` once per page with the same `event_id`.
+- `CE - ht_consent_ready`: FB PageView (consent **false**), TikTok (`holdConsent` then `grantConsent`), DT PageView.
+- `cHTML - consentUpdate` (500ms fake) **paused**.
+- Outbrain pixel / purchase / ATC **paused**.
+- `CW \| Conversion Linker` All Pages.
+- `CON - GA4 id` = `G-5F610QDZTF`. `CON - transport url` = `https://gr.camelotwater.com/metrics`.
+- **Paused earlier (v56):** `GT - Google Ads`, Floodlight PV/config/purchase, Clickcease.
+- **Deleted:** Cookiebot.
+
+## sGTM — live v228
+
+- `CW \| SST Meta PageView / ViewContent / AddToCart / InitiateCheckout / Purchase / Lead` — Data Client + hostname `gr.camelotwater.com`. ED billing keys + `external_id`. No IP geo. Event Enhancement on. HttpOnly on. `adStorageConsent` required.
+- `CW \| Block leftover on gr.camelotwater.com` on shared `FB - PageView / VC / ATC / IC / Purchase / Lead`.
+- `CW \| SST TikTok *`. `LT - Tiktok ID`: `gr.camelotwater.com` → `CEI2FTBC77UD28TRAQT0`. Token row **empty** until pixel-specific token.
+- Existing `G-ADS - *` / `GA4 - Base` / Floodlight still LT-routed.
+
+Do not delete GG / GS / HT / other-tenant tags.
+
+## Meta audiences (17 Sep 2026)
+
+Created on pixel `2382379672021615` (not attached to spend):
+
+| Audience | ID |
+| --- | --- |
+| CW \| ViewContent 180d | `120249285947070241` |
+| CW \| AddToCart 180d | `120249285947150241` |
+| CW \| InitiateCheckout 180d | `120249285947240241` |
+| CW \| Purchase 180d | `120249285947330241` |
+| CW \| Lead 180d | `120249285947390241` |
+
+Keep existing visitor 7–180d lists. Do not use `pixel_id` 0 abandoned-cart lists or 2019-pixel lists.
+
+## GA4 audiences (17 Sep 2026)
+
+Property `249879584` (ads personalization on):
+
+| Audience | ID |
+| --- | --- |
+| CW \| Purchasers 7D | `15795810757` |
+| CW \| Purchasers 180D | `15795851933` |
+| CW \| ATC no purchase 7D | `15795858362` |
+| CW \| ATC no purchase 30D | `15795887691` |
+| CW \| Checkout no purchase 7D | `15795894383` |
+| CW \| Checkout no purchase 30D | `15795906211` |
+| CW \| View item no purchase 30D | `15795859008` |
+| CW \| Leads 90D | `15795885111` |
+
+## Still open
+
+| Item | Owner |
+| --- | --- |
+| Disable MonsterInsights Premium at WP origin | Web-dev |
+| Ads UI: uncheck Included in Conversions on 36 HIDDEN UA leftovers; demote ENABLED **Android installs** `776445775` (keep Purchase GR \| HT `501451643`) | Human in Ads |
+| `LT - Tiktok Access Token` row for `gr.camelotwater.com` (pixel-specific) | Human |
+| Confirm Floodlight `14357133` vs `DC-17307679` | Human / CM360 |
+| Stape **new** scan of `gr.camelotwater.com` **with ads accepted** (not apex, not `sgtm.`) | After this patch |
+| Meta EMQ Excellent + Test Events (do not publish Test ID) | After real order |
+| Origin paste of Generate so `cw-html-gtm-loader` can be removed later | Web-dev |
+| Outbrain S2S postback URL from DSP (optional) | Human / media |
+
+<Check>
+  Housekeeping, SST, and the Stape 45 GCM patch are live (web **v57** / sGTM **v228** / `cw-sgtm-metrics` + `cw-html-gtm-loader`). `/metrics/healthy` → ok. `gtag('consent','default')` is in HTML. Do not rebuild containers. Do not publish web Default Workspace or sGTM Default. Do not enable Cookie Keeper on this same-origin snippet. Do not reuse the HT TikTok token. Do not invent an Outbrain postback.
+</Check>
