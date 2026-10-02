@@ -1,0 +1,81 @@
+---
+title: "Vestal"
+sidebarTitle: "Vestal"
+description: "Scenario A SST for vestal.gr. Web v6 and server v237 are published. Custom Loader is generated and still needs a theme paste. No Cloudflare zone, so no /metrics."
+icon: "bag-shopping"
+---
+
+Ecommerce shop, Greece / EEA. Primary conversion is purchase. This is Scenario A: the containers already existed. The 2 October 2026 job patched them. It did not create a new Stape container or a new web GTM.
+
+Repo: `digital-hellenic-technologies/ht-vestal`. Read `STATUS.md` first. The shop theme is not in that repo.
+
+<Note>
+  Stape scan used for this job: [vestal.gr, 6 Sep 2026, score 46](https://stape.io/website-tracking-checker/01a07685-49c3-7fd3-ba03-31cbceb15bb4). Do not invent a newer score until someone runs the checker again after the theme paste.
+</Note>
+
+## IDs
+
+| Piece | Value |
+| --- | --- |
+| Website | `https://vestal.gr` |
+| Web GTM | `GTM-NPZPG58V` (account `6264494553`). **Live v6** |
+| Server GTM | Shared multi-tenant container. **Live v237** is the Vestal pixel-lookup publish. Do not publish an older default. Do not delete other tenants. |
+| Stape host | `sgtm.vestal.gr` Ready, no own CDN |
+| GA4 | Property `449663116`, measurement `G-ESZQ14S2QV` |
+| Google Ads | `747-241-8699`. Conversion id `11372588264` |
+| Meta | Ad account `223244827224679`, pixel `846423880357072` |
+| iubenda | Site `4402076`, cookie policy `71168316`, inside web GTM |
+| TikTok | None. Do not add one. |
+| Cloudflare | No zone in the Hellenic account. Same-origin path stays empty. |
+
+Ads labels, unchanged: purchase `mNjOCI200NobEOjZ764q`, begin checkout `fjaTCJC00NobEOjZ764q`, add to cart `xjrjCJO00NobEOjZ764q`.
+
+## What the scan asked for
+
+| Item | Decision |
+| --- | --- |
+| ITP / cookie lifetime | No Cloudflare, so no `/metrics` Worker. Custom Loader is on `https://sgtm.vestal.gr`. Cookie Keeper generate returned the same head snippet; the container power-up is already on. |
+| Turn off client GA4 | Not done. The Google tag's `server_container_url` is what feeds server GA4 and the shared Ads tags. Pausing it would drop ecommerce. The library still loads, so this Stape point stays open. |
+| Ad-block Custom Loader | Generated. Query URL returns 200. Bare file returns 404. The filename is not stored in git. **Not pasted on the site yet.** Regenerate in Stape: domain `sgtm.vestal.gr`, web GTM `GTM-NPZPG58V`, platform Other, ad blocker on, Same Origin Path empty, Cookie Keeper off. |
+| Consent | Consent Mode v2 defaults are denied. Purpose 5 pushes `ht_consent_ready` once per page. The accept-button reload is paused. |
+
+## Events
+
+| Event | GA4 | Google Ads | Meta |
+| --- | --- | --- | --- |
+| `ht_consent_ready` | — | — | Browser PageView and server page_view |
+| `page_view` | Google tag, analytics consent, via `sgtm.vestal.gr` | — | With the consent-ready hit |
+| `view_item` | Yes, analytics consent | Remarketing through the server tag. Browser Ads tag paused. | ViewContent after marketing consent |
+| `add_to_cart` | Yes. Not a key event. | Secondary, not primary. Browser tag paused. | AddToCart |
+| `begin_checkout` | Yes. Not a key event. | Not primary. Browser tag paused. | InitiateCheckout |
+| `purchase` | Key event. 28 days before this job showed no purchase rows. | **Purchase - Web** is the only webpage primary. | Purchase, with email, phone, name, and address when checkout has them |
+
+`form_start` and `form_submit` show up in GA4 from the site. They are not ad conversions. The old GA4 `form_submit` import in Ads is hidden. Leave it hidden.
+
+## Housekeeping already done
+
+- Web measurement id was the placeholder `G-XXXXXXXXXX`. It is now `G-ESZQ14S2QV`.
+- Browser pixel id was `1`. Server lookup for `vestal.gr` was `false`. Both now use pixel `846423880357072`.
+- Browser Ads conversion tags and the Ads Google tag are paused so they do not double the server hits.
+- Purchase user data is normalized in the browser and hashed once on the server. Purchase advanced matching sends email, phone, name, city, state, zip, country, and external id, plus `event_id` shared with the Data Tag.
+- GA4 audiences added: added to cart (90 days), began checkout (90 days), viewed product (30 days). All Users and Purchasers were already there.
+- Google Ads: add to cart and begin checkout are no longer primary. Purchase - Web stays primary.
+- Account Mapping sheet gained a Vestal row on 2 Oct 2026.
+
+## Still open
+
+- Web-dev Generates the Custom Loader in Stape (domain `sgtm.vestal.gr`, web GTM `GTM-NPZPG58V`, platform Other, ad blocker on, Same Origin Path empty, Cookie Keeper off) and pastes that output. Also removes any theme pixel, extra `gtm.js`, and any iubenda outside GTM. Then purge cache. Do not copy the loader filename into git.
+- Google Ads UI, not the API: include **Purchase - Web** in the conversions column. Move **YouTube channel subscriptions** and **YouTube follow-on views** out of that column. The API cannot write those fields.
+- Meta audiences for ViewContent, AddToCart, InitiateCheckout, and Purchase were not created. HT-SysAdmin can read the account and cannot write audiences until it has Advertiser access. All-users 30 and 60 days, plus Facebook and Instagram engagers, already exist.
+- Do not call Event Match Quality excellent yet. The pixel's approximate match rate was unavailable before the id fix. Check Events Manager after consented purchases.
+- Stape subscription payment status on the shared container was failed while the container was still running. Check billing.
+
+## GDPR
+
+iubenda stays in the web GTM tag (site `4402076`), not a copy of the Hellenic head banner. Accept and reject are both shown. Purpose toggles are on. Consent is not granted by continued browsing. The floating preferences button stays so people can change their mind.
+
+Before accept: ads and analytics storage are denied. GA4 tags wait for analytics storage. Meta, Data Tags, and the conversion linker wait for ad storage. Marketing cookies are not written by those tags before purpose 5.
+
+Server Meta tags on the shared container still have ad storage optional, because requiring it would stop other tenants that do not send consent. Vestal only sends those hits after ads consent.
+
+A theme copy of the pixel or the banner would bypass this. That removal is the web-dev ticket.
