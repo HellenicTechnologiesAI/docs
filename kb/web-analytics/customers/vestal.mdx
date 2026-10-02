@@ -36,7 +36,7 @@ Ads labels, unchanged: purchase `mNjOCI200NobEOjZ764q`, begin checkout `fjaTCJC0
 | --- | --- |
 | ITP / cookie lifetime | No Cloudflare, so no `/metrics` Worker. Custom Loader is on `https://sgtm.vestal.gr`. Cookie Keeper generate returned the same head snippet; the container power-up is already on. |
 | Turn off client GA4 | Not done. The Google tag's `server_container_url` is what feeds server GA4 and the shared Ads tags. Pausing it would drop ecommerce. The library still loads, so this Stape point stays open. |
-| Ad-block Custom Loader | Generated and saved in the customer repo as `docs/custom-loader.html`. Query URL returns 200. Bare file returns 404. **Not pasted on the site yet.** |
+| Ad-block Custom Loader | Generated. Query URL returns 200. Bare file returns 404. The filename is not stored in git. **Not pasted on the site yet.** Regenerate in Stape: domain `sgtm.vestal.gr`, web GTM `GTM-NPZPG58V`, platform Other, ad blocker on, Same Origin Path empty, Cookie Keeper off. |
 | Consent | Consent Mode v2 defaults are denied. Purpose 5 pushes `ht_consent_ready` once per page. The accept-button reload is paused. |
 
 ## Events
@@ -64,7 +64,7 @@ Ads labels, unchanged: purchase `mNjOCI200NobEOjZ764q`, begin checkout `fjaTCJC0
 
 ## Still open
 
-- Web-dev pastes `docs/custom-loader.html` and removes any theme pixel, extra `gtm.js`, and any iubenda outside GTM. Then purge cache.
+- Web-dev Generates the Custom Loader in Stape (domain `sgtm.vestal.gr`, web GTM `GTM-NPZPG58V`, platform Other, ad blocker on, Same Origin Path empty, Cookie Keeper off) and pastes that output. Also removes any theme pixel, extra `gtm.js`, and any iubenda outside GTM. Then purge cache. Do not copy the loader filename into git.
 - Google Ads UI, not the API: include **Purchase - Web** in the conversions column. Move **YouTube channel subscriptions** and **YouTube follow-on views** out of that column. The API cannot write those fields.
 - Meta audiences for ViewContent, AddToCart, InitiateCheckout, and Purchase were not created. HT-SysAdmin can read the account and cannot write audiences until it has Advertiser access. All-users 30 and 60 days, plus Facebook and Instagram engagers, already exist.
 - Do not call Event Match Quality excellent yet. The pixel's approximate match rate was unavailable before the id fix. Check Events Manager after consented purchases.
