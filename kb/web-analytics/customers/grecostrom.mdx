@@ -256,7 +256,7 @@ Live GTM4WP is **2.0.3** (not 1.22.5). On `/checkout/` with a Woo session: body 
 
 Meta Ads Data Advisor “No Pixel found” + Woo plugin upsell is the wrong path. Do not install Meta for WooCommerce. Wait for `ht_consent_ready` / `fbq` on that page (checkout HTML is ~1MB).
 
-**DPT:** keep GTM4WP container injection off. Turn **Track e-commerce ON**. Push `begin_checkout` from the same theme cart as ATC (GA4 `currency` / `value` / `items`, not UA `currencyCode`). Do not publish GTM — triggers are already correct.
+6 Oct 2026 GTM4WP admin (unchanged, correct): container **off / data layer only**, no rows. WooCommerce → Data layer content has cart/customer **off**, order data **on** — those are extra objects, not `begin_checkout`. Live checkout already set `gtm4wp_checkout_products=[]`, so **Track e-commerce is on**. Do not flip plugin settings. **DPT:** push `begin_checkout` from the Sage/Store API cart on `/checkout/` (GA4 `currency` / `value` / `items`). Do not publish GTM — triggers are already correct.
 
 ## Still open
 
