@@ -1,7 +1,7 @@
 ---
 title: "GrecoStrom"
 sidebarTitle: "GrecoStrom"
-description: "Scenario A SST for grecostrom.gr: web v106, sGTM v223, /metrics + Custom Loader Workers live. Stape v2 PDF is the Aug 7 scan (score 40), not a new crawl."
+description: "Scenario A SST for grecostrom.gr: web v107 iubenda Accept-all live, sGTM v238, /metrics + Custom Loader Workers. Stape after-scan 6 Oct scored 61."
 icon: "bed"
 ---
 
@@ -23,7 +23,7 @@ Customer handbook repo: private `ht-grecostrom`. Never commit CAPI, Stape API ke
 | --- | --- |
 | Site | WooCommerce + WPML + GTM4WP 1.22.5 + Flying Press + **Cloudflare** (apex proxied). [shop.grecostrom.gr](https://shop.grecostrom.gr) still injects the same GTM. |
 | Loader | **Live.** Worker **`gs-html-gtm-loader`** on `grecostrom.gr/*` rewrites GTM4WP official GTM to Stape Generate (Cookie Keeper **off**, `/metrics`). Noscript → `https://sgtm.grecostrom.gr/ns.html?id=GTM-N7G3WKL`. Header `x-gs-gtm-loader: stape-custom`. Origin GTM4WP injection still on. |
-| Web `GTM-N7G3WKL` | Account `6000107638`, container `30113322`, live **v106** `GS housekeeping Floodlight gone + ht_consent_ready pixels + EMQ keys` (33 tags). |
+| Web `GTM-N7G3WKL` | Account `6000107638`, container `30113322`, live **v107** `GS \| iubenda Accept-all + emitGtmEvents + ht_consent_ready` (33 tags). |
 | sGTM | Shared Multi-tenant, live **v238** (GS Meta/TikTok 355–366 still present). Default WS **241** is not live — never publish it. |
 | Same-origin | Worker **`gs-sgtm-metrics`**. Routes `grecostrom.gr/metrics*` + `www`. Cache bypass first. `X-From-Cdn: cf-stape`. |
 | Proof | [grecostrom.gr/metrics/healthy](https://grecostrom.gr/metrics/healthy) → `ok`. `/metrics/gtm.js?id=GTM-N7G3WKL` 200. |
@@ -33,7 +33,7 @@ Customer handbook repo: private `ht-grecostrom`. Never commit CAPI, Stape API ke
 | Meta | Ad account `821006281968800`. Pixel **`660914304818146`**. |
 | DV360 | Advertiser `8345751972`. Floodlight **`15192785`** server-only after v106. |
 | TikTok | Web pixel **`C8B3LAFVFBF9K2CMOS6G`** on `ht_consent_ready`. `LT - Tiktok ID` has `grecostrom.gr`. Access-token row **missing**. |
-| CMP | Iubenda only (site `3446175`). Cookiebot **deleted**. |
+| CMP | Iubenda only (site `3446175`). Cookiebot **deleted**. Web **v107** Gallery tag 188 `embedCS=auto`: Accept / Reject / Customize live. |
 | Cloudflare zone | `grecostrom.gr` `bbc61b9919149ae1b1b604405849fc9f`. |
 
 ## Hard locks
@@ -55,7 +55,7 @@ Customer handbook repo: private `ht-grecostrom`. Never commit CAPI, Stape API ke
 | --- | --- |
 | Site | [https://grecostrom.gr/](https://grecostrom.gr/) |
 | Legacy shop | [https://shop.grecostrom.gr/](https://shop.grecostrom.gr/) |
-| Web GTM | `GTM-N7G3WKL` (account `6000107638`, container `30113322`, live **v106**) |
+| Web GTM | `GTM-N7G3WKL` (account `6000107638`, container `30113322`, live **v107**) |
 | sGTM | Shared Multi-tenant account `6202173174`, container `169217628`, live **v223** |
 | sGTM host | `https://sgtm.grecostrom.gr` |
 | Same-origin | `https://grecostrom.gr/metrics` (Worker `gs-sgtm-metrics`) |
@@ -141,7 +141,7 @@ Do **not** implement Stape’s All Pages / Cookie Keeper advice.
 
 | Stape rec (after PDF) | Δ | Do this? |
 | --- | --- | --- |
-| 1. First-touch Meta / Ads / TikTok on first page (All Pages) | +19 | **No.** First visit = ads denied. Pixels stay on `ht_consent_ready` 262. `GS \| ht_consent_ready` 261 requires `{{Marketing Consent}}` true. |
+| 1. First-touch Meta / Ads / TikTok on first page (All Pages) | +19 | **No.** First visit = ads denied. Pixels stay on `ht_consent_ready` 262. `GS \| ht_consent_ready` 261 requires `{{Marketing Consent}}` true (241/242/265). Accept-all is live in v107. |
 | 2. Meta web + CAPI hybrid | +8 | **Already live** (`GS \| SST Meta *` 355–360, FB token row present). Checker missed CAPI because DT PageView 195 never ran on the first unconsented hit. |
 | 3. TikTok Events API | +6 | Tags 361–366 live. **`LT - Tiktok Access Token` has no `grecostrom.gr` row.** Pixel-specific token only — do not reuse HT. |
 | 4. Page speed / INP 1644 ms | +5 | Theme / Flying Press. Not GTM. |
@@ -178,18 +178,20 @@ Noscript (not same-origin):
 
 No `title`. No `data-lazy-src`. Apply on `grecostrom.gr` and `shop.grecostrom.gr` if ads still land there. Purge Flying Press + Cloudflare HTML.
 
-## Web GTM — live v106
+## Web GTM — live v107
 
 Account `6000107638` / `GTM-N7G3WKL`.
 
-- iubenda Community Gallery, purposeBasic **granted**, ads/measurement denied until accept.
-- `GS | ht_consent_ready` (261) on Initialization All Pages [MKT] (241) **and** `CE - consent_update` [MKT] (242), once per page.
+- iubenda Community Gallery **188** `embedCS=auto` on Consent Initialization: Accept / Reject / Customize, `emitGtmEvents`, `consentOnContinuedBrowsing: false`, purposeBasic **granted**, ads/measurement denied until accept. EN/EL/DE policy map. Floating keyhole off. cHTML **217** **paused** (was autoblocking + stripped CS).
+- `GS | ht_consent_ready` (261) on Initialization All Pages [MKT] (241), `CE - consent_update` [MKT] (242), and `CE - iubenda_gtm_consent_event [MKT]` (**265**), once per page (`ht_consent_ready` + `gtmconsentupdate`, same `event_id`).
 - `CE - ht_consent_ready` (262): `FB - PageView`, TikTok Pixel (consent needed), `DT - PageView`.
 - Conversion Meta / DT still on `[MKT]` ecommerce triggers.
 - `CON - GA4 id` = `G-ZTF0MGDMMH`. `CON - transport url` = `https://grecostrom.gr/metrics`.
-- **Paused:** tag 40 web Purchase awct, tag 206 `GT - Google Ads`.
+- **Paused:** tag 40 web Purchase awct, tag 206 `GT - Google Ads`, tag 217 iubenda multi-language HTML.
 - **Deleted vs v103:** Cookiebot, leftover awct, Clickcease, client Floodlight, unused DC-17252433 vars, junk copies.
 - TikTok kept. Data Tag copies kept (`Copy of DT - *`).
+
+Live homepage 6 Oct ~12:46 UTC: «Αποδοχή όλων» / «Απόρριψη όλων» / «Περισσότερες πληροφορίες». Accept grants ads trio + analytics and fires `ht_consent_ready`. Save-and-continue is gone.
 
 ## sGTM — live v223
 
@@ -252,6 +254,7 @@ Purchase HT `513890542` kept INCLUDE+PRIMARY. ENABLED webpage junk demoted where
 
 | Date | Phase | What |
 | --- | --- | --- |
+| 6 Oct 2026 | iubenda v107 | Named publish: Gallery 188 `embedCS=auto` Accept/Reject/Customize + `emitGtmEvents`; paused 217 autoblocking; consent vars any `_iub_cs-*` by purpose id; `ht_consent_ready` also on `iubenda_gtm_consent_event` 265. Live homepage «Αποδοχή όλων» / «Απόρριψη όλων»; Accept grants ads trio + `ht_consent_ready`. |
 | 6 Oct 2026 | Stape after | New crawl 10:15 UTC score **61** (was 40). Recs 1–2 are checker/CMP, not missing CAPI. Rec 3 = TikTok token. Rec 4 = INP. sGTM live now **v238** (Avance publish; GS tags 355–366 still there). |
 | 6 Oct 2026 | WS Floodlight | Deleted Default WS tags 250/251/252 + vars 253–256. Duplicate `ht_consent_ready` 263/264 removed; Re-sync imported live 261/262. 113/195 reset to 262. API sync **0** conflicts. **Not published.** |
 | 6 Oct 2026 | Preview #38961 | Consented GTM Preview fired full funnel tags. Later: GA4 standard bc 1, realtime purchase 1, Meta Ads Purchase 1 / IC 2. Organic still dark. Cancel **#38961**. |
@@ -290,8 +293,8 @@ Meta Ads Data Advisor “No Pixel found” + Woo plugin upsell is the wrong path
 | --- | --- |
 | Restore `begin_checkout` from the Sage/Store API cart. Organic funnel still dead 3–6 Oct; Preview #38961 proved tags fire when DL events exist | Web-dev |
 | **Cancel test orders #37890 and #38961** | Human / store |
-| Web GTM Default WS 109 already equals v106. If Conflicts still show on TikTok 113 / DT 195, pick **Use latest version** and refresh. **Do not publish** Default. **Do not** Re-sync sGTM Default 241 | Human in GTM (UI only) |
-| iubenda: visible «Αποθήκευση και συνέχεια» leaves analytics/ad **denied**; «Αποδοχή όλων» missing from DOM | Web-dev / CMP |
+| Web GTM Default WS 109 matches live **v107**. **Do not** Re-sync sGTM Default 241 | Human in GTM (do not republish leftover UI) |
+| iubenda Accept-all **shipped in web v107** (Gallery 188 auto embed). Returning Save-only cookies stay ads-denied until the shopper Accepts. Footer `iubenda-cs-preferences-link` still a theme job | Done in GTM / optional web-dev footer |
 | Turn GTM4WP container injection off at origin (edge rewrite already live) | Web-dev |
 | Ads UI: uncheck Included in Conversions on UA leftovers; EmploymentFormSucess include | Human in Ads |
 | `LT - Tiktok Access Token` row for `grecostrom.gr` (pixel-specific) | Human / Stape UI |
@@ -302,5 +305,5 @@ Meta Ads Data Advisor “No Pixel found” + Woo plugin upsell is the wrong path
 | Category-split view_item audiences (mattresses/beds/baby) | After volume check |
 
 <Check>
-  Housekeeping, SST, and the edge Custom Loader are live (web v106 / sGTM v223 / `gs-sgtm-metrics` + `gs-html-gtm-loader`). Test purchase **#37890** fired the funnel after a full iubenda grant. Cancel that order. Origin GTM4WP injection is still on. Do not rebuild containers. Do not publish Default 224. Do not enable Cookie Keeper on this same-origin snippet.
+  Housekeeping, SST, edge Custom Loader, and iubenda Accept-all are live (web **v107** / sGTM v238 / `gs-sgtm-metrics` + `gs-html-gtm-loader`). Test purchases **#37890** and **#38961** should be cancelled. Origin GTM4WP injection is still on. Do not rebuild containers. Do not publish sGTM Default 241. Do not enable Cookie Keeper on this same-origin snippet.
 </Check>
