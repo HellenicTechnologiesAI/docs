@@ -24,7 +24,7 @@ Customer handbook repo: private `ht-grecostrom`. Never commit CAPI, Stape API ke
 | Site | WooCommerce + WPML + GTM4WP 1.22.5 + Flying Press + **Cloudflare** (apex proxied). [shop.grecostrom.gr](https://shop.grecostrom.gr) still injects the same GTM. |
 | Loader | **Live.** Worker **`gs-html-gtm-loader`** on `grecostrom.gr/*` rewrites GTM4WP official GTM to Stape Generate (Cookie Keeper **off**, `/metrics`). Noscript → `https://sgtm.grecostrom.gr/ns.html?id=GTM-N7G3WKL`. Header `x-gs-gtm-loader: stape-custom`. Origin GTM4WP injection still on. |
 | Web `GTM-N7G3WKL` | Account `6000107638`, container `30113322`, live **v106** `GS housekeeping Floodlight gone + ht_consent_ready pixels + EMQ keys` (33 tags). |
-| sGTM | Shared Multi-tenant, live **v223** `GS SST Meta EMQ hostname-scope + TikTok Events API LT` (124 tags). Default WS **224** is not live — never publish it. |
+| sGTM | Shared Multi-tenant, live **v238** (GS Meta/TikTok 355–366 still present). Default WS **241** is not live — never publish it. |
 | Same-origin | Worker **`gs-sgtm-metrics`**. Routes `grecostrom.gr/metrics*` + `www`. Cache bypass first. `X-From-Cdn: cf-stape`. |
 | Proof | [grecostrom.gr/metrics/healthy](https://grecostrom.gr/metrics/healthy) → `ok`. `/metrics/gtm.js?id=GTM-N7G3WKL` 200. |
 | Tagging URL | [sgtm.grecostrom.gr/healthy](https://sgtm.grecostrom.gr/healthy) → `ok`. A `34.107.54.19` (DNS-only). |
@@ -90,9 +90,9 @@ Customer handbook repo: private `ht-grecostrom`. Never commit CAPI, Stape API ke
 
 - Web-dev should still turn GTM4WP container injection **off** and paste Generate at origin so `gs-html-gtm-loader` can be removed later. Keep GTM4WP dataLayer. Edge rewrite is already live.
 - Human Ads UI: uncheck Included in Conversions on leftover UA HIDDEN goals. `EmploymentFormSucess - HT` is still include+primary (API cannot clear it).
-- Human: `grecostrom.gr` row on `LT - Tiktok Access Token` with a **pixel-specific** token for `C8B3LAFVFBF9K2CMOS6G`. Do **not** reuse the HT token. Events API tags are already live.
+- Human: `grecostrom.gr` row on `LT - Tiktok Access Token` with a **pixel-specific** token for `C8B3LAFVFBF9K2CMOS6G`. Do **not** reuse the HT token. Events API tags are already live. This is the only Stape-after rec that is a real SST gap (**+6**).
 - Human Meta: VC/ATC/IC/Purchase/Lead **180d** WCAs on pixel `660914304818146` (Graph cannot create ads). Do not attach to live spend until membership looks real.
-- Stape **new** scan (v2 PDF is the Aug 7 score-40 export). EMQ Excellent 8–10 after real orders with email/phone.
+- Stape **after** scan 6 Oct 10:15 UTC scored **61**. Do **not** put pixels on All Pages for first-touch **+19**. Do **not** enable Cookie Keeper. Meta CAPI is already live (**+8** is a checker miss).
 
 **Drop** (GrecoStrom-owned; done unless noted)
 
@@ -129,23 +129,36 @@ Customer handbook repo: private `ht-grecostrom`. Never commit CAPI, Stape API ke
   </Step>
 </Steps>
 
-## Stape checker (before vs now)
+## Stape checker (before vs after)
 
-Sources: [stape_report_before.pdf](https://drive.google.com/file/d/1S6CY5fmukdWUgqxwvzrcno7LYhnADF1X/view) and `stape_report_before(v2).pdf` (8 Sep 2026 export).
+Sources: [stape_report_before.pdf](https://drive.google.com/file/d/1S6CY5fmukdWUgqxwvzrcno7LYhnADF1X/view), `stape_report_before(v2).pdf` (8 Sep 2026 **print** of the Aug 7 scan), and `stape_report_after (v1).pdf` (**new** crawl 2026-10-06 10:15 UTC).
 
-**v2 PDF is not a new crawl.** The checker URL `019fda3f-1e7e-7877-a601-c2d2a52c7950` is still the **2026-08-07 03:30 UTC** scan (score **40/100**: Ads 9, Cookie lifetime 6, Analytics 74, Page speed 60). Footer 08/09/2026 is print time. Re-exporting that URL cannot improve the score. Run a **new** Website Tracking Checker scan.
+**v2 PDF is not a new crawl.** Checker URL `019fda3f-1e7e-7877-a601-c2d2a52c7950` is still **2026-08-07 03:30 UTC** (score **40/100**).
 
-| Category | Aug 7 scan (v2 PDF) | Live HTML now (8 Sep 2026, after edge loader) |
+**After PDF is a new crawl.** Score **61/100** (Analytics 100, Ads 20, Cookie lifetime 50, Page speed 48). Greens: server-side usage, adblocker bypass, ITP bypass. Homepage at scan: Custom Loader CK-off via Worker, `/metrics` IIFE, noscript `sgtm.grecostrom.gr`.
+
+Do **not** implement Stape’s All Pages / Cookie Keeper advice.
+
+| Stape rec (after PDF) | Δ | Do this? |
 | --- | --- | --- |
-| Cookies / ITP (+19) | Official `googletagmanager.com`. No `/metrics`. | Custom Loader + `/metrics` **in HTML** (Worker `gs-html-gtm-loader`). Cookie Keeper **off** (correct with same-origin). |
-| Ad blockers / official GTM (+12) | Official GTM4WP IIFE. | Official IIFE rewritten to Generate on homepage, `/en/`, product, cart, checkout, shop. |
-| Meta hybrid / CAPI (+8) | Client pixel. | Hybrid + hostname-scoped CAPI already in sGTM v223. Checker needs a new scan + consented hit. |
-| Google Ads server-side (+6) | Client awct. | Web Purchase awct **paused**. sGTM Ads live. Web remarketing tag 16 may still look client-side. |
-| TikTok server-side (+6) | Web-only. | Events API tags live; **`LT - Tiktok Access Token` row missing** — new scan will still flag this. |
-| Floodlight server-side (+3) | Client gtag. | Client Floodlight **deleted** (v106). Server-only `15192785`. |
-| Page speed (+4) | Official GTM + Floodlight + TikTok. | Official GTM gone from HTML. TikTok web pixel remains. |
+| 1. First-touch Meta / Ads / TikTok on first page (All Pages) | +19 | **No.** First visit = ads denied. Pixels stay on `ht_consent_ready` 262. `GS \| ht_consent_ready` 261 requires `{{Marketing Consent}}` true. |
+| 2. Meta web + CAPI hybrid | +8 | **Already live** (`GS \| SST Meta *` 355–360, FB token row present). Checker missed CAPI because DT PageView 195 never ran on the first unconsented hit. |
+| 3. TikTok Events API | +6 | Tags 361–366 live. **`LT - Tiktok Access Token` has no `grecostrom.gr` row.** Pixel-specific token only — do not reuse HT. |
+| 4. Page speed / INP 1644 ms | +5 | Theme / Flying Press. Not GTM. |
 
-Do not invent a new loader filename if a new scan still shows Custom Loader +4 after this byte-identical Generate.
+Cookie lifetime 50 is expected with Cookie Keeper **off** (same-origin `/metrics`; Safari must not request `kp*`).
+
+| Category | Aug 7 (score 40) | 6 Oct after PDF (score 61) |
+| --- | --- | --- |
+| Cookies / ITP | Official GTM. No `/metrics`. | Custom Loader + `/metrics` in HTML. ITP bypass **green**. Cookie lifetime 50 (CK **off**, correct). |
+| Ad blockers | Official GTM4WP IIFE. | Adblocker bypass **green**. No `googletagmanager.com/gtm.js`. |
+| Meta hybrid / CAPI | Client pixel. | Client pixel seen; CAPI tags live but first-hit unconsented so checker scored +8 miss. |
+| Google Ads server-side | Client awct. | Web Purchase paused. sGTM Ads live. First-touch Ads 20. |
+| TikTok server-side | Web-only. | Client pixel seen. Events API tags live; **token row missing**. |
+| Floodlight | Client gtag. | Client deleted (v106). Server-only `15192785`. |
+| Page speed | Official GTM + extra pixels. | INP 1644 ms (theme). CWV FAST. |
+
+Do not invent a new loader filename if a recrawl still shows Custom Loader +4 after this byte-identical Generate.
 
 ## Custom Loader — web-dev paste (Cookie Keeper off)
 
@@ -239,6 +252,7 @@ Purchase HT `513890542` kept INCLUDE+PRIMARY. ENABLED webpage junk demoted where
 
 | Date | Phase | What |
 | --- | --- | --- |
+| 6 Oct 2026 | Stape after | New crawl 10:15 UTC score **61** (was 40). Recs 1–2 are checker/CMP, not missing CAPI. Rec 3 = TikTok token. Rec 4 = INP. sGTM live now **v238** (Avance publish; GS tags 355–366 still there). |
 | 6 Oct 2026 | WS Floodlight | Deleted Default WS tags 250/251/252 + vars 253–256. Duplicate `ht_consent_ready` 263/264 removed; Re-sync imported live 261/262. 113/195 reset to 262. API sync **0** conflicts. **Not published.** |
 | 6 Oct 2026 | Preview #38961 | Consented GTM Preview fired full funnel tags. Later: GA4 standard bc 1, realtime purchase 1, Meta Ads Purchase 1 / IC 2. Organic still dark. Cancel **#38961**. |
 | 5 Oct 2026 | CK-off + checkout | Worker re-shipped CK-off Generate. Consented ATC is theme REST (`currencyCode`). `/checkout/` can load `ht_consent_ready` + `fbevents.js`; GTM4WP 2.0.3 `begin_checkout` is empty (`gtm4wp_checkout_products=[]`). |
@@ -282,7 +296,7 @@ Meta Ads Data Advisor “No Pixel found” + Woo plugin upsell is the wrong path
 | Ads UI: uncheck Included in Conversions on UA leftovers; EmploymentFormSucess include | Human in Ads |
 | `LT - Tiktok Access Token` row for `grecostrom.gr` (pixel-specific) | Human / Stape UI |
 | Meta 180d VC/ATC/IC/Purchase/Lead WCAs | Human in Ads Manager |
-| Stape **new** scan (do not re-export Aug 7 report `019fda3f-…`) | After this loader |
+| Stape after-scan 6 Oct 10:15 UTC scored **61**. Do not All-Pages first-touch. Do not enable CK. TikTok token is the SST gap | Human / after token |
 | Meta EMQ Excellent + Test Events (do not publish Test ID) | After real order |
 | Rotate CAPI if inventory leaked `LT - fb api token` | Human in Events Manager |
 | Category-split view_item audiences (mattresses/beds/baby) | After volume check |
