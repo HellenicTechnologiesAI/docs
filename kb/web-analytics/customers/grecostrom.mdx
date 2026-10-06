@@ -98,7 +98,7 @@ Customer handbook repo: private `ht-grecostrom`. Never commit CAPI, Stape API ke
 
 - Cookiebot CMP tags — **deleted**.
 - Paused leftover web `awct` — **deleted**.
-- Client Floodlight `DC-15192785` + unused `DC-17252433` vars — **deleted in live v106**. Default Workspace **109** cleaned 6 Oct 2026. After Re-sync, TikTok 113 + DT PageView 195 were reset to live `CE - ht_consent_ready` 262. Workspace **0 changes**. **Not published.** Keep **15192785** server-side.
+- Client Floodlight `DC-15192785` + unused `DC-17252433` vars — **deleted in live v106**. Default Workspace **109** cleaned 6 Oct 2026 and now **equals v106** (33/60/87, pixels on 262). Re-sync Conflict cards on TikTok 113 / DT 195 are leftover UI — pick **Use latest version**, refresh. **Not published.** Keep **15192785** server-side.
 - Junk GA4 key events — **deleted**. Keep `purchase`, `add_to_cart`, `begin_checkout`.
 - Web Ads Purchase + `GT - Google Ads` — **paused** (sGTM sends Ads; Ads has no dedupe).
 - UA conversion include flags — **not writable via API**. Human Ads UI.
@@ -239,8 +239,7 @@ Purchase HT `513890542` kept INCLUDE+PRIMARY. ENABLED webpage junk demoted where
 
 | Date | Phase | What |
 | --- | --- | --- |
-| 6 Oct 2026 | WS Floodlight | Deleted Default WS tags 250/251/252 + vars 253–256. Restored \`GS | ht_consent_ready`(264) and`CE - ht_consent_ready\` (263). Workspace = live names (33 tags). **Not published** (live v106). |
-| 6 Oct 2026 | WS Floodlight | Deleted Default WS tags 250/251/252 + vars 253–256. Duplicate `ht_consent_ready` 263/264 removed so Re-sync can import live 261/262. **Not published.** |
+| 6 Oct 2026 | WS Floodlight | Deleted Default WS tags 250/251/252 + vars 253–256. Duplicate `ht_consent_ready` 263/264 removed; Re-sync imported live 261/262. 113/195 reset to 262. API sync **0** conflicts. **Not published.** |
 | 6 Oct 2026 | Preview #38961 | Consented GTM Preview fired full funnel tags. Later: GA4 standard bc 1, realtime purchase 1, Meta Ads Purchase 1 / IC 2. Organic still dark. Cancel **#38961**. |
 | 5 Oct 2026 | CK-off + checkout | Worker re-shipped CK-off Generate. Consented ATC is theme REST (`currencyCode`). `/checkout/` can load `ht_consent_ready` + `fbevents.js`; GTM4WP 2.0.3 `begin_checkout` is empty (`gtm4wp_checkout_products=[]`). |
 | 8 Sep 2026 | Page created | Stub under Web Analytics → Customers. |
@@ -259,7 +258,7 @@ Thank-you `/checkout/order-received/38961/?key=wc_order_IBRVrUP5EpcVgGS` (body `
 
 GTM tags are healthy **when** the dataLayer has `begin_checkout` / `purchase`. Organic checkout is still dark. Static thank-you HTML has no inline `purchase` (GTM4WP 2.0 runtime push). **Cancel #38961.**
 
-Preview used **Default Workspace 109**, which _had_ client Floodlight 250/251/252. Those tags + vars 253–256 were deleted 6 Oct. Duplicate `ht_consent_ready` 263/264 removed so **Re-sync** can import live 261/262. **Do not publish** Default — shoppers already get v106.
+Preview used **Default Workspace 109**, which _had_ client Floodlight 250/251/252. Those tags + vars 253–256 were deleted 6 Oct. Duplicate `ht_consent_ready` 263/264 removed; Re-sync imported live 261/262. Workspace 109 now matches v106 (API sync = 0 conflicts). Yellow Conflict cards on TikTok 113 / DT 195: pick **Use latest version**, refresh. **Do not publish** Default — shoppers already get v106. **Do not** Re-sync sGTM Default 241 (live v237).
 
 ## Checkout vs ATC (5 Oct 2026)
 
@@ -277,7 +276,7 @@ Meta Ads Data Advisor “No Pixel found” + Woo plugin upsell is the wrong path
 | --- | --- |
 | Restore `begin_checkout` from the Sage/Store API cart. Organic funnel still dead 3–6 Oct; Preview #38961 proved tags fire when DL events exist | Web-dev |
 | **Cancel test orders #37890 and #38961** | Human / store |
-| Web GTM Default WS: Floodlight gone. Click **Re-sync** (duplicate `ht_consent_ready` 263/264 removed). **Do not publish** Default — live v106 already matches | Human in GTM |
+| Web GTM Default WS 109 already equals v106. If Conflicts still show on TikTok 113 / DT 195, pick **Use latest version** and refresh. **Do not publish** Default. **Do not** Re-sync sGTM Default 241 | Human in GTM (UI only) |
 | iubenda: visible «Αποθήκευση και συνέχεια» leaves analytics/ad **denied**; «Αποδοχή όλων» missing from DOM | Web-dev / CMP |
 | Turn GTM4WP container injection off at origin (edge rewrite already live) | Web-dev |
 | Ads UI: uncheck Included in Conversions on UA leftovers; EmploymentFormSucess include | Human in Ads |
