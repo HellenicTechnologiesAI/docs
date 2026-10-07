@@ -279,6 +279,7 @@ Purchase HT `513890542` kept INCLUDE+PRIMARY. ENABLED webpage junk demoted where
 
 | Date | Phase | What |
 | --- | --- | --- |
+| 7 Oct 2026 | begin_checkout | Theme `app.751388.js` `pushBeginCheckout()` on `/checkout/` from Store API cart. Live Chrome: one GA4 `begin_checkout` (`EUR` / `16` / item 3179), no `currencyCode`. GTM4WP compile also filled. |
 | 7 Oct 2026 | Floodlight v241 | Named sGTM publish: LTs `grecostrom.gr` → `17252433` / `page_0` / `sales` / `purch0`. Tag **452** ITEMS_SOLD on trigger 353. Shared Sales **91** blocked by 348. Web stays Floodlight-free. Confirm DV360 line items use the new activities. |
 | 6 Oct 2026 | iubenda v107 | Named publish: Gallery 188 `embedCS=auto` Accept/Reject/Customize + `emitGtmEvents`; paused 217 autoblocking; consent vars any `_iub_cs-*` by purpose id; `ht_consent_ready` also on `iubenda_gtm_consent_event` 265. Live homepage «Αποδοχή όλων» / «Απόρριψη όλων»; Accept grants ads trio + `ht_consent_ready`. |
 | 6 Oct 2026 | Stape after | New crawl 10:15 UTC score **61** (was 40). Recs 1–2 are checker/CMP, not missing CAPI. Rec 3 = TikTok token. Rec 4 = INP. sGTM live now **v238** (Avance publish; GS tags 355–366 still there). |
@@ -318,7 +319,7 @@ Meta Ads Data Advisor “No Pixel found” + Woo plugin upsell is the wrong path
 | Item | Owner |
 | --- | --- |
 | Confirm DV360 line items use `Page_View_Grecostrom` / `Purchase_Grecostrom` on advertiser `17252433`, not leftover `15192785` | Human in DV360 / CM360 |
-| Restore `begin_checkout` from the Sage/Store API cart. Organic funnel still dead 3–6 Oct; Preview #38961 proved tags fire when DL events exist | Web-dev |
+| Theme `begin_checkout` **shipped** in `app.751388.js` (GA4 `currency` / `value` / `items` from Store API). Watch organic GA4 `begin_checkout` over the next day | Done in theme / watch GA4 |
 | **Cancel test orders #37890 and #38961** | Human / store |
 | Web GTM Default WS 109 matches live **v107**. **Do not** publish sGTM Default Workspace (workspace id 241). Live container version is **v241** | Human in GTM |
 | iubenda Accept-all **shipped in web v107** (Gallery 188 auto embed). Returning Save-only cookies stay ads-denied until the shopper Accepts. Footer `iubenda-cs-preferences-link` still a theme job | Done in GTM / optional web-dev footer |
