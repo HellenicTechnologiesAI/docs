@@ -1,0 +1,96 @@
+---
+title: "1926 Les Bains"
+sidebarTitle: "Les Bains"
+description: "Scenario A SST for 1926les-bains.com: web GTM v11 live (Measurement ID, iubenda Gallery, ht_consent_ready, awct pause). Custom Loader ready for web-dev. No Cloudflare same-origin."
+icon: "spa"
+---
+
+<Warning>
+  Multi-tenant domain — do **not** create a new Stape or sGTM container. Do **not** invent `/metrics` (no Cloudflare zone access). Do **not** copy HT / Golden Gastro / GrecoStrom IDs. Do **not** use the sheet row **1926 Collections** (that is Le Soleil).
+</Warning>
+
+Scenario A record for [1926les-bains.com](https://1926les-bains.com/) (7 Oct 2026). Playbooks: [Server Side Tracking](/kb/web-analytics/server-side-tracking), [Cursor: existing Stape](/kb/web-analytics/cursor-prompt-existing-stape), [Customer GitHub repo](/kb/customer-github-repo).
+
+Customer handbook: local `ht-lesbains` (push when org write access exists). Never commit CAPI or Stape API keys.
+
+<Note>
+  Stape scan PDF: [Drive](https://drive.google.com/file/d/13YwlMhk1U8r1RCCXzS8yvtz-HxPm7dVA/view). Checker scanned **2026-10-04**, score **35/100**. Re-scan only after Custom Loader is live — do not re-export the 4 Oct URL.
+</Note>
+
+## Current state (7 Oct 2026)
+
+| Piece | Status |
+| --- | --- |
+| Web `GTM-MB9BB3XB` | **v11** live — Measurement ID `G-SXJW1RX5KW`; iubenda Gallery site `4020328`; `LB \| ht_consent_ready`; Meta/DT PageView on CE-153; leftover web awct paused |
+| sGTM Multi-tenant | **v242** — LT rows for `1926les-bains.com` present (GA4, Ads labels, FB pixel + token). Shared `G-ADS - Purchase` / `FB - *` path. No Les Bains-only republish needed this pass |
+| Custom Loader (CK **off**) | Generated; paste ready in customer handbook. Loader with query → **200** (~600KB). Bare file → **404**. Site HTML still has official `gtm.js` + theme gtag until web-dev pastes |
+| Cookie Keeper | **Not pasted.** Regenerate in Stape UI (CK on, Stape User ID, Same Origin Path **empty**) after loader QA — do not paste the CK-off snippet again |
+| Cloudflare same-origin | **Skipped** — zone not in our CF token |
+| GA4 audiences | **5 created** (Purchasers 7D/180D, begin_checkout no purchase 30D, book_now no purchase 30D, Leads 90D) |
+| Meta WCAs | **Blocked** — Graph create failed; human must accept Custom Audience TOS / grant ads permissions, then recreate |
+| Ads | `Purchase -Web` primary + Included in Conversions. Google-hosted local-actions still `primary_for_goal=true` (API immutable) — demote in Ads UI if desired |
+
+## Decision
+
+| Decision | Value |
+| --- | --- |
+| Scenario | **A** |
+| Cloudflare same-origin | **No** |
+| CMP | iubenda Gallery site `4020328` + Advanced v2 + `ht_consent_ready` (**live in v11**) |
+| First web-dev ticket | Custom Loader CK **off**; remove theme gtag + official GTM + Cookiebot orphan |
+| Cookie Keeper | Second Generate after QA; Same Origin Path **empty** |
+
+## Public IDs
+
+| System | Value |
+| --- | --- |
+| Web GTM | `GTM-MB9BB3XB` account `6294301216` container `219584964` live **v11** |
+| sGTM | Multi-tenant account `6202173174` container `169217628` live **v242** |
+| sgtm host | `https://sgtm.1926les-bains.com` (`/healthy` → `ok`) |
+| GA4 | Property `489413466`, `G-SXJW1RX5KW` |
+| Google Ads | CID `353-524-7558`, `AW-17779694530` |
+| Ads Purchase primary | `TnaTCOn2-dUbEMK3gp5C` (`Purchase -Web`) |
+| Meta | `act_721547630629216`, pixel `827498817122884` |
+| iubenda | Site `4020328` |
+| TikTok | Not on this site |
+
+## What v11 changed
+
+- Constant `Measurement ID` → `G-SXJW1RX5KW` (was `G-XXXXXXXXXX`).
+- Old custom HTML iubenda tags **paused**; Community Gallery Cookie Solution live.
+- `LB | ht_consent_ready` fires once when purpose 5 / ads trio granted.
+- `FB || BS || PageView` and `DT || Page view` moved to CE-153 (`ht_consent_ready` path).
+- Web awct Book / Email / Lead / Phone **paused** (Purchase + Begin checkout already paused since v6).
+
+## Still on the live site (human)
+
+1. **Web-dev ticket 1:** paste Custom Loader (CK off) from customer handbook; remove official `googletagmanager.com/gtm.js`, theme `gtag/js?id=G-SXJW1RX5KW`, Cookiebot orphan listener; purge caches.
+2. **Meta:** accept Custom Audience TOS for `act_721547630629216`, then create WCAs (PV / IC / Purchase / Lead / book_now, 180d).
+3. **Ads UI (optional):** demote Google-hosted local-actions `primary_for_goal` (not mutable via API). Keep only `Purchase -Web` Included in Conversions for bidding.
+4. After loader live: test booking → confirm Ads + Meta Test Events.
+5. **Web-dev ticket 2:** REPLACE with Cookie Keeper Generate (Stape User ID, Same Origin Path empty).
+6. Booking engine cleanup: drop extra GTMs `GTM-WRTJGB`, `GTM-KF7J5V97`, `GTM-TL2MM4B`.
+7. New Stape scan after CK live.
+
+## Revenue drop (context)
+
+| Period | GA4 revenue | Purchases | Ads cost | Ads conv | Ads value |
+| --- | --- | --- | --- | --- | --- |
+| Jul | €15.3k | 45 | €1,063 | 16.5 | €8.0k |
+| Aug | €33.6k | 29 | €950 | 12.5 | €14.5k |
+| Sep | €27.6k | 26 | €923 | **1** | **€1.2k** |
+| Oct 1–7 | €8.8k | 6 | €206 | **0** | **0** |
+
+Last Ads Purchase: **2026-09-04**. GA4 still booked; Ads lost the purchase signal (web awct paused + server path not feeding Ads while Measurement ID / loader / consent were broken). PMax Cross-network Aug €8.6k → Sep €0.
+
+## Work log
+
+| Date | Phase | What |
+| --- | --- | --- |
+| 7 Oct 2026 | Page created | This customer page + platform IDs row. |
+| 7 Oct 2026 | Phase 0 audit | Live HTML, Stape PDF, GTM/GA4/Ads/Meta, revenue analysis. Spec drafted. |
+| 7 Oct 2026 | Spec approved → patch | Web **v11** published. Custom Loader (CK off) generated + HTTP-verified. GA4 audiences ×5. sGTM LTs confirmed on v242. Meta WCAs blocked. Ads Purchase already primary/included. |
+
+<Check>
+  Agent-side GTM/audience/loader work is done. Blocker for Ads recovery is web-dev Custom Loader paste + post-paste purchase test. Cookie Keeper is ticket 2 only after QA.
+</Check>
