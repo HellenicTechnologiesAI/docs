@@ -1,12 +1,12 @@
 ---
 title: "GrecoStrom"
 sidebarTitle: "GrecoStrom"
-description: "Scenario A SST for grecostrom.gr: web v107 iubenda Accept-all live, sGTM v238, /metrics + Custom Loader Workers. Stape after-scan 6 Oct scored 61."
+description: "Scenario A SST for grecostrom.gr: web v107 iubenda Accept-all, sGTM v241 Floodlight DC-17252433 items_sold, /metrics + Custom Loader Workers. Stape after-scan 6 Oct scored 61."
 icon: "bed"
 ---
 
 <Warning>
-  Multi-tenant domain. Do **not** create a new Stape or sGTM container. Do **not** publish sGTM Default Workspace **224** (live is **v223**). Hostname-scope every sGTM change. Cloudflare zone **is** available — same-origin `/metrics` Worker `gs-sgtm-metrics` is live. Do **not** orange-cloud `sgtm.grecostrom.gr`. Do **not** touch Worker `gg-sgtm-metrics`. Keep TikTok pixel `C8B3LAFVFBF9K2CMOS6G`. Cookie Keeper stays **off** while same-origin is on.
+  Multi-tenant domain. Do **not** create a new Stape or sGTM container. Do **not** publish sGTM Default Workspace (workspace id **241**; live _version_ is **v241** named GrecoStrom Floodlight). Hostname-scope every sGTM change. Cloudflare zone **is** available — same-origin `/metrics` Worker `gs-sgtm-metrics` is live. Do **not** orange-cloud `sgtm.grecostrom.gr`. Do **not** touch Worker `gg-sgtm-metrics`. Keep TikTok pixel `C8B3LAFVFBF9K2CMOS6G`. Cookie Keeper stays **off** while same-origin is on.
 </Warning>
 
 Scenario A record for [grecostrom.gr](https://grecostrom.gr/) (8 Sep 2026). Playbooks: [Server Side Tracking](/kb/web-analytics/server-side-tracking), [Cursor: existing Stape](/kb/web-analytics/cursor-prompt-existing-stape), [Customer GitHub repo](/kb/customer-github-repo).
@@ -24,14 +24,14 @@ Customer handbook repo: private `ht-grecostrom`. Never commit CAPI, Stape API ke
 | Site | WooCommerce + WPML + GTM4WP 1.22.5 + Flying Press + **Cloudflare** (apex proxied). [shop.grecostrom.gr](https://shop.grecostrom.gr) still injects the same GTM. |
 | Loader | **Live.** Worker **`gs-html-gtm-loader`** on `grecostrom.gr/*` rewrites GTM4WP official GTM to Stape Generate (Cookie Keeper **off**, `/metrics`). Noscript → `https://sgtm.grecostrom.gr/ns.html?id=GTM-N7G3WKL`. Header `x-gs-gtm-loader: stape-custom`. Origin GTM4WP injection still on. |
 | Web `GTM-N7G3WKL` | Account `6000107638`, container `30113322`, live **v107** `GS \| iubenda Accept-all + emitGtmEvents + ht_consent_ready` (33 tags). |
-| sGTM | Shared Multi-tenant, live **v238** (GS Meta/TikTok 355–366 still present). Default WS **241** is not live — never publish it. |
+| sGTM | Shared Multi-tenant, live **v241** `HT \| 2026-10-07 GrecoStrom Floodlight items_sold` (174 tags). GS Floodlight **452** + LTs on `DC-17252433`. Avance **450** and GS Meta/TikTok **355–366** still present. Default **Workspace** id **241** is not a publish target — never publish Default Workspace (live _version_ 241 is this named publish). |
 | Same-origin | Worker **`gs-sgtm-metrics`**. Routes `grecostrom.gr/metrics*` + `www`. Cache bypass first. `X-From-Cdn: cf-stape`. |
 | Proof | [grecostrom.gr/metrics/healthy](https://grecostrom.gr/metrics/healthy) → `ok`. `/metrics/gtm.js?id=GTM-N7G3WKL` 200. |
 | Tagging URL | [sgtm.grecostrom.gr/healthy](https://sgtm.grecostrom.gr/healthy) → `ok`. A `34.107.54.19` (DNS-only). |
 | GA4 | Property `268233070`, stream `G-ZTF0MGDMMH`. Key events: `purchase`, `add_to_cart`, `begin_checkout`. |
 | Google Ads | CID `298-000-9656`. `AW-594535532`. Purchase `vEpACO6xhfUBEOzIv5sC`. |
 | Meta | Ad account `821006281968800`. Pixel **`660914304818146`**. |
-| DV360 | Advertiser `8345751972`. Floodlight **`15192785`** server-only after v106. |
+| DV360 | Advertiser `8345751972`. Floodlight **`17252433`** server-only: `invmedia/page_0+standard` + `sales/purch0+items_sold`. |
 | TikTok | Web pixel **`C8B3LAFVFBF9K2CMOS6G`** on `ht_consent_ready`. `LT - Tiktok ID` has `grecostrom.gr`. Access-token row **missing**. |
 | CMP | Iubenda only (site `3446175`). Cookiebot **deleted**. Web **v107** Gallery tag 188 `embedCS=auto`: Accept / Reject / Customize live. |
 | Cloudflare zone | `grecostrom.gr` `bbc61b9919149ae1b1b604405849fc9f`. |
@@ -39,7 +39,7 @@ Customer handbook repo: private `ht-grecostrom`. Never commit CAPI, Stape API ke
 ## Hard locks
 
 - Do **not** create a new Stape or sGTM container.
-- sGTM: fork **live v223+**, never Default 224.
+- sGTM: fork **live v241+**, never Default Workspace.
 - Web: keep `GTM-N7G3WKL` only.
 - `sgtm.` stays grey-cloud. Same-origin path `/metrics` via Worker `gs-sgtm-metrics`. HTML rewrite is Worker **`gs-html-gtm-loader`** only (do not add a third Worker). Do **not** modify `gg-sgtm-metrics`. `/metrics*` routes stay more specific than `/*`.
 - Cookie Keeper **off** in the snippet (same-origin). Do not Generate-with-Cookie-Keeper for this site.
@@ -56,7 +56,7 @@ Customer handbook repo: private `ht-grecostrom`. Never commit CAPI, Stape API ke
 | Site | [https://grecostrom.gr/](https://grecostrom.gr/) |
 | Legacy shop | [https://shop.grecostrom.gr/](https://shop.grecostrom.gr/) |
 | Web GTM | `GTM-N7G3WKL` (account `6000107638`, container `30113322`, live **v107**) |
-| sGTM | Shared Multi-tenant account `6202173174`, container `169217628`, live **v223** |
+| sGTM | Shared Multi-tenant account `6202173174`, container `169217628`, live **v241** |
 | sGTM host | `https://sgtm.grecostrom.gr` |
 | Same-origin | `https://grecostrom.gr/metrics` (Worker `gs-sgtm-metrics`) |
 | GA4 | Account stream `G-ZTF0MGDMMH`, property `268233070` |
@@ -68,7 +68,7 @@ Customer handbook repo: private `ht-grecostrom`. Never commit CAPI, Stape API ke
 | Meta Pixel | `660914304818146` |
 | Extra pixels on account | `527202269141241` DILIUSA, `579848138077239` Px GD8386 — do not delete |
 | DV360 | Advertiser `8345751972` |
-| Floodlight | Advertiser `15192785`, group `invmedia`, counter `pagev0`, sales `sales0` |
+| Floodlight | Advertiser `17252433`, group `invmedia` / `sales`, counter `page_0+standard`, purchase `purch0+items_sold` |
 | TikTok | `C8B3LAFVFBF9K2CMOS6G` |
 | iubenda | Site `3446175` (CS en `55513087` / el `76150047` / de `45322997`) |
 
@@ -80,7 +80,7 @@ Customer handbook repo: private `ht-grecostrom`. Never commit CAPI, Stape API ke
 - Leads: contact form, phone click, employment form as **secondary** (`generate_lead` / `contact_form_submit`) — not Ads primary.
 - Google Ads **Purchase** as the only e-shop primary (Enhanced Conversions). Store visits + local actions **separate**.
 - Meta Pixel `660914304818146` hybrid + CAPI (sGTM `FB - *` via LT). Events already fire (PV/VC/ATC/IC/Purchase).
-- DV360 Floodlight purchase `sales0` + page counter `pagev0` on advertiser `15192785`.
+- DV360 Floodlight page `DC-17252433/invmedia/page_0+standard` + purchase `DC-17252433/sales/purch0+items_sold` (sGTM **v241**). Old advertiser `15192785` / `pagev0` / `sales0` is no longer fired for this host.
 - TikTok pixel `C8B3LAFVFBF9K2CMOS6G`.
 - Iubenda in web GTM. GTM4WP dataLayer (tags off / injection currently on — move to Custom Loader).
 - sGTM LT rows already present for `grecostrom.gr` (GA4, Ads IDs/labels, FB pixel, Floodlight).
@@ -98,7 +98,7 @@ Customer handbook repo: private `ht-grecostrom`. Never commit CAPI, Stape API ke
 
 - Cookiebot CMP tags — **deleted**.
 - Paused leftover web `awct` — **deleted**.
-- Client Floodlight `DC-15192785` + unused `DC-17252433` vars — **deleted in live v106**. Default Workspace **109** cleaned 6 Oct 2026 and now **equals v106** (33/60/87, pixels on 262). Re-sync Conflict cards on TikTok 113 / DT 195 are leftover UI — pick **Use latest version**, refresh. **Not published.** Keep **15192785** server-side.
+- Client Floodlight `DC-15192785` + unused `DC-17252433` **web** vars — **deleted in live v106**. Do **not** put official `gtag.js` DC-17252433 back on the site. Server path is sGTM **v241** on advertiser `17252433`.
 - Junk GA4 key events — **deleted**. Keep `purchase`, `add_to_cart`, `begin_checkout`.
 - Web Ads Purchase + `GT - Google Ads` — **paused** (sGTM sends Ads; Ads has no dedupe).
 - UA conversion include flags — **not writable via API**. Human Ads UI.
@@ -155,7 +155,7 @@ Cookie lifetime 50 is expected with Cookie Keeper **off** (same-origin `/metrics
 | Meta hybrid / CAPI | Client pixel. | Client pixel seen; CAPI tags live but first-hit unconsented so checker scored +8 miss. |
 | Google Ads server-side | Client awct. | Web Purchase paused. sGTM Ads live. First-touch Ads 20. |
 | TikTok server-side | Web-only. | Client pixel seen. Events API tags live; **token row missing**. |
-| Floodlight | Client gtag. | Client deleted (v106). Server-only `15192785`. |
+| Floodlight | Client gtag. | Client deleted (v106). Server **v241** `DC-17252433` `page_0+standard` + `purch0+items_sold`. |
 | Page speed | Official GTM + extra pixels. | INP 1644 ms (theme). CWV FAST. |
 
 Do not invent a new loader filename if a recrawl still shows Custom Loader +4 after this byte-identical Generate.
@@ -193,15 +193,40 @@ Account `6000107638` / `GTM-N7G3WKL`.
 
 Live homepage 6 Oct ~12:46 UTC: «Αποδοχή όλων» / «Απόρριψη όλων» / «Περισσότερες πληροφορίες». Accept grants ads trio + analytics and fires `ht_consent_ready`. Save-and-continue is gone.
 
-## sGTM — live v223
+## sGTM — live v241
 
-Generic `G-ADS - *`, `GA4 - Base`, Floodlight Counter/Sales still hostname-routed via LT. `grecostrom.gr` remains in GA4 / Ads / FB pixel / FB token / Floodlight LTs.
+Generic `G-ADS - *`, `GA4 - Base`, and Floodlight Counter still hostname-routed via LT. `grecostrom.gr` remains in GA4 / Ads / FB pixel / FB token / Floodlight LTs.
 
-**New in v223**
+**Floodlight (7 Oct 2026, named workspace 246 → version 241)**
+
+CM360 Active activities (created 24 Jun 2026, GLOBAL_SITE_TAG):
+
+| Activity | Id | send_to |
+| --- | --- | --- |
+| Page_View_Grecostrom | `464783915` | `DC-17252433/invmedia/page_0+standard` |
+| Purchase_Grecostrom | `464867388` | `DC-17252433/sales/purch0+items_sold` |
+
+Web v107 has **zero** Floodlight tags (client DC stacks deleted on purpose). Do **not** load `googletagmanager.com/gtag.js?id=DC-17252433`.
+
+| Object | Role |
+| --- | --- |
+| LT 84 | `grecostrom.gr` → `17252433` (was `15192785`) |
+| LT 85 | counter type `invmedia` |
+| LT 86 | counter cat `page_0` (was `pagev0`) |
+| LT 87 | sales type `sales` (was `invmedia`) |
+| LT 88 | sales cat `purch0` (was `sales0`) |
+| Tag 89 | shared Counter STANDARD on DC page_view — uses the LTs |
+| Tag 452 | `GS \| SST Floodlight Purchase ITEMS_SOLD` hardcoded `17252433` / `sales` / `purch0`, fire trigger **353**, qty `{{GS \| Floodlight quantity}}` (ED `num_items`, default 1), revenue `{{ED - value}}`, u1 `{{ED - order_id}}` |
+| Tag 91 | shared Sales TRANSACTIONS blocked on grecostrom by trigger **348** (plus HT 285 / Avance 412) |
+| Tag 450 | Avance ITEMS_SOLD `17270846` unchanged |
+
+Other-tenant LT rows were not edited. Default **Workspace** id 241 remains — never publish Default Workspace.
+
+**Still from v223**
 
 - `LT - Tiktok ID`: `grecostrom.gr` → `C8B3LAFVFBF9K2CMOS6G`.
 - `GS | SST Meta PageView / ViewContent / AddToCart / InitiateCheckout / Purchase / Lead` — Data Client + hostname contains `grecostrom.gr`. User data from ED billing fields + `external_id`. **No** IP geo hashed fields. Event Enhancement on. HttpOnly cookies on. `adStorageConsent` required.
-- `GS | Block leftover on grecostrom.gr` on shared `FB - PageView / VC / ATC / IC / Purchase / Lead`.
+- `GS | Block leftover on grecostrom.gr` on shared `FB - PageView / VC / ATC / IC / Purchase / Lead` and now Floodlight Sales **91**.
 - `GS | SST TikTok *` Pageview / ViewContent / AddToCart / InitiateCheckout / CompletePayment / SubmitForm. Token from `LT - Tiktok Access Token` (**empty for this host until a pixel-specific token is added**).
 
 Do not delete GG / HT / Starbucks / other-tenant tags.
@@ -254,6 +279,7 @@ Purchase HT `513890542` kept INCLUDE+PRIMARY. ENABLED webpage junk demoted where
 
 | Date | Phase | What |
 | --- | --- | --- |
+| 7 Oct 2026 | Floodlight v241 | Named sGTM publish: LTs `grecostrom.gr` → `17252433` / `page_0` / `sales` / `purch0`. Tag **452** ITEMS_SOLD on trigger 353. Shared Sales **91** blocked by 348. Web stays Floodlight-free. Confirm DV360 line items use the new activities. |
 | 6 Oct 2026 | iubenda v107 | Named publish: Gallery 188 `embedCS=auto` Accept/Reject/Customize + `emitGtmEvents`; paused 217 autoblocking; consent vars any `_iub_cs-*` by purpose id; `ht_consent_ready` also on `iubenda_gtm_consent_event` 265. Live homepage «Αποδοχή όλων» / «Απόρριψη όλων»; Accept grants ads trio + `ht_consent_ready`. |
 | 6 Oct 2026 | Stape after | New crawl 10:15 UTC score **61** (was 40). Recs 1–2 are checker/CMP, not missing CAPI. Rec 3 = TikTok token. Rec 4 = INP. sGTM live now **v238** (Avance publish; GS tags 355–366 still there). |
 | 6 Oct 2026 | WS Floodlight | Deleted Default WS tags 250/251/252 + vars 253–256. Duplicate `ht_consent_ready` 263/264 removed; Re-sync imported live 261/262. 113/195 reset to 262. API sync **0** conflicts. **Not published.** |
@@ -275,7 +301,7 @@ Thank-you `/checkout/order-received/38961/?key=wc_order_IBRVrUP5EpcVgGS` (body `
 
 GTM tags are healthy **when** the dataLayer has `begin_checkout` / `purchase`. Organic checkout is still dark. Static thank-you HTML has no inline `purchase` (GTM4WP 2.0 runtime push). **Cancel #38961.**
 
-Preview used **Default Workspace 109**, which _had_ client Floodlight 250/251/252. Those tags + vars 253–256 were deleted 6 Oct. Duplicate `ht_consent_ready` 263/264 removed; Re-sync imported live 261/262. Workspace 109 now matches v106 (API sync = 0 conflicts). Yellow Conflict cards on TikTok 113 / DT 195: pick **Use latest version**, refresh. **Do not publish** Default — shoppers already get v106. **Do not** Re-sync sGTM Default 241 (live v237).
+Preview used **Default Workspace 109**, which _had_ client Floodlight 250/251/252. Those tags + vars 253–256 were deleted 6 Oct. Shoppers now get **v107**. **Do not** publish sGTM Default Workspace (workspace id 241). Live container version is **v241**.
 
 ## Checkout vs ATC (5 Oct 2026)
 
@@ -291,9 +317,10 @@ Meta Ads Data Advisor “No Pixel found” + Woo plugin upsell is the wrong path
 
 | Item | Owner |
 | --- | --- |
+| Confirm DV360 line items use `Page_View_Grecostrom` / `Purchase_Grecostrom` on advertiser `17252433`, not leftover `15192785` | Human in DV360 / CM360 |
 | Restore `begin_checkout` from the Sage/Store API cart. Organic funnel still dead 3–6 Oct; Preview #38961 proved tags fire when DL events exist | Web-dev |
 | **Cancel test orders #37890 and #38961** | Human / store |
-| Web GTM Default WS 109 matches live **v107**. **Do not** Re-sync sGTM Default 241 | Human in GTM (do not republish leftover UI) |
+| Web GTM Default WS 109 matches live **v107**. **Do not** publish sGTM Default Workspace (workspace id 241). Live container version is **v241** | Human in GTM |
 | iubenda Accept-all **shipped in web v107** (Gallery 188 auto embed). Returning Save-only cookies stay ads-denied until the shopper Accepts. Footer `iubenda-cs-preferences-link` still a theme job | Done in GTM / optional web-dev footer |
 | Turn GTM4WP container injection off at origin (edge rewrite already live) | Web-dev |
 | Ads UI: uncheck Included in Conversions on UA leftovers; EmploymentFormSucess include | Human in Ads |
@@ -305,5 +332,5 @@ Meta Ads Data Advisor “No Pixel found” + Woo plugin upsell is the wrong path
 | Category-split view_item audiences (mattresses/beds/baby) | After volume check |
 
 <Check>
-  Housekeeping, SST, edge Custom Loader, and iubenda Accept-all are live (web **v107** / sGTM v238 / `gs-sgtm-metrics` + `gs-html-gtm-loader`). Test purchases **#37890** and **#38961** should be cancelled. Origin GTM4WP injection is still on. Do not rebuild containers. Do not publish sGTM Default 241. Do not enable Cookie Keeper on this same-origin snippet.
+  Housekeeping, SST, edge Custom Loader, iubenda Accept-all, and Floodlight `DC-17252433` are live (web **v107** / sGTM **v241** / `gs-sgtm-metrics` + `gs-html-gtm-loader`). Test purchases **#37890** and **#38961** should be cancelled. Origin GTM4WP injection is still on. Do not rebuild containers. Do not publish sGTM Default Workspace. Do not add client `gtag.js` DC-17252433. Do not enable Cookie Keeper on this same-origin snippet.
 </Check>
