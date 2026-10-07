@@ -1,0 +1,89 @@
+---
+title: "1926 Les Bains"
+sidebarTitle: "Les Bains"
+description: "Scenario A SST for 1926les-bains.com: Phase 0 audit complete. Stape score 35/100. No Cloudflare same-origin. Waiting for approval before GTM/SST patch."
+icon: "spa"
+---
+
+<Warning>
+  **Phase 0 only (7 Oct 2026).** No GTM / sGTM / Stape / DNS / site edits until the Tracking Spec is approved. Multi-tenant domain — do **not** create a new Stape or sGTM container. Do **not** invent `/metrics` (no Cloudflare zone access). Do **not** copy HT / Golden Gastro / GrecoStrom IDs.
+</Warning>
+
+Scenario A record for [1926les-bains.com](https://1926les-bains.com/) (7 Oct 2026). Playbooks: [Server Side Tracking](/kb/web-analytics/server-side-tracking), [Cursor: existing Stape](/kb/web-analytics/cursor-prompt-existing-stape).
+
+Stape scan PDF: [Drive](https://drive.google.com/file/d/13YwlMhk1U8r1RCCXzS8yvtz-HxPm7dVA/view) — score **35/100** (scanned 2026-10-04).
+
+## Decision
+
+| Decision | Value |
+| --- | --- |
+| Scenario | **A** |
+| Cloudflare same-origin | **No** — zone not in our CF account |
+| CMP | iubenda custom HTML site `4020328` → Community Gallery + `ht_consent_ready` |
+| First web-dev ticket | Custom Loader CK **off**; remove theme gtag + official GTM + Cookiebot orphan |
+| Cookie Keeper | Second Generate after QA; Same Origin Path **empty** |
+
+## Public IDs
+
+| System | Value |
+| --- | --- |
+| Web GTM | `GTM-MB9BB3XB` account `6294301216` container `219584964` live **v10** |
+| sGTM | Multi-tenant live **v242** |
+| sgtm host | `https://sgtm.1926les-bains.com` (`/healthy` 200) |
+| GA4 | Property `489413466`, `G-SXJW1RX5KW` |
+| Google Ads | CID `353-524-7558`, `AW-17779694530` |
+| Ads Purchase primary | `TnaTCOn2-dUbEMK3gp5C` |
+| Meta | `act_721547630629216`, pixel `827498817122884` |
+| iubenda | Site `4020328` |
+| TikTok | Not on this site |
+
+## Audit highlights
+
+- Official `googletagmanager.com/gtm.js` + hardcoded theme `gtag/js?id=G-SXJW1RX5KW` — no Custom Loader.
+- Web GTM `Measurement ID` = **`G-XXXXXXXXXX`** (all GTM GA4 event tags broken; theme gtag keeps GA4 alive).
+- Web Ads Purchase / Begin checkout paused since v6; other awct still live.
+- sGTM LT rows for `1926les-bains.com` already present (GA4, Ads labels, FB pixel + token).
+- iubenda via custom HTML, not Gallery; orphan Cookiebot listener in theme (no Cookiebot script).
+- Booking engine also loads extra GTMs: `GTM-WRTJGB`, `GTM-KF7J5V97`, `GTM-TL2MM4B`.
+- Meta: 0 audiences; all campaigns paused.
+- Stape issues: ITP +19, GA4 server +16, Custom Loader +12, consent +7, Ads server +6, page speed +5.
+
+## Revenue drop
+
+| Period | GA4 revenue | Purchases | Ads cost | Ads conv | Ads value |
+| --- | --- | --- | --- | --- | --- |
+| Jul | €15.3k | 45 | €1,063 | 16.5 | €8.0k |
+| Aug | €33.6k | 29 | €950 | 12.5 | €14.5k |
+| Sep | €27.6k | 26 | €923 | **1** | **€1.2k** |
+| Oct 1–7 | €8.8k | 6 | €206 | **0** | **0** |
+
+Last Ads Purchase: **2026-09-04**. Spend continues with zero Ads conversions after that. GA4 still records purchases — bookings did not stop; **Ads lost the purchase signal** (web awct paused + server path not delivering into Ads). PMax Cross-network revenue Aug €8.6k → Sep €0. Organic stayed primary. Meta not spending.
+
+## Keep / need / drop
+
+**Keep:** Purchase primary; paused web Purchase/Begin checkout awct; Data Tags; Meta hybrid pixel; sGTM LT rows; funnel event names.
+
+**Need:** Custom Loader; fix Measurement ID; iubenda Gallery + `ht_consent_ready`; gate Meta on consent; pause remaining web awct after sGTM→Ads verified; GA4 + Meta audiences; EMQ keys; booking GTM cleanup; Cookie Keeper second paste.
+
+**Drop:** Theme gtag; official gtm.js; Cookiebot orphan; `/metrics` without CF; new Stape container; TikTok (unless client confirms); local-actions as bidding primary.
+
+## Tracking Spec (WAITING APPROVAL)
+
+1. Web-dev: Custom Loader (CK off, Same Origin Path empty) + noscript `https://sgtm.1926les-bains.com/ns.html?id=GTM-MB9BB3XB`. Remove theme gtag + official GTM + Cookiebot orphan.
+2. Web GTM: Measurement ID → `G-SXJW1RX5KW`; iubenda Gallery + Advanced v2 + `ht_consent_ready`; move Meta/DT PageView onto it; pause leftover awct after sGTM Ads verified; named publish.
+3. sGTM: confirm Ads Purchase for Les Bains; hostname-scope only if needed; fork live v242+; never delete other tenants.
+4. Ads UI: keep Purchase primary; demote observe / local-actions from bidding primary where needed.
+5. GA4 + Meta audiences; EMQ match keys.
+6. After QA: Cookie Keeper Generate REPLACE (Stape User ID).
+7. New Stape scan (do not re-export 4 Oct URL).
+
+## Work log
+
+| Date | Phase | What |
+| --- | --- | --- |
+| 7 Oct 2026 | Page created | This customer page. |
+| 7 Oct 2026 | Phase 0 audit | Live HTML, Stape PDF, GTM/GA4/Ads/Meta, revenue analysis. Spec drafted. |
+
+<Check>
+  Audit complete. No GTM/sGTM/Stape/DNS/site changes yet. Approve the Tracking Spec to proceed with housekeeping then SST fixes.
+</Check>
