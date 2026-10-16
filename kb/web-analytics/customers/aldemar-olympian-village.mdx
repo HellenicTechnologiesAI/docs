@@ -1,0 +1,72 @@
+---
+title: "Aldemar Olympian Village"
+sidebarTitle: "Aldemar Olympian Village"
+description: "Scenario A SST for aldemarolympianvillage.gr: web v74, sGTM v245, Ads LT reserve-online fix. Custom Loader paste pending (no Cloudflare)."
+icon: "hotel"
+keywords:
+  - "Aldemar"
+  - "Olympian Village"
+  - "WebHotelier"
+  - "Stape"
+  - "SST"
+---
+
+<Warning>
+  Multi-tenant sGTM. Do **not** create a new Stape container. Do **not** invent `/metrics` — **no Cloudflare** on this zone. Cookie Keeper only as a **second** Generate after loader + tags QA. Do not delete other-tenant folders.
+</Warning>
+
+Scenario A record for [aldemarolympianvillage.gr](https://www.aldemarolympianvillage.gr/) (16 Oct 2026). Playbooks: [Server Side Tracking](/kb/web-analytics/server-side-tracking), [Cursor: existing Stape](/kb/web-analytics/cursor-prompt-existing-stape).
+
+Customer handbook repo: private `ht-aldemar-olympian-village`. Never commit CAPI, Stape API keys, or Measurement Protocol secrets.
+
+## Current state (16 Oct 2026)
+
+| Piece | Live |
+| --- | --- |
+| Site | IIS / ASP.NET. Bookings on WebHotelier `aldemarolympianvillage.reserve-online.net`. |
+| Loader | **Still official** `googletagmanager.com/gtm.js`. Generate #1 in repo `artifacts/` — web-dev REPLACE pending. |
+| Web `GTM-K4HNNK8` | Account `6006511883`, live **v74** (ht_consent_ready, pause Floodlight/awct). |
+| sGTM | Shared Multi-tenant, live **v245** (Ads LT reserve-online, Meta/TikTok consent). |
+| Same-origin | **No** (no CF zone). `sgtm.` → `eug.stape.io`, `/healthy` → `ok`. |
+| GA4 | `G-LG990201CT`, key event `purchase`. |
+| Google Ads | CID `384-864-0176`, `AW-10888177989`, primary **Booking \| HT**. |
+| Meta | Pixel `420198015421261`. |
+| TikTok | `D69ECSJC77U1GPVV48IG`. |
+| DV360 | Advertiser `6979553235`. Floodlight **`15321830`** (server). Client `17328374` paused. |
+| CMP | iubenda site `3957304` in web GTM (custom HTML + GCM Advanced patch). Cookiebot paused. |
+| Stape scan | **58/100** (11 Oct 2026). New scan after Custom Loader. |
+
+## Keep / need / drop
+
+**Keep:** Booking \| HT primary; GA4 purchase; Meta hybrid; TikTok; Floodlight `15321830` server; Data Tags → WebHotelier; Triptease if contracted.
+
+**Need:** Web-dev Custom Loader paste; Ads UI UA HIDDEN includes; token rotate; Cookie Keeper Generate #2 after QA; new Stape scan.
+
+**Drop / paused:** Client Floodlight stacks; web Ads Purchase/IC awct; Cookiebot leftover.
+
+## Root cause fixed (Ads 0 conversions)
+
+sGTM `Google Ads - Webhotelier Booking Confirmed` fires on reserve-online, but LT conversion id + Booking HT label only matched `.gr`. **v245** adds `aldemarolympianvillage.reserve-online.net` rows.
+
+## Hard locks
+
+- No new Stape / sGTM container.
+- No `/metrics` Worker.
+- Cookie Keeper **off** until after first loader QA.
+- Hostname-scope only on multi-tenant.
+- Do not copy HT IDs.
+
+## Still open
+
+| Item | Owner |
+| --- | --- |
+| Paste Custom Loader Generate #1 | Web-dev |
+| Ads UI UA HIDDEN includes | Human |
+| Confirm DC-15321830 vs 17328374 | Media |
+| Rotate Meta CAPI + TikTok tokens | Human |
+| Cookie Keeper Generate #2 | After QA |
+| New Stape scan | After loader |
+
+<Check>
+  GTM web v74 / sGTM v245 are live. Site loader is still official GTM until web-dev REPLACE. Do not enable Cookie Keeper on the first paste. Do not invent same-origin without Cloudflare.
+</Check>
