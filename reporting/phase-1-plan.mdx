@@ -1,0 +1,16 @@
+---
+title: "Phase 1 plan"
+sidebarTitle: "Phase 1 plan"
+description: "Gregio real data, one fra1 droplet, no Airbyte, custom daily grain."
+---
+
+Phase 1 ships Gregio only.
+
+- Google Ads child `8746035566` (Gregio Live), MCC login-customer
+- Meta `1405833119731509` (no `act_` in ClickHouse)
+- GA4 property `342364284`
+- Grain: date + campaign for ads; date + channel for GA4. Never hour or network.
+- Conversion window 14 days on nightly Google pulls
+- First backfill ~37 months, one day per Ads/GA4 request
+- Seed logins: username `admin` (staff) and `gregio` (customer → Gregio only). Emails are internal `@reports.hellenictechnologies.com`.
+- No agency user in phase 1

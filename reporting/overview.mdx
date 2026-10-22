@@ -1,0 +1,38 @@
+---
+title: "Reporting — start here"
+sidebarTitle: "Overview"
+description: "Gregio-first ads and GA4 scorecards on reports.hellenictechnologies.com."
+---
+
+Hellenic reporting is the ads + GA4 scorecard product. Live app: [https://reports.hellenictechnologies.com](https://reports.hellenictechnologies.com). First tenant is **Gregio** (`www.gregioeshop.gr`).
+
+GitHub: `patrickabedin/HellenicPerformance-Dashboards`. Production branch for this work is `cursor/gregio-phase1-9ca7` until merge to `main`.
+
+ClickHouse droplet is `hp-clickhouse-fra1` in DigitalOcean project **hellenic-performance** (Frankfurt). HTTPS hostname is `ch.hellenictechnologies.com` (grey-cloud). Native 9000 is localhost only.
+
+<Warning>
+  Internal Hellenic Technologies only. Never write passwords, SSH private keys, Gateway secrets, or a filled env file into this KB or Git.
+</Warning>
+
+## Hard rules
+
+1. Real Gregio data only. No demo KPIs.
+2. No Airbyte. Ingest lives in `workers/ingest/`.
+3. ClickHouse is per source, not per customer. Tenancy is Supabase + `account_id IN (...)`.
+4. Chat is Vercel AI Gateway. Never OpenRouter. One project + key per customer.
+5. Do not orange-cloud `ch.hellenictechnologies.com`.
+6. Do not reuse OmniAI / Skynet / hellenicAI SSH keys or the existing FRA ClickHouse volume.
+7. Do not edit apex/`www` DNS (marketing site).
+
+## Child pages
+
+| Page | Use when |
+| --- | --- |
+| [Architecture](/reporting/architecture) | How APIs, ingest, ClickHouse, Vercel, and Supabase connect |
+| [Phase 1 plan](/reporting/phase-1-plan) | What shipped and what was skipped |
+| [ClickHouse schema](/reporting/clickhouse-schema) | Raw vs certified, PKs, `FINAL` |
+| [Ingest](/reporting/ingest) | Google GAQL, Meta Insights, GA4 1-day |
+| [Tenancy](/reporting/tenancy) | Roles, RLS, allow-list |
+| [Metrics](/reporting/metrics) | Certified KPI definitions |
+| [AI spend](/reporting/ai-spend) | Per-customer Gateway keys |
+| [Cursor agents](/reporting/cursor-agents) | Secret **names**, SSH |

@@ -1,0 +1,15 @@
+---
+title: "Sync runbook"
+sidebarTitle: "Sync"
+description: "Backfill, nightly conversion window, UI spot-checks. Do not commit totals."
+---
+
+Backfill (slow, about 37 months, one day per Ads/GA4 request):
+
+```bash
+ssh -o BatchMode=yes hp-clickhouse 'cd /opt/hp && docker compose -f infra/docker-compose.yml run --rm ingest node --import tsx src/index.ts backfill'
+```
+
+Nightly is the ingest sidecar daemon (last 14 days, about 02:00 Athens).
+
+UI spot-check: last-30-day spend on `/app` should be in the same ballpark as Google Ads and Meta UIs. They will not match 1:1. Do not commit totals.

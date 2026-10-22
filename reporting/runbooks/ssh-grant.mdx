@@ -1,0 +1,20 @@
+---
+title: "SSH grant"
+sidebarTitle: "SSH grant"
+description: "Add a Cursor account or human public key to hp-clickhouse."
+---
+
+Pattern: one product key + extra public keys in git.
+
+1. Generate an ed25519 key for the new account (or laptop). Hellenic does not need to run `ssh-keygen` for the product key — agents generate that.
+2. Open a PR adding the **public** half to `infra/ssh/authorized_keys` with an owner comment.
+3. From an agent that already has the product key:
+
+```bash
+./infra/ssh/grant-key.sh "ssh-ed25519 AAAA... owner-comment"
+```
+
+4. The other Cursor account adds Runtime secret `HELLENIC_REPORTING_SSH_PRIVATE_KEY` (same product private key) **or** uses their own key if only their pubkey was granted.
+5. `ssh -o BatchMode=yes hp-clickhouse 'uname -a'`
+
+Do not reuse OmniAI / Skynet / hellenicAI keys.

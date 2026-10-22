@@ -1,0 +1,32 @@
+---
+title: "Reporting architecture"
+sidebarTitle: "Architecture"
+description: "APIs to ingest worker to ClickHouse to Vercel. Supabase tenancy."
+---
+
+```mermaid
+flowchart LR
+  GAds[GoogleAds_v22_GAQL]
+  GA4[GA4_Data_API]
+  Meta[Meta_Insights]
+  Worker[ingest_worker_sidecar]
+  RawG[raw_google_ads]
+  RawM[raw_meta_ads]
+  RawA[raw_ga4]
+  Cert[analytics_certified_views]
+  App[reports.hellenictechnologies.com]
+  SB[Supabase_tenancy]
+  GAds --> Worker
+  GA4 --> Worker
+  Meta --> Worker
+  Worker --> RawG
+  Worker --> RawM
+  Worker --> RawA
+  RawG --> Cert
+  RawM --> Cert
+  RawA --> Cert
+  SB -->|allowed_ids| App
+  App -->|FINAL_views| Cert
+```
+
+One droplet: ClickHouse + Caddy on 443 + ingest sidecar. No Airbyte box. App is a single Vercel project (`ht-reporting`) on team HT AI. Each customer also has an empty Vercel project `ht-reporting-ai-{slug}` used only to scope an AI Gateway API key.

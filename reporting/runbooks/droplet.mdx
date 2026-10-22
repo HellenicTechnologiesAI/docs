@@ -1,0 +1,15 @@
+---
+title: "Droplet"
+sidebarTitle: "Droplet"
+description: "hp-clickhouse-fra1 compose, Caddy, volume, firewall."
+---
+
+- Droplet: `hp-clickhouse-fra1` (`s-4vcpu-8gb`, fra1)
+- Volume: `hp-clickhouse-data-fra1` 200 GB mounted at `/mnt/clickhouse`
+- DigitalOcean project: **hellenic-performance**
+- Compose: `/opt/hp/infra/docker-compose.yml` — ClickHouse, Caddy `:443`, ingest sidecar
+- Native `9000` bound to localhost only
+- UFW: 22 (key auth), 80/443. Password SSH off.
+- Hostname: `ch.hellenictechnologies.com` **grey-cloud A**. Do not orange-cloud it.
+
+Snapshots: DigitalOcean volume snapshots. Do not attach the Skynet FRA ClickHouse volume.

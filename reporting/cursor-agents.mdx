@@ -1,0 +1,34 @@
+---
+title: "Cursor agents"
+sidebarTitle: "Cursor agents"
+description: "Required secret names, environment install, and BatchMode SSH."
+---
+
+Cursor Cloud secrets are per environment / per Cursor team. Another Cursor login does not inherit this run's secrets.
+
+Agents cannot hold an interactive SSH TTY. Use one-shot key auth:
+
+```bash
+ssh -o BatchMode=yes hp-clickhouse 'uname -a'
+```
+
+## Secret names (values never here)
+
+| Name | Runtime | Why |
+| --- | --- | --- |
+| `HELLENIC_REPORTING_SSH_PRIVATE_KEY` | on | Product SSH key |
+| `CLICKHOUSE_URL` / `CLICKHOUSE_USER` / `CLICKHOUSE_PASSWORD` | on | App + ingest |
+| `NEXT_PUBLIC_SUPABASE_URL` / `NEXT_PUBLIC_SUPABASE_ANON_KEY` | mixed | App |
+| `SUPABASE_SERVICE_ROLE_KEY` | on | Gateway rows, seed |
+| `VERCEL_TOKEN` | on | Deploy + Gateway keys |
+| `SUPABASE_ACCESS_TOKEN` | on | Management API |
+| `CLOUDFLARE_HTA_ACCOUNT_ID` / `CLOUDFLARE_HTA_API_TOKEN` | mixed | hellenictechnologies.com zone |
+| Google Ads / Meta / GA4 OAuth names | on | Ingest |
+
+Do not use `OPENROUTER_API_KEY`. Do not use the Support client-sites Cloudflare token on this zone.
+
+## Install snippet
+
+Cloud Agent `install` should run `infra/ssh/install-agent-key.sh`. Restricted-egress environments must allow outbound **TCP 22** to the droplet. After adding secrets, start a **new** agent.
+
+Prefer the same Cursor team + same Cloud environment so every agent inherits SSH.
